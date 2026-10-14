@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "name": "canary",
+  "description": "Rollout posture: any runbook proposed against 3% of the fleet becomes a campaign that must prove itself on one host first.",
+  "protected_roles": ["db-primary", "validator"],
+  "max_drained_fraction": 0.15,
+  "cooldown_ticks": 5,
+  "max_actions_per_tick": 8,
+  "deny_list": ["decommission_host"],
+  "freeze_windows": [],
+  "maintenance_windows": [{"start": 0, "end": 1000000, "dcs": null, "label": "rollout window"}],
+  "quotas": {"window_ticks": 24, "per_role": {}, "per_dc": {}},
+  "approvals": {
+    "DESTRUCTIVE": {"required": 2, "roles": ["sre-lead", "dc-ops"]},
+    "DISRUPTIVE": {"required": 1, "roles": ["sre", "sre-lead"]},
+    "protected": {"required": 1, "roles": ["sre-lead", "db-owner"]}
+  },
+  "escalation": {"page_after_ticks": 3, "expire_after_ticks": 12},
+  "rate_limits": {},
+  "canary": {"enabled": true, "fleet_fraction": 0.03, "window_ticks": 15, "canary_count": 1},
+  "min_active_per_role": {"db-primary": 1, "validator": 1}
+}

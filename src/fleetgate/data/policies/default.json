@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "name": "default",
+  "description": "Production posture: reversible actions auto-run on unprotected hosts, everything else waits for humans.",
+  "protected_roles": ["db-primary", "validator"],
+  "max_drained_fraction": 0.10,
+  "cooldown_ticks": 5,
+  "max_actions_per_tick": 3,
+  "deny_list": ["decommission_host"],
+  "freeze_windows": [],
+  "maintenance_windows": [],
+  "quotas": {"window_ticks": 24, "per_role": {"db-primary": 2, "validator": 2}, "per_dc": {}},
+  "approvals": {
+    "DESTRUCTIVE": {"required": 2, "roles": ["sre-lead", "dc-ops"]},
+    "DISRUPTIVE": {"required": 1, "roles": ["sre", "sre-lead"]},
+    "protected": {"required": 1, "roles": ["sre-lead", "db-owner"]}
+  },
+  "escalation": {"page_after_ticks": 3, "expire_after_ticks": 12},
+  "rate_limits": {"reboot_host": {"max": 2, "window_ticks": 10}, "power_cycle_host": {"max": 2, "window_ticks": 10}},
+  "canary": {"enabled": true, "fleet_fraction": 0.05, "window_ticks": 10, "canary_count": 1},
+  "min_active_per_role": {"db-primary": 1, "validator": 1}
+}

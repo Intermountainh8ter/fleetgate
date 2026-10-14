@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "name": "permissive",
+  "description": "Faster remediation: wider blast radius, a standing maintenance window for disruptive actions, single approver for destructive ones.",
+  "protected_roles": ["db-primary"],
+  "max_drained_fraction": 0.25,
+  "cooldown_ticks": 3,
+  "max_actions_per_tick": 6,
+  "deny_list": ["decommission_host"],
+  "freeze_windows": [],
+  "maintenance_windows": [{"start": 0, "end": 1000000, "dcs": null, "label": "standing maintenance window"}],
+  "quotas": {"window_ticks": 24, "per_role": {}, "per_dc": {}},
+  "approvals": {
+    "DESTRUCTIVE": {"required": 1, "roles": ["sre-lead", "dc-ops"]},
+    "DISRUPTIVE": {"required": 1, "roles": ["sre", "sre-lead"]},
+    "protected": {"required": 1, "roles": ["sre-lead", "db-owner"]}
+  },
+  "escalation": {"page_after_ticks": 2, "expire_after_ticks": 20},
+  "rate_limits": {},
+  "canary": {"enabled": true, "fleet_fraction": 0.10, "window_ticks": 10, "canary_count": 2},
+  "min_active_per_role": {"db-primary": 1}
+}

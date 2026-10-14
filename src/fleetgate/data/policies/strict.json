@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "name": "strict",
+  "description": "Regulated posture: tight blast radius, 2-of-3 approvals for destructive work, one action per tick, per-DC quotas.",
+  "protected_roles": ["db-primary", "db-replica", "validator", "ingress"],
+  "max_drained_fraction": 0.05,
+  "cooldown_ticks": 10,
+  "max_actions_per_tick": 1,
+  "deny_list": ["decommission_host", "reimage_host", "failover_db_primary"],
+  "freeze_windows": [],
+  "maintenance_windows": [],
+  "quotas": {"window_ticks": 24, "per_role": {"db-primary": 1, "validator": 1, "ingress": 2}, "per_dc": {"dc1": 8, "dc2": 8}},
+  "approvals": {
+    "DESTRUCTIVE": {"required": 2, "roles": ["sre-lead", "dc-ops", "change-manager"]},
+    "DISRUPTIVE": {"required": 2, "roles": ["sre", "sre-lead", "dc-ops"]},
+    "protected": {"required": 2, "roles": ["sre-lead", "db-owner", "change-manager"]}
+  },
+  "escalation": {"page_after_ticks": 2, "expire_after_ticks": 8},
+  "rate_limits": {"reboot_host": {"max": 1, "window_ticks": 20}, "power_cycle_host": {"max": 1, "window_ticks": 20}, "drain_host": {"max": 2, "window_ticks": 10}},
+  "canary": {"enabled": true, "fleet_fraction": 0.03, "window_ticks": 20, "canary_count": 1},
+  "min_active_per_role": {"db-primary": 1, "validator": 2, "ingress": 1}
+}
