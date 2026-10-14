@@ -9,6 +9,7 @@ into the open group instead of becoming new incidents.
 """
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
 from .detect import Incident, signal_metrics
@@ -75,8 +76,10 @@ def hypothesis_for(signal: str) -> tuple[str, str] | None:
 
 class Correlator:
     def __init__(self, topology: Topology, min_hosts: int = 3, min_fraction: float = 0.25, window_ticks: int = 3,
-                 absorb_ticks: int = 12):
+                 absorb_ticks: int = 12, is_open: Callable[[GroupIncident], bool] | None = None):
+        """`is_open(group)` lets the owner keep a group absorbing stragglers for as long as it is unresolved."""
         self.topo = topology
+        self.is_open = is_open
         self.min_hosts, self.min_fraction = min_hosts, min_fraction
         self.window, self.absorb = window_ticks, absorb_ticks
         self.buffer: list[Incident] = []  # recent host incidents not yet grouped
@@ -101,7 +104,7 @@ class Correlator:
         scope_id = self._scope_id(inc.host, scope)
         for g in reversed(self.groups):
             if g.scope == scope and g.scope_id == scope_id and g.hypothesis == name \
-                    and tick - g.opened_tick <= self.absorb:
+                    and (tick - g.opened_tick <= self.absorb or (self.is_open is not None and self.is_open(g))):
                 g.members.append(inc)
                 if inc.host not in g.hosts:
                     g.hosts.append(inc.host)

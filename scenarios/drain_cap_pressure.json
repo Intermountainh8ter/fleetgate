@@ -1,0 +1,19 @@
+{
+  "name": "drain_cap_pressure",
+  "description": "Five disks fail on a 30-host fleet but the policy lets only 10% (3 hosts) be drained at once.",
+  "fleet": {"hosts": 30, "seed": 133},
+  "ticks": 60,
+  "policy": "default",
+  "tags": ["compound", "blast-radius", "stress"],
+  "events": [
+    {"tick": 3, "type": "inject", "host": {"role": "worker", "nth": 0}, "fault": "disk_failing"},
+    {"tick": 4, "type": "inject", "host": {"role": "worker", "nth": 1}, "fault": "disk_failing"},
+    {"tick": 5, "type": "inject", "host": {"role": "worker", "nth": 2}, "fault": "disk_failing"},
+    {"tick": 6, "type": "inject", "host": {"role": "worker", "nth": 3}, "fault": "disk_failing"},
+    {"tick": 7, "type": "inject", "host": {"role": "worker", "nth": 4}, "fault": "disk_failing"}
+  ],
+  "expect": {
+    "approve_all": {"min": {"faults_detected": 5, "faults_resolved": 3, "faults_contained": 0}, "max": {"spurious_incidents": 0, "pages": 2, "verify_failures": 0, "max_drained_fraction": 0.1}},
+    "deny_all": {"min": {"faults_detected": 5, "faults_resolved": 0, "faults_contained": 3}, "max": {"spurious_incidents": 0, "pages": 5, "verify_failures": 0, "max_drained_fraction": 0.1}}
+  }
+}

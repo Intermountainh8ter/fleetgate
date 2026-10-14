@@ -1,0 +1,20 @@
+{
+  "name": "firmware_drift_rollout",
+  "description": "Six hosts report firmware drift: the fix is a fleet-wide campaign, so canary-first applies.",
+  "fleet": {"hosts": 30, "seed": 134},
+  "ticks": 60,
+  "policy": "canary",
+  "tags": ["campaign", "canary", "disruptive"],
+  "events": [
+    {"tick": 3, "type": "inject", "host": {"role": "worker", "nth": 0}, "fault": "firmware_mismatch"},
+    {"tick": 3, "type": "inject", "host": {"role": "worker", "nth": 1}, "fault": "firmware_mismatch"},
+    {"tick": 3, "type": "inject", "host": {"role": "worker", "nth": 2}, "fault": "firmware_mismatch"},
+    {"tick": 3, "type": "inject", "host": {"role": "worker", "nth": 3}, "fault": "firmware_mismatch"},
+    {"tick": 3, "type": "inject", "host": {"role": "worker", "nth": 4}, "fault": "firmware_mismatch"},
+    {"tick": 3, "type": "inject", "host": {"role": "worker", "nth": 5}, "fault": "firmware_mismatch"}
+  ],
+  "expect": {
+    "approve_all": {"min": {"faults_detected": 6, "faults_resolved": 4, "faults_contained": 0}, "max": {"spurious_incidents": 0, "pages": 2, "verify_failures": 0, "max_drained_fraction": 0.133}},
+    "deny_all": {"min": {"faults_detected": 6, "faults_resolved": 4, "faults_contained": 0}, "max": {"spurious_incidents": 0, "pages": 2, "verify_failures": 0, "max_drained_fraction": 0.133}}
+  }
+}

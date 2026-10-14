@@ -1,0 +1,16 @@
+{
+  "name": "double_fault_same_host",
+  "description": "A disk fails and the service dies on the same worker within three ticks.",
+  "fleet": {"hosts": 30, "seed": 131},
+  "ticks": 45,
+  "policy": "default",
+  "tags": ["compound", "hardware", "software"],
+  "events": [
+    {"tick": 3, "type": "inject", "host": {"role": "worker", "nth": 0}, "fault": "disk_failing"},
+    {"tick": 6, "type": "inject", "host": {"role": "worker", "nth": 0}, "fault": "service_down"}
+  ],
+  "expect": {
+    "approve_all": {"min": {"faults_detected": 2, "faults_resolved": 2, "faults_contained": 0}, "max": {"spurious_incidents": 0, "pages": 0, "verify_failures": 0, "max_drained_fraction": 0.033}},
+    "deny_all": {"min": {"faults_detected": 1, "faults_resolved": 0, "faults_contained": 1}, "max": {"spurious_incidents": 0, "pages": 1, "verify_failures": 0, "max_drained_fraction": 0.033}}
+  }
+}

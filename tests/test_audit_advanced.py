@@ -290,3 +290,17 @@ def test_replay_tracks_undrain_denials_pages_and_scenario_events():
     assert st.pages[0]["reason"] == "r" and st.incidents["i1"]["status"] == "contained"
     assert st.scenario_events == [{"tick": 1, "type": "inject", "host": "h1"}] and st.checkpoints == 1
     assert st.incidents["i1"]["denied"] == ["reboot_host@h1"]
+
+
+def test_entries_are_snapshots_of_what_the_caller_passed():
+    a = AuditLog(checkpoint_every=0)
+    hosts = ["h1", "h2"]
+    nested = {"k": [1, 2]}
+    a.append("group", hosts=hosts, nested=nested, pair=("a", "b"), odd={1, 2})
+    hosts.append("h3")  # a group incident keeps growing after it was logged...
+    nested["k"].append(3)
+    assert a.verify() == (True, None)  # ...which must not retroactively change the hashed history
+    e = a.entries[0]
+    assert e["hosts"] == ["h1", "h2"] and e["nested"] == {"k": [1, 2]} and e["pair"] == ["a", "b"]
+    assert isinstance(e["odd"], str)  # non-JSON values degrade to their string form instead of crashing
+    assert json.loads(json.dumps(a.entries)) == a.entries  # in-memory == what a reload from disk would see

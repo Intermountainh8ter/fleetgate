@@ -1,0 +1,15 @@
+{
+  "name": "cooling_zone_loss",
+  "description": "A CRAC unit fails and the whole cooling zone heats up and throttles.",
+  "fleet": {"hosts": 40, "seed": 128},
+  "ticks": 40,
+  "policy": "default",
+  "tags": ["rack", "correlated", "thermal", "cascade"],
+  "events": [
+    {"tick": 4, "type": "inject_zone", "zone": {"index": 0}}
+  ],
+  "expect": {
+    "approve_all": {"min": {"faults_detected": 20, "faults_resolved": 0, "faults_contained": 0}, "max": {"spurious_incidents": 0, "pages": 0, "verify_failures": 0, "max_drained_fraction": 0.0}},
+    "deny_all": {"min": {"faults_detected": 20, "faults_resolved": 0, "faults_contained": 0}, "max": {"spurious_incidents": 0, "pages": 1, "verify_failures": 0, "max_drained_fraction": 0.0}}
+  }
+}

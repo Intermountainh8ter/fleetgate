@@ -1,0 +1,26 @@
+{
+  "name": "multi_dc_ntp_source_failure",
+  "description": "A time source in dc1 fails: many hosts in the datacenter drift together.",
+  "fleet": {"hosts": 40, "seed": 130, "dcs": 2},
+  "ticks": 40,
+  "policy": "default",
+  "tags": ["correlated", "time", "multi-dc"],
+  "events": [
+    {"tick": 4, "type": "inject", "host": "h000", "fault": "ntp_drift"},
+    {"tick": 4, "type": "inject", "host": "h001", "fault": "ntp_drift"},
+    {"tick": 4, "type": "inject", "host": "h002", "fault": "ntp_drift"},
+    {"tick": 4, "type": "inject", "host": "h003", "fault": "ntp_drift"},
+    {"tick": 4, "type": "inject", "host": "h004", "fault": "ntp_drift"},
+    {"tick": 4, "type": "inject", "host": "h005", "fault": "ntp_drift"},
+    {"tick": 4, "type": "inject", "host": "h006", "fault": "ntp_drift"},
+    {"tick": 4, "type": "inject", "host": "h007", "fault": "ntp_drift"},
+    {"tick": 4, "type": "inject", "host": "h008", "fault": "ntp_drift"},
+    {"tick": 4, "type": "inject", "host": "h009", "fault": "ntp_drift"},
+    {"tick": 4, "type": "inject", "host": "h010", "fault": "ntp_drift"},
+    {"tick": 4, "type": "inject", "host": "h011", "fault": "ntp_drift"}
+  ],
+  "expect": {
+    "approve_all": {"min": {"faults_detected": 12, "faults_resolved": 12, "faults_contained": 0}, "max": {"spurious_incidents": 0, "pages": 0, "verify_failures": 0, "max_drained_fraction": 0.0}},
+    "deny_all": {"min": {"faults_detected": 12, "faults_resolved": 3, "faults_contained": 0}, "max": {"spurious_incidents": 0, "pages": 1, "verify_failures": 0, "max_drained_fraction": 0.0}}
+  }
+}

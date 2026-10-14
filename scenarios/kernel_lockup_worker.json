@@ -1,0 +1,15 @@
+{
+  "name": "kernel_lockup_worker",
+  "description": "Soft lockups hang a worker; the fix is drain, reboot, return - a disruptive tier needing sign-off.",
+  "fleet": {"hosts": 30, "seed": 105},
+  "ticks": 40,
+  "policy": "default",
+  "tags": ["software", "disruptive"],
+  "events": [
+    {"tick": 3, "type": "inject", "host": {"role": "worker", "nth": 5}, "fault": "kernel_soft_lockup"}
+  ],
+  "expect": {
+    "approve_all": {"min": {"faults_detected": 1, "faults_resolved": 1, "faults_contained": 0}, "max": {"spurious_incidents": 0, "pages": 0, "verify_failures": 0, "max_drained_fraction": 0.033}},
+    "deny_all": {"min": {"faults_detected": 1, "faults_resolved": 0, "faults_contained": 1}, "max": {"spurious_incidents": 0, "pages": 1, "verify_failures": 0, "max_drained_fraction": 0.033}}
+  }
+}

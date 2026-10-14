@@ -124,3 +124,17 @@ def test_unknown_host_is_ignored_by_grouping():
     groups, singles = c.correlate(5, [ghost], set(t.hosts))
     assert groups == [] and singles == [ghost]
     assert c._absorb(5, ghost) is False
+
+
+def test_an_unresolved_group_keeps_absorbing_late_symptoms():
+    t = topo()
+    rack = next(iter(t.racks.values()))
+    open_state = {"open": True}
+    c = Correlator(t, absorb_ticks=5, is_open=lambda g: open_state["open"])
+    g = c.correlate(5, [inc(h, "uplink_loss", 5) for h in rack.hosts[:4]], set(t.hosts))[0][0]
+    late = inc(rack.hosts[8], "link_flap", 40)  # far outside the absorb window
+    groups, singles = c.correlate(40, [late], set(t.hosts))
+    assert groups == [] and singles == [] and rack.hosts[8] in g.hosts
+    open_state["open"] = False
+    groups, singles = c.correlate(60, [inc(rack.hosts[9], "link_flap", 60)], set(t.hosts))
+    assert singles and groups == []  # once the group is resolved a new symptom is a new, standalone incident

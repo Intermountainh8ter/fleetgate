@@ -40,9 +40,11 @@ from .verifier import VerifierAgent
 
 Approver = Callable[[Proposal, str], bool]
 
-# Verdicts that cannot change by waiting: prune these steps at pre-flight.
-STRUCTURAL_DENIALS = frozenset({Reason.UNKNOWN_RUNBOOK, Reason.UNKNOWN_HOST, Reason.DENY_LIST, Reason.FREEZE_WINDOW,
-                                Reason.INTERNAL_ERROR})
+# Garbage proposals (not a catalogue runbook, not a host in the fleet, or a gate fault): dropped at pre-flight, the
+# rest of the plan carries on. A *real* runbook denied by policy (deny-list, freeze, preconditions, caps...) is
+# different: it is decided when its turn comes, and a denial there stops the plan, because later steps (undrain,
+# verify, ...) assume the denied one happened.
+STRUCTURAL_DENIALS = frozenset({Reason.UNKNOWN_RUNBOOK, Reason.UNKNOWN_HOST, Reason.INTERNAL_ERROR})
 # Verdicts that a later tick may clear: the step waits and is re-evaluated (bounded by MAX_STEP_WAIT).
 TRANSIENT_DENIALS = frozenset({Reason.TICK_BUDGET, Reason.COOLDOWN, Reason.RATE_LIMIT, Reason.QUOTA_ROLE,
                                Reason.QUOTA_DC, Reason.CANARY_PENDING})
@@ -162,6 +164,9 @@ class Orchestrator:
         self.triage = triage or TriageAgent(fleet, protected=self.policy.cfg.protected_roles)
         self.detector = detector or ThresholdDetector()
         self.correlator = correlator or (Correlator(fleet.topology) if correlate else None)
+        if self.correlator is not None and self.correlator.is_open is None:
+            # an unresolved group keeps absorbing late symptoms from its scope instead of spawning per-host fixes
+            self.correlator.is_open = lambda g: (r := self.records.get(g.id)) is not None and r.status != "resolved"
         self.root_cause = root_cause or RootCauseAgent(fleet)
         self.verifier = verifier or VerifierAgent(fleet)
         self.dry_run = dry_run

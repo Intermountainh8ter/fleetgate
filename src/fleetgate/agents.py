@@ -233,7 +233,7 @@ PLAN_SCHEMA: dict[str, Any] = {
 class HeuristicPlanner:
     """Playbook lookup: fault -> ordered runbooks. For group incidents, uses the group playbook."""
 
-    def __init__(self, max_group_hosts: int = 3):
+    def __init__(self, max_group_hosts: int = 12):
         self.max_group_hosts = max_group_hosts
 
     def plan(self, incident: AnyIncident, triage: Triage) -> list[Proposal]:

@@ -8,7 +8,7 @@ from fleetgate.audit import AuditLog
 from fleetgate.llm import ScriptedLLM
 from fleetgate.orchestrator import approve_all, deny_all
 from fleetgate.policy import PolicyConfig
-from fleetgate.runner import FaultOutcome, run_scenario
+from fleetgate.runner import FaultOutcome, check_expectations, run_scenario
 from fleetgate.scenarios import Scenario
 
 SVC = Scenario.from_dict({
@@ -109,3 +109,30 @@ def test_unknown_scenario_policy_name_raises():
     s.policy = "nope"
     with pytest.raises(FileNotFoundError):
         run_scenario(s)
+
+
+def test_check_expectations_reports_every_violated_bound():
+    summary = run_scenario(DISK, approver=approve_all).summary()
+    ok = {"min": {"faults_detected": 1, "faults_resolved": 1}, "max": {"spurious_incidents": 0, "pages": 0}}
+    assert check_expectations(summary, ok) == []
+    bad = {"min": {"faults_resolved": 2, "no_such_key": 1}, "max": {"executed": 1}}
+    msgs = check_expectations(summary, bad)
+    assert len(msgs) == 3 and "faults_resolved: expected >= 2, got 1" in msgs[0]
+    assert any("no_such_key" in m for m in msgs) and any("executed: expected <= 1" in m for m in msgs)
+    assert check_expectations(summary, None) == []
+    assert check_expectations({**summary, "audit_ok": False}, None) == ["audit chain failed verification"]
+
+
+def test_follow_on_incidents_are_not_counted_as_false_positives():
+    fan = Scenario.from_dict({"name": "fan", "fleet": {"hosts": 30, "seed": 5}, "ticks": 30,
+                              "events": [{"tick": 2, "type": "inject", "host": {"role": "worker", "nth": 0},
+                                          "fault": "fan_failure"}]})
+    s = run_scenario(fan, approver=approve_all).summary()
+    assert s["follow_on_incidents"] >= 1 and s["spurious_incidents"] == 0  # thermal is a real consequence
+    quiet = Scenario.from_dict({"name": "q", "fleet": {"hosts": 30, "seed": 5}, "ticks": 5, "events": []})
+    # an incident with no fault in the ground truth would be a false positive
+    r = run_scenario(quiet)
+    r.fleet.inject("h001", "service_down")
+    r.orchestrator.run(4)
+    r.fleet.fault_log.clear()
+    assert r.summary()["spurious_incidents"] == 1

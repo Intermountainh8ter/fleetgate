@@ -1,0 +1,16 @@
+{
+  "name": "strict_policy_double_failure",
+  "description": "Two simultaneous disk failures under the strict policy: one action per tick, 5% drain cap.",
+  "fleet": {"hosts": 40, "seed": 140},
+  "ticks": 60,
+  "policy": "strict",
+  "tags": ["policy", "strict", "blast-radius"],
+  "events": [
+    {"tick": 3, "type": "inject", "host": {"role": "worker", "nth": 0}, "fault": "disk_failing"},
+    {"tick": 3, "type": "inject", "host": {"role": "worker", "nth": 1}, "fault": "disk_failing"}
+  ],
+  "expect": {
+    "approve_all": {"min": {"faults_detected": 2, "faults_resolved": 2, "faults_contained": 0}, "max": {"spurious_incidents": 0, "pages": 0, "verify_failures": 0, "max_drained_fraction": 0.05}},
+    "deny_all": {"min": {"faults_detected": 2, "faults_resolved": 0, "faults_contained": 2}, "max": {"spurious_incidents": 0, "pages": 2, "verify_failures": 0, "max_drained_fraction": 0.05}}
+  }
+}

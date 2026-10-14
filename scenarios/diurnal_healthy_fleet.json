@@ -1,0 +1,13 @@
+{
+  "name": "diurnal_healthy_fleet",
+  "description": "Strong diurnal load, no faults: nothing should open an incident.",
+  "fleet": {"hosts": 30, "seed": 136, "load": {"period": 48, "amplitude": 0.5}},
+  "ticks": 96,
+  "policy": "default",
+  "tags": ["diurnal", "healthy", "negative"],
+  "events": [],
+  "expect": {
+    "approve_all": {"min": {"faults_detected": 0, "faults_resolved": 0, "faults_contained": 0}, "max": {"spurious_incidents": 0, "pages": 0, "verify_failures": 0, "max_drained_fraction": 0.0}},
+    "deny_all": {"min": {"faults_detected": 0, "faults_resolved": 0, "faults_contained": 0}, "max": {"spurious_incidents": 0, "pages": 0, "verify_failures": 0, "max_drained_fraction": 0.0}}
+  }
+}

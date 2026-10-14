@@ -1,0 +1,15 @@
+{
+  "name": "nvme_wear_storage",
+  "description": "NVMe endurance nearly consumed on a storage node: ticket, drain, replace.",
+  "fleet": {"hosts": 30, "seed": 120},
+  "ticks": 50,
+  "policy": "default",
+  "tags": ["hardware", "destructive", "approval"],
+  "events": [
+    {"tick": 3, "type": "inject", "host": {"role": "storage", "nth": 1}, "fault": "nvme_wear"}
+  ],
+  "expect": {
+    "approve_all": {"min": {"faults_detected": 1, "faults_resolved": 1, "faults_contained": 0}, "max": {"spurious_incidents": 0, "pages": 0, "verify_failures": 0, "max_drained_fraction": 0.033}},
+    "deny_all": {"min": {"faults_detected": 1, "faults_resolved": 0, "faults_contained": 1}, "max": {"spurious_incidents": 0, "pages": 1, "verify_failures": 0, "max_drained_fraction": 0.033}}
+  }
+}

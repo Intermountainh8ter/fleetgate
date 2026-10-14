@@ -324,3 +324,16 @@ def test_audit_chain_covers_the_whole_run(fleet30, worker):
     assert o.audit.verify() == (True, None)
     seqs = [e["seq"] for e in o.audit.entries]
     assert seqs == list(range(len(seqs))) and o.audit.entries[0]["kind"] == "run_start"
+
+
+def test_a_real_step_denied_by_policy_stops_the_plan_so_later_steps_cannot_undo_the_containment():
+    f = Fleet(30, seed=2)
+    f.inject(first_host(f, "worker"), "kernel_soft_lockup")
+    o = Orchestrator(f, policy=Policy(f, PolicyConfig.load("freeze")), approver=approve_all)
+    o.run(40)
+    rec = next(iter(o.records.values()))
+    assert [r for _, r, _ in o.executed] == ["drain_host"]  # reboot is frozen; undrain must NOT run on a faulty host
+    assert [s.status for s in rec.steps] == ["verified", "denied", "skipped"]
+    assert len(o.records) == 1 and rec.status == "contained" and rec.escalated  # no drain/undrain flapping
+    assert f.hosts[rec.hosts[0]].drained
+    assert kinds(o, "plan_aborted")[0]["reason"].endswith("(DENY_FREEZE_WINDOW)")

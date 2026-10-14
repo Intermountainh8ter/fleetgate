@@ -1,0 +1,15 @@
+{
+  "name": "protected_primary_service_down",
+  "description": "The database primary's service dies: even a reversible restart needs the protected-role approvers.",
+  "fleet": {"hosts": 30, "seed": 109},
+  "ticks": 25,
+  "policy": "default",
+  "tags": ["software", "protected", "approval"],
+  "events": [
+    {"tick": 3, "type": "inject", "host": {"role": "db-primary", "nth": 0}, "fault": "service_down"}
+  ],
+  "expect": {
+    "approve_all": {"min": {"faults_detected": 1, "faults_resolved": 1, "faults_contained": 0}, "max": {"spurious_incidents": 0, "pages": 0, "verify_failures": 0, "max_drained_fraction": 0.0}},
+    "deny_all": {"min": {"faults_detected": 1, "faults_resolved": 0, "faults_contained": 0}, "max": {"spurious_incidents": 0, "pages": 1, "verify_failures": 0, "max_drained_fraction": 0.0}}
+  }
+}

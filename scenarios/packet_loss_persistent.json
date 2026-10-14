@@ -1,0 +1,15 @@
+{
+  "name": "packet_loss_persistent",
+  "description": "Persistent 8% packet loss on one host.",
+  "fleet": {"hosts": 30, "seed": 124},
+  "ticks": 25,
+  "policy": "default",
+  "tags": ["network", "step", "reversible"],
+  "events": [
+    {"tick": 3, "type": "inject", "host": {"role": "worker", "nth": 2}, "fault": "packet_loss"}
+  ],
+  "expect": {
+    "approve_all": {"min": {"faults_detected": 1, "faults_resolved": 1, "faults_contained": 0}, "max": {"spurious_incidents": 0, "pages": 0, "verify_failures": 0, "max_drained_fraction": 0.0}},
+    "deny_all": {"min": {"faults_detected": 1, "faults_resolved": 1, "faults_contained": 0}, "max": {"spurious_incidents": 0, "pages": 0, "verify_failures": 0, "max_drained_fraction": 0.0}}
+  }
+}

@@ -14,6 +14,13 @@ A scenario is plain data so it can be committed, diffed and generated. Example::
       "tags": ["software", "ramp"]
     }
 
+Expectations (optional) pin the outcome of a seeded run for regression testing::
+
+    "expect": {"approve_all": {"min": {"faults_resolved": 1}, "max": {"pages": 0}},
+               "deny_all": {"min": {"faults_contained": 1}}}
+
+Each bound names a key of `RunResult.summary()`; `fleetgate.runner.check_expectations` evaluates them.
+
 Event types: inject, inject_rack, inject_zone, inject_pdu, inject_random, clear, clear_all, set_load.
 Host selectors: "h003" | {"role": "worker", "nth": 0} | "random" | {"random": true, "roles": [...]}.
 Rack/zone/pdu selectors: explicit id | {"index": k} | "random".
@@ -54,6 +61,8 @@ EVENT_SCHEMA = {
     },
     "additionalProperties": False,
 }
+_BOUNDS = {"type": "object", "additionalProperties": {"type": "number"}}
+_EXPECT = {"type": "object", "properties": {"min": _BOUNDS, "max": _BOUNDS}, "additionalProperties": False}
 SCENARIO_SCHEMA = {
     "type": "object",
     "required": ["name", "fleet", "ticks", "events"],
@@ -81,7 +90,8 @@ SCENARIO_SCHEMA = {
         "events": {"type": "array", "items": EVENT_SCHEMA},
         "policy": {"type": "string"},
         "tags": {"type": "array", "items": {"type": "string"}},
-        "expect": {"type": "object"},
+        "expect": {"type": "object", "properties": {"approve_all": _EXPECT, "deny_all": _EXPECT},
+                   "additionalProperties": False},
     },
     "additionalProperties": False,
 }
@@ -128,6 +138,23 @@ class Scenario:
                 if f and f not in out:
                     out.append(f)
         return out
+
+
+def dumps_scenario(d: dict[str, Any]) -> str:
+    """Stable, diff-friendly JSON: one event per line, other keys in a fixed order."""
+    order = ["name", "description", "fleet", "ticks", "policy", "tags", "events", "expect"]
+    keys = [k for k in order if k in d] + [k for k in d if k not in order]
+    parts = []
+    for k in keys:
+        if k == "events":
+            body = ",\n".join("    " + json.dumps(e, sort_keys=False) for e in d[k])
+            parts.append('  "events": [\n' + body + "\n  ]" if d[k] else '  "events": []')
+        elif k == "expect":
+            rows = ",\n".join(f"    {json.dumps(who)}: {json.dumps(b)}" for who, b in d[k].items())
+            parts.append('  "expect": {\n' + rows + "\n  }")
+        else:
+            parts.append(f'  {json.dumps(k)}: {json.dumps(d[k])}')
+    return "{\n" + ",\n".join(parts) + "\n}\n"
 
 
 def _check_event(ev: dict[str, Any], scen: str) -> None:

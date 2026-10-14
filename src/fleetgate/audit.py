@@ -89,6 +89,9 @@ class AuditLog:
 
     def _append_raw(self, kind: str, fields: dict[str, Any]) -> dict[str, Any]:
         prev = self.entries[-1]["hash"] if self.entries else self.GENESIS
+        # Snapshot the fields as plain JSON: callers often pass live lists/dicts (e.g. a group incident's host list)
+        # that they keep mutating, and a history entry must never change after it was hashed.
+        fields = json.loads(json.dumps(fields, default=str))
         body = {"seq": len(self.entries), "kind": kind, **fields}
         h = self._digest(prev, body)
         entry = {**body, "prev": prev, "hash": h}

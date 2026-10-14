@@ -41,8 +41,8 @@ def test_valid_scenario_roundtrips_and_exposes_helpers():
     assert s.events_at(3) == s.events and s.events_at(4) == []
     assert Scenario.from_dict(s.to_dict()).to_dict() == s.to_dict()
     assert len(s.build_fleet().hosts) == 30
-    withx = Scenario.from_dict(scen(expect={"min_detected": 1}))
-    assert withx.to_dict()["expect"] == {"min_detected": 1}
+    expect = {"approve_all": {"min": {"faults_resolved": 1}, "max": {"pages": 0}}}
+    assert Scenario.from_dict(scen(expect=expect)).to_dict()["expect"] == expect
 
 
 @pytest.mark.parametrize("patch,needle", [
@@ -64,6 +64,9 @@ def test_valid_scenario_roundtrips_and_exposes_helpers():
     ({"events": [{"tick": 1, "type": "inject_random", "faults": ["nope"]}]}, "unknown faults"),
     ({"events": [{"tick": 1, "type": "clear", "host": "h001"}]}, "clear needs host and fault"),
     ({"events": [{"tick": 1, "type": "inject", "host": "h001", "fault": "thermal", "duty": 2}]}, "maximum"),
+    ({"expect": {"approve_all": {"min": {"pages": "none"}}}}, "expected number"),
+    ({"expect": {"always": {"min": {}}}}, "unexpected property"),
+    ({"expect": {"deny_all": {"floor": {}}}}, "unexpected property"),
 ])
 def test_invalid_scenarios_are_rejected_with_a_useful_message(patch, needle):
     with pytest.raises((SchemaError, ValueError)) as ei:
@@ -195,3 +198,15 @@ def test_scenario_dir_resolution_order(tmp_path, monkeypatch):
     assert scenario_dir(tmp_path) == tmp_path  # explicit argument wins
     monkeypatch.delenv("FLEETGATE_SCENARIO_DIR")
     assert scenario_dir().name == "scenarios"
+
+
+def test_dumps_scenario_is_stable_and_loadable():
+    from fleetgate.scenarios import dumps_scenario
+
+    d = scen(expect={"approve_all": {"min": {"faults_resolved": 1}}, "deny_all": {"max": {"pages": 2}}})
+    text = dumps_scenario(d)
+    assert json.loads(text) == d and text.endswith("}\n")
+    assert text.count("\n    {") == len(d["events"]) and text.index('"name"') < text.index('"events"')
+    assert dumps_scenario(json.loads(text)) == text
+    assert json.loads(dumps_scenario(scen(events=[])))["events"] == []
+    assert json.loads(dumps_scenario({**scen(), "extra_key": 1}))["extra_key"] == 1

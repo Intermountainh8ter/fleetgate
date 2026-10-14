@@ -60,15 +60,61 @@ class RunResult:
         detected = [o for o in injected if o.detected_tick is not None]
         ttds = [o.ttd for o in detected if o.ttd is not None]
         ttrs = [o.ttr for o in injected if o.ttr is not None]
-        spurious = s["incidents"] - len({o.incident_id for o in detected if o.incident_id})
+        injected_ids = {o.incident_id for o in detected if o.incident_id}
+        cascade_only, spurious = 0, 0
+        for rec in self.orchestrator.records.values():
+            if rec.incident.id in injected_ids:
+                continue
+            kinds = {e["event"] for e in explaining_events(rec, self.fleet.fault_log)}
+            if "inject" in kinds or "cascade" in kinds:
+                cascade_only += 1  # a real anomaly (a follow-on fault or a second signal of an injected one)
+            else:
+                spurious += 1  # nothing in the ground truth explains this incident: a false positive
         s.update({"scenario": self.scenario, "policy": self.policy, "faults_injected": len(injected),
                   "faults_detected": len(detected),
                   "faults_resolved": sum(o.status == "resolved" for o in injected),
                   "faults_contained": sum(o.status == "contained" for o in injected),
                   "ttd_mean": round(sum(ttds) / len(ttds), 2) if ttds else None,
                   "ttr_mean": round(sum(ttrs) / len(ttrs), 2) if ttrs else None,
-                  "spurious_incidents": max(0, spurious)})
+                  "follow_on_incidents": cascade_only, "spurious_incidents": spurious})
+        s["max_drained_fraction"] = round(
+            max((t["drained"] for t in self.orchestrator.tick_log), default=0) / max(1, s["hosts"]), 3)
         return s
+
+
+def check_expectations(summary: dict[str, Any], expect: dict[str, Any] | None) -> list[str]:
+    """Compare a run summary with a scenario's `min`/`max` bounds. Returns human-readable failures (empty = pass)."""
+    failures: list[str] = []
+    for key, bound in (expect or {}).get("min", {}).items():
+        got = summary.get(key)
+        if got is None or got < bound:
+            failures.append(f"{key}: expected >= {bound}, got {got}")
+    for key, bound in (expect or {}).get("max", {}).items():
+        got = summary.get(key)
+        if got is None or got > bound:
+            failures.append(f"{key}: expected <= {bound}, got {got}")
+    if summary.get("audit_ok") is False:
+        failures.append("audit chain failed verification")
+    return failures
+
+
+def incident_signals(rec: Any) -> set[str]:
+    if rec.is_group:
+        return set(rec.incident.signal.split("+"))
+    return {rec.incident.signal}
+
+
+def signal_hits(signals: set[str], fault: str) -> bool:
+    touched = set(FAULT_SPECS[fault].metrics)
+    return fault in signals or any(set(signal_metrics(sig)) & touched for sig in signals)
+
+
+def explaining_events(rec: Any, fault_log: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Ground-truth fault events (injections and cascades) that make this incident a true positive."""
+    sigs = incident_signals(rec)
+    return [ev for ev in fault_log
+            if ev["event"] in ("inject", "cascade") and ev["host"] in rec.hosts
+            and ev["tick"] < rec.incident.opened_tick and signal_hits(sigs, ev["fault"])]
 
 
 def run_scenario(scenario: Scenario, ticks: int | None = None, policy: PolicyConfig | str | None = None,
@@ -110,18 +156,12 @@ def score(orch: Orchestrator) -> list[FaultOutcome]:
             continue
         host, fault = ev["host"], ev["fault"]
         o = FaultOutcome(host, fault, ev["tick"], ev["group"])
-        touched = set(FAULT_SPECS[fault].metrics)
         for rec in recs:
             if rec.incident.opened_tick < ev["tick"] + 1 or host not in rec.hosts:
                 continue
-            if rec.is_group:
-                sigs = set(rec.incident.signal.split("+"))  # type: ignore[union-attr]
-            else:
-                sigs = {rec.incident.signal}
-            hit = fault in sigs or any(set(signal_metrics(s)) & touched for s in sigs)
-            if hit:
+            if signal_hits(incident_signals(rec), fault):
                 o.detected_tick, o.incident_id = rec.incident.opened_tick, rec.incident.id
-                o.exact_signal = fault in sigs
+                o.exact_signal = fault in incident_signals(rec)
                 o.status = rec.status
                 o.closed_tick = rec.closed_tick
                 break

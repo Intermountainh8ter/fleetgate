@@ -1,0 +1,15 @@
+{
+  "name": "maintenance_window_reopens",
+  "description": "The same lockup during the weekly dc1 maintenance window (ticks 40-47): the reboot is allowed.",
+  "fleet": {"hosts": 30, "seed": 139},
+  "ticks": 70,
+  "policy": "freeze",
+  "tags": ["policy", "freeze", "maintenance-window"],
+  "events": [
+    {"tick": 41, "type": "inject", "host": {"role": "worker", "nth": 0}, "fault": "kernel_soft_lockup"}
+  ],
+  "expect": {
+    "approve_all": {"min": {"faults_detected": 1, "faults_resolved": 1, "faults_contained": 0}, "max": {"spurious_incidents": 0, "pages": 0, "verify_failures": 0, "max_drained_fraction": 0.033}},
+    "deny_all": {"min": {"faults_detected": 1, "faults_resolved": 1, "faults_contained": 0}, "max": {"spurious_incidents": 0, "pages": 0, "verify_failures": 0, "max_drained_fraction": 0.033}}
+  }
+}

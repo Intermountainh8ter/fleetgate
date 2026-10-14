@@ -1,0 +1,15 @@
+{
+  "name": "freeze_blocks_disruptive",
+  "description": "A change freeze is in force: a kernel lockup's reboot is denied and the host is only contained.",
+  "fleet": {"hosts": 30, "seed": 138},
+  "ticks": 40,
+  "policy": "freeze",
+  "tags": ["policy", "freeze", "disruptive"],
+  "events": [
+    {"tick": 3, "type": "inject", "host": {"role": "worker", "nth": 0}, "fault": "kernel_soft_lockup"}
+  ],
+  "expect": {
+    "approve_all": {"min": {"faults_detected": 1, "faults_resolved": 0, "faults_contained": 1}, "max": {"spurious_incidents": 0, "pages": 1, "verify_failures": 0, "max_drained_fraction": 0.033}},
+    "deny_all": {"min": {"faults_detected": 1, "faults_resolved": 0, "faults_contained": 1}, "max": {"spurious_incidents": 0, "pages": 1, "verify_failures": 0, "max_drained_fraction": 0.033}}
+  }
+}

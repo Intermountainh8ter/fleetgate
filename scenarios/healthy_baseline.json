@@ -1,0 +1,13 @@
+{
+  "name": "healthy_baseline",
+  "description": "A quiet flat-load fleet: the false-positive control.",
+  "fleet": {"hosts": 30, "seed": 137},
+  "ticks": 100,
+  "policy": "default",
+  "tags": ["healthy", "negative"],
+  "events": [],
+  "expect": {
+    "approve_all": {"min": {"faults_detected": 0, "faults_resolved": 0, "faults_contained": 0}, "max": {"spurious_incidents": 0, "pages": 0, "verify_failures": 0, "max_drained_fraction": 0.0}},
+    "deny_all": {"min": {"faults_detected": 0, "faults_resolved": 0, "faults_contained": 0}, "max": {"spurious_incidents": 0, "pages": 0, "verify_failures": 0, "max_drained_fraction": 0.0}}
+  }
+}

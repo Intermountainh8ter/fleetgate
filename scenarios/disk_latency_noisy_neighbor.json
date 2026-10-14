@@ -1,0 +1,15 @@
+{
+  "name": "disk_latency_noisy_neighbor",
+  "description": "Disk latency spikes with no SMART errors; the safe response is to contain.",
+  "fleet": {"hosts": 30, "seed": 121},
+  "ticks": 25,
+  "policy": "default",
+  "tags": ["hardware", "contained"],
+  "events": [
+    {"tick": 3, "type": "inject", "host": {"role": "worker", "nth": 6}, "fault": "disk_latency"}
+  ],
+  "expect": {
+    "approve_all": {"min": {"faults_detected": 1, "faults_resolved": 0, "faults_contained": 1}, "max": {"spurious_incidents": 0, "pages": 0, "verify_failures": 0, "max_drained_fraction": 0.033}},
+    "deny_all": {"min": {"faults_detected": 1, "faults_resolved": 0, "faults_contained": 1}, "max": {"spurious_incidents": 0, "pages": 0, "verify_failures": 0, "max_drained_fraction": 0.033}}
+  }
+}

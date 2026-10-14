@@ -1,0 +1,15 @@
+{
+  "name": "tor_switch_rack_failure",
+  "description": "A top-of-rack switch dies: ten hosts lose their uplink at once and must become ONE incident.",
+  "fleet": {"hosts": 40, "seed": 114},
+  "ticks": 30,
+  "policy": "default",
+  "tags": ["rack", "correlated", "network"],
+  "events": [
+    {"tick": 4, "type": "inject_rack", "rack": {"index": 0}}
+  ],
+  "expect": {
+    "approve_all": {"min": {"faults_detected": 10, "faults_resolved": 10, "faults_contained": 0}, "max": {"spurious_incidents": 0, "pages": 0, "verify_failures": 0, "max_drained_fraction": 0.0}},
+    "deny_all": {"min": {"faults_detected": 10, "faults_resolved": 10, "faults_contained": 0}, "max": {"spurious_incidents": 0, "pages": 0, "verify_failures": 0, "max_drained_fraction": 0.0}}
+  }
+}
