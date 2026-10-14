@@ -27,6 +27,13 @@ def _type_ok(value: Any, t: str) -> bool:
     return cls is not None and isinstance(value, cls)
 
 
+def _matches(pattern: str, value: str) -> bool:
+    """re.search, except that a trailing `$` means end of string (not "or before a final newline")."""
+    if pattern.endswith("$") and not pattern.endswith("\\$"):
+        pattern = pattern[:-1] + r"\Z"
+    return re.search(pattern, value) is not None
+
+
 def validate(instance: Any, schema: dict[str, Any], path: str = "$") -> list[str]:
     """Return a list of validation errors (empty when the instance is valid)."""
     errors: list[str] = []
@@ -45,7 +52,7 @@ def validate(instance: Any, schema: dict[str, Any], path: str = "$") -> list[str
             errors.append(f"{path}: shorter than {schema['minLength']} chars")
         if "maxLength" in schema and len(instance) > schema["maxLength"]:
             errors.append(f"{path}: longer than {schema['maxLength']} chars")
-        if "pattern" in schema and not re.search(schema["pattern"], instance):
+        if "pattern" in schema and not _matches(schema["pattern"], instance):
             errors.append(f"{path}: {instance!r} does not match {schema['pattern']!r}")
 
     if isinstance(instance, (int, float)) and not isinstance(instance, bool):

@@ -45,11 +45,13 @@ class VerifyResult:
     entries: int = 0
     checkpoints: int = 0
     signed: bool = False
+    unchecked_signatures: int = 0  # entries carrying a signature that could not be checked (no key supplied)
     problems: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         return {"ok": self.ok, "first_bad_seq": self.first_bad_seq, "entries": self.entries,
-                "checkpoints": self.checkpoints, "signed": self.signed, "problems": self.problems}
+                "checkpoints": self.checkpoints, "signed": self.signed,
+                "unchecked_signatures": self.unchecked_signatures, "problems": self.problems}
 
 
 class AuditLog:
@@ -141,13 +143,14 @@ class AuditLog:
             if e.get("hash") != self._digest(prev, body):
                 return fail(i, f"entry {i}: hash mismatch (content altered)")
             if self.key:
+                # With a key configured every entry must be signed: otherwise an attacker who rewrites the file
+                # could strip the signatures and recompute a plain hash chain.
                 if "sig" not in e:
-                    if require_signatures:
-                        return fail(i, f"entry {i}: unsigned")
-                elif not hmac.compare_digest(e["sig"], self._sign(e["hash"]) or ""):
+                    return fail(i, f"entry {i}: unsigned (signature stripped?)")
+                if not hmac.compare_digest(str(e["sig"]), self._sign(e["hash"]) or ""):
                     return fail(i, f"entry {i}: bad signature (wrong key or forged entry)")
-            elif require_signatures:
-                return fail(i, f"entry {i}: cannot check signature without key")
+            elif "sig" in e:
+                res.unchecked_signatures += 1
             if e["kind"] == "checkpoint":
                 res.checkpoints += 1
                 block = [x["hash"] for x in self.entries[e["block_start"]:e["block_end"]]]
@@ -270,7 +273,7 @@ def replay(entries: list[dict[str, Any]]) -> ReplayState:
             s.incidents[e["id"]]["root_cause"] = e.get("hypothesis")
         elif k == "policy":
             s.decisions[e.get("code", "?")] = s.decisions.get(e.get("code", "?"), 0) + 1
-            if e.get("decision") == "DENY":
+            if e.get("decision") == "DENY" and not e.get("provisional"):
                 s.denied.append({"incident": e.get("id"), "runbook": e.get("runbook"), "host": e.get("host"),
                                  "code": e.get("code")})
                 if e.get("id") in s.incidents:

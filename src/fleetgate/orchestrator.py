@@ -14,10 +14,21 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from itertools import islice
 from typing import Any
 
-from .agents import (AnyIncident, HeuristicPlanner, Planner, Proposal, RootCause, RootCauseAgent, Triage,
-                     TriageAgent, incident_hosts, incident_signal)
+from .agents import (
+    AnyIncident,
+    HeuristicPlanner,
+    Planner,
+    Proposal,
+    RootCause,
+    RootCauseAgent,
+    Triage,
+    TriageAgent,
+    incident_hosts,
+    incident_signal,
+)
 from .approvals import ApprovalQueue, ApprovalRequest, as_approver
 from .audit import AuditLog
 from .correlate import Correlator, GroupIncident
@@ -39,6 +50,27 @@ MAX_PLAN_STEPS = 16
 MAX_STEP_WAIT = 20
 
 
+MAX_PROPOSALS_READ = 10_000  # a planner is untrusted: never consume an unbounded plan
+MAX_ID_LEN = 200
+
+
+def sanitise_proposals(raw: Any) -> tuple[list[Proposal], int]:
+    """Coerce untrusted planner output into well-typed Proposals. Returns (proposals, malformed_count).
+
+    Anything that is not a Proposal with string runbook/host is dropped; ids are clamped so a megabyte-long
+    "runbook name" cannot bloat the audit log (a clamped id can never equal a catalogue id, so it is still denied).
+    """
+    out: list[Proposal] = []
+    malformed = 0
+    for p in islice(raw, MAX_PROPOSALS_READ):
+        if not (isinstance(p, Proposal) and isinstance(p.runbook, str) and isinstance(p.host, str)):
+            malformed += 1
+            continue
+        rationale = p.rationale if isinstance(p.rationale, str) else ""
+        out.append(Proposal(p.runbook[:MAX_ID_LEN], p.host[:MAX_ID_LEN], rationale[:300]))
+    return out, malformed
+
+
 def deny_all(_: Proposal, __: str) -> bool:
     return False
 
@@ -50,7 +82,8 @@ def approve_all(_: Proposal, __: str) -> bool:
 @dataclass
 class PlanStep:
     proposal: Proposal
-    status: str = "pending"  # pending | awaiting_approval | verifying | verified | failed | denied | skipped | rolled_back
+    # pending | awaiting_approval | approved_waiting | verifying | verified | failed | denied | skipped | rolled_back
+    status: str = "pending"
     verdict: Verdict | None = None
     request_id: str | None = None
     executed_tick: int | None = None
@@ -99,8 +132,8 @@ class IncidentRecord:
     @property
     def active(self) -> bool:
         """True while the plan still has work to do (plans run to completion even after resolution)."""
-        return not self.plan_aborted and any(s.status in ("pending", "awaiting_approval", "approved_waiting", "verifying")
-                                             for s in self.steps)
+        live = ("pending", "awaiting_approval", "approved_waiting", "verifying")
+        return not self.plan_aborted and any(s.status in live for s in self.steps)
 
     def to_dict(self) -> dict[str, Any]:
         return {"id": self.incident.id, "signal": self.signal, "hosts": self.hosts, "status": self.status,
@@ -204,7 +237,10 @@ class Orchestrator:
         self.audit.append("root_cause", tick=t, id=inc.id, hypothesis=rc.hypothesis, confidence=round(rc.confidence, 2),
                           scope=rc.scope, scope_id=rc.scope_id, contributing=rc.contributing, evidence=rc.evidence[:4])
         try:
-            proposals = list(self.planner.plan(inc, tri))
+            proposals, malformed = sanitise_proposals(self.planner.plan(inc, tri))
+            if malformed:
+                self.audit.append("plan_filtered", tick=t, id=inc.id,
+                                  dropped=[f"{malformed} malformed proposal(s) (not str runbook/host)"])
         except Exception as exc:  # a crashing planner escalates; it never blocks the gate
             proposals = []
             self.audit.append("escalation", tick=t, id=inc.id, reason=f"planner error: {type(exc).__name__}")
@@ -230,8 +266,11 @@ class Orchestrator:
         for step in rec.steps:
             v = self.policy.evaluate(step.proposal.runbook, step.proposal.host)
             step.verdict = v
-            self._audit_policy(rec, step, v, phase="preflight")
-            if v.decision == Decision.DENY and v.code in STRUCTURAL_DENIALS:
+            pruned = v.decision == Decision.DENY and v.code in STRUCTURAL_DENIALS
+            # A pre-flight verdict on a later step is provisional (earlier steps may satisfy its preconditions);
+            # only a structural denial is final at this point.
+            self._audit_policy(rec, step, v, phase="preflight", provisional=not pruned)
+            if pruned:
                 step.status = "denied"
                 rec.denied.append(f"{step.proposal.runbook}@{step.proposal.host}")
 
@@ -418,11 +457,12 @@ class Orchestrator:
                 self._abort_plan(rec, f"verification of {p.runbook}@{p.host} failed: {v.failed[0]}")
 
     # ---- bookkeeping -------------------------------------------------------------------------
-    def _audit_policy(self, rec: IncidentRecord, step: PlanStep, v: Verdict, phase: str = "execute") -> None:
+    def _audit_policy(self, rec: IncidentRecord, step: PlanStep, v: Verdict, phase: str = "execute",
+                      provisional: bool = False) -> None:
         p = step.proposal
         self.audit.append("policy", tick=self.fleet.tick, id=rec.incident.id, runbook=p.runbook, host=p.host,
                           decision=v.decision.value, code=v.code.value, reason=v.reason, rationale=p.rationale[:200],
-                          phase=phase, rollback=step.is_rollback)
+                          phase=phase, rollback=step.is_rollback, provisional=provisional)
 
     def _page(self, rec: IncidentRecord, reason: str) -> None:
         rec.escalated = True

@@ -80,7 +80,8 @@ class CapacityAgent:
         n = len(self.fleet.hosts)
         cap_hosts = math.floor(self.cfg.max_drained_fraction * n + 1e-9)
         drained_total = sum(not h.active for h in self.fleet.hosts.values())
-        drains = [h for h in history if h["runbook"] in ("drain_host", "migrate_workloads") and t - h["tick"] < self.window]
+        drains = [h for h in history
+                  if h["runbook"] in ("drain_host", "migrate_workloads") and t - h["tick"] < self.window]
         window = max(1, min(self.window, t)) if t else self.window
         fleet_rate = len(drains) / window
         headroom_fleet = max(0, cap_hosts - drained_total)
@@ -101,13 +102,18 @@ class CapacityAgent:
             roles.append(RoleCapacity(role, c["total"], c["active"], c["drained"], c["faulty"], rate, headroom, ticks,
                                       projected, need))
             if need:
+                if ticks is None:
+                    eta = "n/a"
+                else:
+                    eta = "<1" if ticks < 1 else f"{ticks:.0f}"
                 recs.append(f"{role}: add {need} spare host(s); at {rate:.3f} drains/tick the cap is reached in "
-                            f"{'<1' if ticks is not None and ticks < 1 else (f'{ticks:.0f}' if ticks is not None else 'n/a')} ticks "
-                            f"and DC-ops lead time is {self.lead} ticks")
+                            f"{eta} ticks and DC-ops lead time is {self.lead} ticks")
             elif c["faulty"] > c["drained"]:
-                recs.append(f"{role}: {c['faulty'] - c['drained']} faulty host(s) still serving; drain capacity available ({headroom})")
+                recs.append(f"{role}: {c['faulty'] - c['drained']} faulty host(s) still serving; "
+                            f"drain capacity available ({headroom})")
         if drained_total > cap_hosts:
-            recs.append(f"fleet is over the drain cap ({drained_total} > {cap_hosts}): no further drains will be allowed")
+            recs.append(f"fleet is over the drain cap ({drained_total} > {cap_hosts}): "
+                        "no further drains will be allowed")
         if not recs:
             recs.append("no action: drain rate is within headroom for the lead time")
         return CapacityReport(t, self.window, self.lead, n, drained_total, self.cfg.max_drained_fraction, cap_hosts,

@@ -77,7 +77,8 @@ class Correlator:
     def __init__(self, topology: Topology, min_hosts: int = 3, min_fraction: float = 0.25, window_ticks: int = 3,
                  absorb_ticks: int = 12):
         self.topo = topology
-        self.min_hosts, self.min_fraction, self.window, self.absorb = min_hosts, min_fraction, window_ticks, absorb_ticks
+        self.min_hosts, self.min_fraction = min_hosts, min_fraction
+        self.window, self.absorb = window_ticks, absorb_ticks
         self.buffer: list[Incident] = []  # recent host incidents not yet grouped
         self.groups: list[GroupIncident] = []
         self.grouped_ids: set[str] = set()

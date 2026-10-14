@@ -22,8 +22,14 @@ def test_reversible_on_worker_allowed():
 
 
 def test_destructive_needs_approval_even_on_worker():
+    # v0.2: destructive runbooks declare preconditions (drained host, open ticket). Without them the gate
+    # denies outright; with them it still asks for approval rather than allowing.
     f, ids = fleet_with_roles()
-    assert Policy(f).evaluate("replace_disk", ids[1]).decision == Decision.NEEDS_APPROVAL
+    assert Policy(f).evaluate("replace_disk", ids[1]).decision == Decision.DENY
+    f.hosts[ids[1]].drained = True
+    f.hosts[ids[1]].ticketed = True
+    v = Policy(f, PolicyConfig(max_drained_fraction=1.0)).evaluate("replace_disk", ids[1])
+    assert v.decision == Decision.NEEDS_APPROVAL
 
 
 def test_protected_role_needs_approval_for_reversible():

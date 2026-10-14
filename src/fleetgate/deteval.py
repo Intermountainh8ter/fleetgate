@@ -79,7 +79,8 @@ class EvalResult:
         return self.false_positive_host_ticks / max(1, self.host_ticks)
 
     def to_dict(self) -> dict[str, Any]:
-        return {"detector": self.detector, "macro_f1": round(self.macro_f1, 3), "macro_recall": round(self.macro_recall, 3),
+        return {"detector": self.detector, "macro_f1": round(self.macro_f1, 3),
+                "macro_recall": round(self.macro_recall, 3),
                 "false_positives": self.false_positive_host_ticks, "host_ticks": self.host_ticks,
                 "fp_per_1k_host_ticks": round(1000 * self.fp_rate, 3),
                 "per_fault": {k: v.to_dict() for k, v in self.per_fault.items()}}
@@ -102,7 +103,7 @@ def evaluate_detector(factory: DetectorFactory, faults: list[str] | None = None,
             st.runs += 1
             for _ in range(warmup):
                 data = fleet.step()
-                for inc in det.observe(fleet.tick, data):
+                for _ in det.observe(fleet.tick, data):
                     fp_total += 1
                     st.fp += 1
                 host_ticks += len(data)
@@ -112,8 +113,8 @@ def evaluate_detector(factory: DetectorFactory, faults: list[str] | None = None,
             for _ in range(horizon):
                 data = fleet.step()
                 for inc in det.observe(fleet.tick, data):
-                    active = {f for f in fleet.hosts[inc.host].faults}
-                    touched_now = set().union(*(set(FAULT_SPECS[f].metrics) for f in active)) if active else set()
+                    active = set(fleet.hosts[inc.host].faults)
+                    touched_now = set().union(*(FAULT_SPECS[f].metrics for f in active)) if active else set()
                     if inc.host == host and (set(signal_metrics(inc.signal)) & touched or inc.signal == fault):
                         st.tp += 1
                         if first is None:
@@ -141,8 +142,10 @@ class SweepPoint:
     ttd_mean: float | None
 
     def to_dict(self) -> dict[str, Any]:
-        return {"param": self.param, "macro_recall": round(self.macro_recall, 3), "fp_per_1k": round(self.fp_per_1k, 3),
-                "macro_f1": round(self.macro_f1, 3), "ttd_mean": None if self.ttd_mean is None else round(self.ttd_mean, 2)}
+        return {"param": self.param, "macro_recall": round(self.macro_recall, 3),
+                "fp_per_1k": round(self.fp_per_1k, 3),
+                "macro_f1": round(self.macro_f1, 3),
+                "ttd_mean": None if self.ttd_mean is None else round(self.ttd_mean, 2)}
 
 
 def sensitivity_sweep(make: Callable[[float], BaseDetector | MultiDetector], params: list[float], **kw: Any,

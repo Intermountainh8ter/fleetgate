@@ -112,7 +112,8 @@ class InteractiveApprover:
     def review(self, request: ApprovalRequest, tick: int) -> list[Approval]:
         req = request.requirement
         self.output_fn(f"[tick {tick}] approval needed: {request.runbook} on {request.host} "
-                       f"({req.code.value}; {req.required} of {', '.join(req.roles)})\n  rationale: {request.rationale}")
+                       f"({req.code.value}; {req.required} of {', '.join(req.roles)})\n"
+                       f"  rationale: {request.rationale}")
         out: list[Approval] = []
         for role in req.roles:
             if len(request.valid_approvers()) + len(out) >= req.required:

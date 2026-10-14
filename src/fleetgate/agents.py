@@ -168,7 +168,8 @@ class RootCauseAgent:
             seen = {inc.signal}
             while parents:  # walk up the cascade graph: oom_kills -> memory_leak, cpu_throttling -> thermal
                 root = parents[0]
-                evidence.append(f"{inc.signal if not contributing else contributing[-1]} is a known consequence of {root}")
+                child = contributing[-1] if contributing else inc.signal
+                evidence.append(f"{child} is a known consequence of {root}")
                 contributing.append(root)
                 seen.add(root)
                 conf = min(0.9, conf + 0.15)
@@ -338,8 +339,8 @@ class LLMPlanner:
             return [], ["reply too large"]
         try:
             items = extract_json_array(raw)
-        except (ValueError, json.JSONDecodeError) as exc:
-            return [], [f"not a JSON array: {exc}"]
+        except (ValueError, RecursionError) as exc:  # JSONDecodeError is a ValueError
+            return [], [f"not a JSON array: {type(exc).__name__}"]
         errs = validate(items, PLAN_SCHEMA)
         return (items, []) if not errs else ([], errs)
 

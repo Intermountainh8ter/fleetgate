@@ -7,10 +7,15 @@ from .audit import ReplayState
 from .orchestrator import Orchestrator
 
 
+def _escape(value: Any) -> str:
+    """Prometheus text-format label escaping: backslash, double quote and newline."""
+    return str(value).replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
+
+
 def _fmt_labels(labels: dict[str, Any]) -> str:
     if not labels:
         return ""
-    return "{" + ",".join(f'{k}="{str(v).replace(chr(34), chr(39))}"' for k, v in labels.items()) + "}"
+    return "{" + ",".join(f'{k}="{_escape(v)}"' for k, v in labels.items()) + "}"
 
 
 class MetricsRegistry:
@@ -43,8 +48,10 @@ def from_orchestrator(orch: Orchestrator) -> MetricsRegistry:
     s = orch.summary()
     m.add("tick", s["ticks"], help_text="Current simulation tick")
     m.add("hosts_total", s["hosts"], help_text="Hosts in the fleet")
-    m.add("hosts_drained", sum(not h.active for h in orch.fleet.hosts.values()), help_text="Hosts drained or decommissioned")
-    m.add("hosts_faulty", len(orch.fleet.faulty_hosts()), help_text="Hosts with at least one active fault (ground truth)")
+    m.add("hosts_drained", sum(not h.active for h in orch.fleet.hosts.values()),
+          help_text="Hosts drained or decommissioned")
+    m.add("hosts_faulty", len(orch.fleet.faulty_hosts()),
+          help_text="Hosts with at least one active fault (ground truth)")
     for role, c in sorted(orch.fleet.role_counts().items()):
         m.add("role_hosts", c["total"], {"role": role, "state": "total"}, help_text="Hosts per role and state")
         m.add("role_hosts", c["active"], {"role": role, "state": "active"})
@@ -75,7 +82,8 @@ def from_orchestrator(orch: Orchestrator) -> MetricsRegistry:
         for k in keys:
             vals = [m_[k] for m_ in orch.last_data.values() if k in m_]
             if vals:
-                m.add("fleet_metric_avg", sum(vals) / len(vals), {"metric": k}, help_text="Fleet-wide mean of a host metric")
+                m.add("fleet_metric_avg", sum(vals) / len(vals), {"metric": k},
+                      help_text="Fleet-wide mean of a host metric")
                 m.add("fleet_metric_max", max(vals), {"metric": k}, help_text="Fleet-wide max of a host metric")
     return m
 
@@ -91,7 +99,8 @@ def from_replay(state: ReplayState) -> MetricsRegistry:
     m.add("incidents_total", len(state.incidents), kind="counter", help_text="Incidents opened (replayed)")
     m.add("actions_executed_total", len(state.executed), kind="counter", help_text="Runbook executions (replayed)")
     for rb, n in sorted(state.runbook_counts.items()):
-        m.add("runbook_executions_total", n, {"runbook": rb}, kind="counter", help_text="Executions per runbook (replayed)")
+        m.add("runbook_executions_total", n, {"runbook": rb}, kind="counter",
+              help_text="Executions per runbook (replayed)")
     for code, n in sorted(state.decisions.items()):
         m.add("policy_decisions_total", n, {"code": code}, kind="counter", help_text="Policy verdicts by reason code")
     m.add("hosts_drained", len(state.drained), help_text="Hosts drained according to the log")

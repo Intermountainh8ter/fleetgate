@@ -94,7 +94,8 @@ _WINDOW = {"type": "object", "required": ["start", "end"],
            "additionalProperties": False}
 _APPROVAL = {"type": "object", "required": ["required", "roles"],
              "properties": {"required": {"type": "integer", "minimum": 1, "maximum": 10},
-                            "roles": {"type": "array", "minItems": 1, "items": {"type": "string"}, "uniqueItems": True}},
+                            "roles": {"type": "array", "minItems": 1, "items": {"type": "string"},
+                                      "uniqueItems": True}},
              "additionalProperties": False}
 POLICY_SCHEMA = {
     "type": "object",
@@ -118,7 +119,8 @@ POLICY_SCHEMA = {
         "approvals": {"type": "object", "properties": {"DESTRUCTIVE": _APPROVAL, "DISRUPTIVE": _APPROVAL,
                                                        "protected": _APPROVAL}, "additionalProperties": False},
         "escalation": {"type": "object", "properties": {
-            "page_after_ticks": {"type": "integer", "minimum": 1}, "expire_after_ticks": {"type": "integer", "minimum": 1}},
+            "page_after_ticks": {"type": "integer", "minimum": 1},
+            "expire_after_ticks": {"type": "integer", "minimum": 1}},
             "additionalProperties": False},
         "rate_limits": {"type": "object", "additionalProperties": {
             "type": "object", "required": ["max", "window_ticks"],
@@ -185,7 +187,8 @@ class PolicyConfig:
         for tier in ("DESTRUCTIVE", "DISRUPTIVE", "protected"):
             a = cfg.approvals[tier]
             if a["required"] > len(a["roles"]):
-                raise ValueError(f"policy {cfg.name!r}: {tier} approvals need {a['required']} of {len(a['roles'])} roles")
+                raise ValueError(f"policy {cfg.name!r}: {tier} approvals need {a['required']} of "
+                                 f"{len(a['roles'])} roles")
         return cfg
 
     def to_dict(self) -> dict[str, Any]:
@@ -290,16 +293,25 @@ class Policy:
         self.campaigns.setdefault(runbook_id, _Campaign()).proposed[host_id] = t
         if runbook_id in cfg.deny_list:
             return Verdict(Decision.DENY, f"{runbook_id} is on the deny-list", Reason.DENY_LIST)
+        dc = self.fleet.topology.dc_of(host_id)
+        targets = rb.target_hosts(self.fleet, host_id)
+        protected = any(self.fleet.hosts[h].role in cfg.protected_roles for h in targets)
+        in_maintenance = self._maintenance_window(dc, t)
         for w in cfg.freeze_windows:
-            if _in_window(w, t) and rb.tier.name not in w.get("allow_tiers", []):
-                return Verdict(Decision.DENY, f"change freeze {w.get('label', '')!r}: {rb.tier.name} not allowed",
-                               Reason.FREEZE_WINDOW)
+            if not _in_window(w, t) or rb.tier.name in w.get("allow_tiers", []):
+                continue
+            # A maintenance window re-opens DISRUPTIVE work on unprotected hosts inside a freeze; DESTRUCTIVE never.
+            if rb.tier == Tier.DISRUPTIVE and in_maintenance is not None and not protected:
+                continue
+            return Verdict(Decision.DENY, f"change freeze {w.get('label', '')!r}: {rb.tier.name} not allowed",
+                           Reason.FREEZE_WINDOW)
         failed = rb.failed_preconditions(self.fleet, host_id)
         if failed:
             return Verdict(Decision.DENY, f"preconditions failed: {', '.join(failed)}", Reason.PRECONDITION_FAILED)
         last = self.recent.get((host_id, runbook_id))
         if last is not None and t - last < cfg.cooldown_ticks:
-            return Verdict(Decision.DENY, f"cooldown: {runbook_id} on {host_id} ran {t - last} ticks ago", Reason.COOLDOWN)
+            return Verdict(Decision.DENY, f"cooldown: {runbook_id} on {host_id} ran {t - last} ticks ago",
+                           Reason.COOLDOWN)
         if self.actions_this_tick.get(t, 0) >= cfg.max_actions_per_tick:
             return Verdict(Decision.DENY, "per-tick action budget exhausted", Reason.TICK_BUDGET)
         rl = cfg.rate_limits.get(runbook_id)
@@ -316,14 +328,13 @@ class Policy:
             if n >= role_cap:
                 return Verdict(Decision.DENY, f"quota: {n} actions on role {host.role} in {window} ticks",
                                Reason.QUOTA_ROLE)
-        dc = self.fleet.topology.dc_of(host_id)
         dc_cap = q.get("per_dc", {}).get(dc)
         if dc_cap is not None:
             n = sum(1 for h in self.history if h["dc"] == dc and t - h["tick"] < window)
             if n >= dc_cap:
                 return Verdict(Decision.DENY, f"quota: {n} actions in {dc} in {window} ticks", Reason.QUOTA_DC)
         if rb.drains:
-            targets = [h for h in rb.target_hosts(self.fleet, host_id) if self.fleet.hosts[h].active]
+            targets = [h for h in targets if self.fleet.hosts[h].active]
             drained = sum(not h.active for h in self.fleet.hosts.values()) + len(targets)
             if drained / len(self.fleet.hosts) > cfg.max_drained_fraction + 1e-12:
                 return Verdict(Decision.DENY, "blast radius: would exceed max drained fraction", Reason.BLAST_RADIUS)
@@ -331,34 +342,41 @@ class Policy:
                 active = sum(1 for h in self.fleet.hosts.values() if h.role == role and h.active)
                 leaving = sum(1 for h in targets if self.fleet.hosts[h].role == role)
                 if leaving and active - leaving < floor:
-                    return Verdict(Decision.DENY, f"capacity floor: would leave {active - leaving} active {role} (< {floor})",
+                    return Verdict(Decision.DENY,
+                                   f"capacity floor: would leave {active - leaving} active {role} (< {floor})",
                                    Reason.ROLE_CAPACITY_FLOOR)
         canary = self._canary_check(rb.id, host_id)
         if canary is not None:
             return canary
-        req = self._requirement(rb, host.role)
+        req = self._requirement(rb, protected)
         if rb.tier == Tier.DESTRUCTIVE:
             return Verdict(Decision.NEEDS_APPROVAL, f"{runbook_id} is destructive", Reason.DESTRUCTIVE_TIER, req)
         if rb.tier == Tier.DISRUPTIVE:
-            for w in cfg.maintenance_windows:
-                if _in_window(w, t) and (w.get("dcs") is None or dc in w["dcs"]) \
-                        and host.role not in cfg.protected_roles:
-                    return Verdict(Decision.ALLOW, f"disruptive action inside maintenance window {w.get('label', '')!r}",
-                                   Reason.MAINTENANCE_WINDOW)
+            if in_maintenance is not None and not protected:
+                return Verdict(Decision.ALLOW,
+                               f"disruptive action inside maintenance window {in_maintenance.get('label', '')!r}",
+                               Reason.MAINTENANCE_WINDOW)
             return Verdict(Decision.NEEDS_APPROVAL, f"{runbook_id} is disruptive", Reason.DISRUPTIVE_TIER, req)
-        if host.role in cfg.protected_roles:
-            return Verdict(Decision.NEEDS_APPROVAL, f"{host.role} host is protected", Reason.PROTECTED_ROLE, req)
+        if protected:
+            return Verdict(Decision.NEEDS_APPROVAL, f"{runbook_id} touches a protected-role host",
+                           Reason.PROTECTED_ROLE, req)
         if self._is_canary_slot(rb.id, host_id):
             return Verdict(Decision.ALLOW, "canary execution for a fleet-wide campaign", Reason.CANARY)
         return Verdict(Decision.ALLOW, "reversible action on unprotected host", Reason.REVERSIBLE)
 
-    def _requirement(self, rb: Any, role: str) -> ApprovalRequirement | None:
+    def _maintenance_window(self, dc: str, tick: int) -> dict[str, Any] | None:
+        for w in self.cfg.maintenance_windows:
+            if _in_window(w, tick) and (w.get("dcs") is None or dc in w["dcs"]):
+                return w
+        return None
+
+    def _requirement(self, rb: Any, protected: bool) -> ApprovalRequirement | None:
         parts: list[tuple[dict[str, Any], Reason]] = []
         if rb.tier == Tier.DESTRUCTIVE:
             parts.append((self.cfg.approvals["DESTRUCTIVE"], Reason.DESTRUCTIVE_TIER))
         elif rb.tier == Tier.DISRUPTIVE:
             parts.append((self.cfg.approvals["DISRUPTIVE"], Reason.DISRUPTIVE_TIER))
-        if role in self.cfg.protected_roles:
+        if protected:
             parts.append((self.cfg.approvals["protected"], Reason.PROTECTED_ROLE))
         if not parts:
             return None
@@ -410,14 +428,18 @@ class Policy:
         for tier, a in c.approvals.items():
             lines.append(f"approvals {tier}: {a['required']} of {', '.join(a['roles'])}")
         for w in c.freeze_windows:
-            lines.append(f"freeze {w.get('label', '')!r}: ticks [{w['start']}, {w['end']}) allow {w.get('allow_tiers', [])}")
+            lines.append(f"freeze {w.get('label', '')!r}: ticks [{w['start']}, {w['end']}) "
+                         f"allow {w.get('allow_tiers', [])}")
         for w in c.maintenance_windows:
-            lines.append(f"maintenance {w.get('label', '')!r}: ticks [{w['start']}, {w['end']}) dcs {w.get('dcs') or 'all'}")
+            lines.append(f"maintenance {w.get('label', '')!r}: ticks [{w['start']}, {w['end']}) "
+                         f"dcs {w.get('dcs') or 'all'}")
         if c.rate_limits:
-            lines.append("rate limits: " + ", ".join(f"{k} {v['max']}/{v['window_ticks']}t" for k, v in c.rate_limits.items()))
+            lines.append("rate limits: " + ", ".join(f"{k} {v['max']}/{v['window_ticks']}t"
+                                                      for k, v in c.rate_limits.items()))
         q = c.quotas
         if q.get("per_role") or q.get("per_dc"):
-            lines.append(f"quotas per {q.get('window_ticks')} ticks: roles {q.get('per_role', {})} dcs {q.get('per_dc', {})}")
+            lines.append(f"quotas per {q.get('window_ticks')} ticks: roles {q.get('per_role', {})} "
+                         f"dcs {q.get('per_dc', {})}")
         if c.canary.get("enabled", True):
             lines.append(f"canary-first: campaigns >= {c.canary.get('fleet_fraction', 0.05):.0%} of fleet need "
                          f"{c.canary.get('canary_count', 1)} verified canary")

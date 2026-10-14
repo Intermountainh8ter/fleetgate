@@ -365,8 +365,8 @@
     "service_down": ["restart_service"],
     "nic_errors": ["reset_nic"],
     "ecc_correctable": ["drain_host", "open_ticket"],
-    "ecc_uncorrectable": ["drain_host", "open_ticket", "replace_dimm"],
-    "disk_failing": ["drain_host", "open_ticket", "replace_disk"],
+    "ecc_uncorrectable": ["drain_host", "open_ticket", "replace_dimm", "undrain_host"],
+    "disk_failing": ["drain_host", "open_ticket", "replace_disk", "undrain_host"],
     "psu_failure": ["open_ticket", "replace_psu"],
     "memory_leak": ["restart_service"],
     "oom_kills": ["restart_service"],
@@ -385,7 +385,7 @@
     "swap_exhaustion": ["swapoff_swapon"],
     "inode_exhaustion": ["purge_inode_tmp"],
     "gpu_xid": ["drain_host", "reset_gpu", "undrain_host"],
-    "nvme_wear": ["open_ticket", "drain_host", "replace_disk"]
+    "nvme_wear": ["open_ticket", "drain_host", "replace_disk", "undrain_host"]
   },
   "group_playbooks": {
     "tor_switch_failure": ["failover_tor_uplink", "open_ticket"],

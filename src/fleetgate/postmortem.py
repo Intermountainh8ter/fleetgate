@@ -6,7 +6,7 @@ when present, may only write the narrative summary; the template fallback is alw
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 from .llm import LLM, safe_complete
@@ -34,6 +34,7 @@ class Postmortem:
     pages: int
     action_items: list[str]
     summary: str = ""
+    contained_tick: int | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return self.__dict__.copy()
@@ -43,7 +44,8 @@ class Postmortem:
                  f"- Incident: `{self.incident_id}`", f"- Severity: {self.severity or 'n/a'}",
                  f"- Hosts: {', '.join(self.hosts) or 'n/a'}", f"- Status: {self.status}",
                  f"- Detected: tick {self.detected_tick}; first action: tick {self.first_action_tick}; "
-                 f"closed: tick {self.closed_tick}; MTTR: {self.mttr_ticks if self.mttr_ticks is not None else 'n/a'} ticks",
+                 f"contained: tick {self.contained_tick}; closed: tick {self.closed_tick}; "
+                 f"MTTR: {self.mttr_ticks if self.mttr_ticks is not None else 'n/a'} ticks",
                  f"- Root cause: {self.root_cause or 'undetermined'}",
                  f"- Contributing: {', '.join(self.contributing) or 'none recorded'}", "",
                  "## Summary", "", self.summary, "", "## Timeline", ""]
@@ -77,10 +79,12 @@ class PostmortemAgent:
         signal = opened.get("signal") or opened.get("hypothesis") or "incident"
         severity = next((e.get("severity") for e in rel if e["kind"] == "triage"), None)
         rc = next((e for e in rel if e["kind"] == "root_cause"), None)
-        closed = next((e for e in rel if e["kind"] == "closed"), None)
+        closes = [e for e in rel if e["kind"] == "closed"]
+        closed = closes[-1] if closes else None  # an incident can be contained first and resolved later
+        contained = next((e for e in closes if e.get("status") == "contained"), None)
         executed = [e for e in rel if e["kind"] == "executed"]
         denied = [{"runbook": e["runbook"], "host": e["host"], "code": e.get("code")}
-                  for e in rel if e["kind"] == "policy" and e.get("decision") == "DENY"]
+                  for e in rel if e["kind"] == "policy" and e.get("decision") == "DENY" and not e.get("provisional")]
         req_ids = {e["request_id"] for e in rel if e["kind"] == "approval_request"}
         approvals = [{"request_id": e["request_id"], "runbook": e.get("runbook"), "host": e.get("host"),
                       "status": e.get("status")} for e in entries
@@ -93,7 +97,8 @@ class PostmortemAgent:
         first_action = executed[0]["tick"] if executed else None
         closed_tick = closed.get("tick") if closed else None
         status = closed.get("status") if closed else "open"
-        mttr = (closed_tick - detected) if closed_tick is not None and detected is not None and status == "resolved" else None
+        resolved = closed_tick is not None and detected is not None and status == "resolved"
+        mttr = (closed_tick - detected) if resolved else None
         timeline = [{"tick": e.get("tick", detected), "event": _describe(e)} for e in rel if e["kind"] != "checkpoint"]
         items = _action_items(signal, status, denied, approvals, verifications, pages, rc)
         pm = Postmortem(incident_id, f"{signal} on {', '.join(hosts[:3])}{'...' if len(hosts) > 3 else ''}",
@@ -101,6 +106,7 @@ class PostmortemAgent:
                         rc.get("hypothesis") if rc else None, list(rc.get("contributing", [])) if rc else [],
                         timeline, [f"{e['runbook']}@{e['host']}" for e in executed], denied, approvals,
                         verifications, rollbacks, pages, items)
+        pm.contained_tick = contained.get("tick") if contained else None
         pm.summary = self._summary(pm)
         return pm
 
@@ -134,11 +140,23 @@ def _describe(e: dict[str, Any]) -> str:
     if k == "executed":
         return f"executed {e.get('runbook')}@{e.get('host')}{' (dry-run)' if e.get('dry_run') else ''}"
     if k == "verify":
-        return f"verification of {e.get('runbook')}@{e.get('host')}: {'ok' if e.get('ok') else 'FAILED ' + str(e.get('failed'))}"
+        outcome = "ok" if e.get("ok") else "FAILED " + str(e.get("failed"))
+        return f"verification of {e.get('runbook')}@{e.get('host')}: {outcome}"
     if k == "page":
         return f"PAGED: {e.get('reason')}"
     if k == "closed":
         return f"closed as {e.get('status')}"
+    if k == "approval":
+        return f"{e.get('approver')} ({e.get('role')}) {'approved' if e.get('approved') else 'rejected'} " \
+               f"{e.get('runbook')}@{e.get('host')}"
+    if k == "approval_resolved":
+        return f"approval for {e.get('runbook')}@{e.get('host')} {e.get('status')}"
+    if k == "plan":
+        return f"plan of {e.get('n_steps')} step(s) proposed"
+    if k == "plan_aborted":
+        return f"plan stopped: {e.get('reason')}"
+    if k == "merged":
+        return f"merged into {e.get('into')}"
     if k == "escalation":
         return f"escalated: {e.get('reason')}"
     return k
@@ -148,7 +166,8 @@ def _action_items(signal: str, status: str, denied: list[dict[str, Any]], approv
                   verifications: list[dict[str, Any]], pages: int, rc: dict[str, Any] | None) -> list[str]:
     items: list[str] = []
     if status == "contained":
-        items.append(f"Hardware follow-up: {signal} is contained (host drained) but not fixed; track the DC-ops ticket.")
+        items.append(f"Hardware follow-up: {signal} is contained (host drained) but not fixed; "
+                     "track the DC-ops ticket.")
     if status == "open":
         items.append("Incident still open at end of log: confirm current state before closing.")
     codes = {d["code"] for d in denied}
@@ -164,7 +183,8 @@ def _action_items(signal: str, status: str, denied: list[dict[str, Any]], approv
         items.append(f"{pages} page(s) fired waiting for approval: review approver coverage/on-call rota.")
     for v in verifications:
         if not v["ok"]:
-            items.append(f"Verification of {v['runbook']} failed ({v['failed'][:1]}): review probe thresholds or the runbook.")
+            items.append(f"Verification of {v['runbook']} failed ({v['failed'][:1]}): "
+                         "review probe thresholds or the runbook.")
     if rc and rc.get("contributing"):
         items.append(f"Address the upstream cause ({rc['hypothesis']}); {', '.join(rc['contributing'])} were symptoms.")
     return items

@@ -8,7 +8,7 @@ KEY_METRICS = ("temp_c", "cpu_util", "mem_used_pct", "packet_loss_pct", "disk_la
 
 def _row(cols: list[tuple[str, int]], values: list[object]) -> str:
     out = []
-    for (name, width), v in zip(cols, values):
+    for (_name, width), v in zip(cols, values):
         s = f"{v:.1f}" if isinstance(v, float) else str(v)
         out.append(s[:width].ljust(width) if not isinstance(v, (int, float)) else s[:width].rjust(width))
     return " ".join(out)
@@ -34,16 +34,17 @@ def render_tick(orch: Orchestrator, max_hosts: int = 12, width: int = 110) -> st
             steps = ",".join(f"{st.proposal.runbook}:{st.status[:4]}" for st in r.steps)[:36]
             lines.append(_row(cols, [r.incident.id, r.triage.severity if r.triage else "-",
                                      r.root_cause.hypothesis if r.root_cause else "-", len(r.hosts), steps]))
-    faulty = [h for h in orch.fleet.faulty_hosts()][:max_hosts]
+    faulty = list(orch.fleet.faulty_hosts())[:max_hosts]
     if faulty:
         lines.append("-" * width)
-        hcols = [("host", 6), ("role", 11), ("rack", 14), ("state", 8), ("faults", 28)] + [(m[:11], 11) for m in KEY_METRICS]
+        hcols = [("host", 6), ("role", 11), ("rack", 14), ("state", 8), ("faults", 28)]
+        hcols += [(m[:11], 11) for m in KEY_METRICS]
         lines.append(_header(hcols))
         for h in faulty:
             m = orch.fleet.last_sample.get(h.id, {})
             state = "drained" if h.drained else ("cordon" if h.cordoned else ("decom" if h.decommissioned else "up"))
             vals: list[object] = [h.id, h.role, h.rack, state, ",".join(h.faults)[:28]]
-            vals += [m[k] if k in m else "n/a" for k in KEY_METRICS]
+            vals += [m.get(k, "n/a") for k in KEY_METRICS]
             lines.append(_row(hcols, vals))
     acts = s["executed_this_tick"]
     if acts:
