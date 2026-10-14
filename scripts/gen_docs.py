@@ -26,7 +26,7 @@ from _common import md_table  # noqa: E402
 
 from fleetgate.fleet import FAULT_SPECS, GROUP_FAULTS  # noqa: E402
 from fleetgate.orchestrator import approve_all, deny_all  # noqa: E402
-from fleetgate.policy import POLICY_DIR, REASON_GUIDE, PolicyConfig, Reason, available_policies  # noqa: E402
+from fleetgate.policy import REASON_GUIDE, PolicyConfig, Reason, available_policies  # noqa: E402
 from fleetgate.runbooks import CATALOG, GROUP_PLAYBOOK, PLAYBOOK, REGISTRY, Tier  # noqa: E402
 from fleetgate.runner import run_scenario  # noqa: E402
 from fleetgate.scenarios import load_scenarios  # noqa: E402
@@ -65,7 +65,7 @@ def runbooks_md() -> str:
            ], "lllr"), "",
            "## Fields\n",
            "- **preconditions**: state the gate probes before allowing the runbook (`host_drained`, `ticket_open`, "
-           "`bmc_reachable`, `ssh_reachable`, `role:<name>`, ...). A failed precondition is `DENY_PRECONDITION_FAILED`.\n"
+           "`bmc_reachable`, `ssh_reachable`, `role:<name>`, ...). A failed one is `DENY_PRECONDITION_FAILED`.\n"
            "- **verify**: probes the VerifierAgent re-reads after `duration_ticks + 1`. A failure proposes the "
            "**rollback** partner (through the gate like anything else) and pages a human.\n"
            "- **scope**: `host`, or `rack` (the runbook touches every host in the rack; the gate then judges *all* of "
@@ -123,8 +123,8 @@ def scenarios_md() -> str:
            "pattern, topology), a timeline of fault events and a policy. Run one with "
            "`fleetgate simulate --scenario NAME`.\n",
            "The two result columns come from running every scenario here, seeded, with an approver that approves "
-           "everything (`auto`) and one that rejects everything (`deny`): detected / resolved / contained are counts of "
-           "the faults the scenario injects; pages are escalations to a human. 'Resolved' means the fault was actually "
+           "everything (`auto`) and one that rejects everything (`deny`): detected / resolved / contained count the "
+           "faults the scenario injects; pages are escalations to a human. 'Resolved' means the fault was actually "
            "fixed; 'contained' means the host was safely drained but the fault remains for DC-ops. The same numbers "
            "are pinned as regression bounds in each scenario's `expect` block.\n",
            md_table(["scenario", "hosts", "ticks", "policy", "faults", "approve: det / res / con / pages",
@@ -327,7 +327,7 @@ def eval_block() -> str:
           r["censored_mttr"], r["resolve_rate"], r["peak_drained"], r["signoffs_per_risky_action"]] for r in rows],
         "rrrlrrrr"))
     out.append("")
-    marg = {k: v for k, v in mc["marginals"].items()}
+    marg = mc["marginals"]
     out.append("The Pareto front over (censored MTTR down, peak drained down, sign-offs up), "
                f"{len(rows)} of {mc['configs']} configurations. Marginal effect of each knob (mean over the others): ")
     mrows = []
@@ -344,29 +344,122 @@ def eval_block() -> str:
     return "\n".join(out)
 
 
-BLOCKS = {"facts": facts_block, "evals": eval_block}
+def gate_block() -> str:
+    c = PolicyConfig.load("default")
+    d, p, r = c.approvals["DESTRUCTIVE"], c.approvals["DISRUPTIVE"], c.approvals["protected"]
+    rate = ", ".join(f"{k} {v['max']} per {v['window_ticks']} ticks" for k, v in c.rate_limits.items()) or "none"
+    quota = ", ".join(f"{k} <= {v}" for k, v in c.quotas.get("per_role", {}).items()) or "none"
+    floors = ", ".join(f"{k} >= {v}" for k, v in c.min_active_per_role.items()) or "none"
+    rows = [
+        ["Runbook id not in the catalogue (exact match), or host not in the fleet", "DENY",
+         "`DENY_UNKNOWN_RUNBOOK`, `DENY_UNKNOWN_HOST`"],
+        [f"Runbook on the deny-list ({', '.join(sorted(c.deny_list))})", "DENY", "`DENY_LISTED_RUNBOOK`"],
+        ["Change freeze covers this tier (none in `default`; see the `freeze` policy)", "DENY", "`DENY_FREEZE_WINDOW`"],
+        ["A precondition does not hold (host drained, ticket open, BMC reachable, ...)", "DENY",
+         "`DENY_PRECONDITION_FAILED`"],
+        [f"Same runbook on the same host within {c.cooldown_ticks} ticks (anti-flapping)", "DENY", "`DENY_COOLDOWN`"],
+        [f"More than {c.max_actions_per_tick} actions in one tick", "DENY", "`DENY_TICK_BUDGET`"],
+        [f"Rate limit exceeded ({rate})", "DENY", "`DENY_RATE_LIMIT`"],
+        [f"Role quota exceeded per {c.quotas['window_ticks']} ticks ({quota})", "DENY", "`DENY_QUOTA_ROLE`"],
+        [f"Drain would push drained hosts above {c.max_drained_fraction:.0%} of the fleet "
+         "(counted over every host a rack-wide runbook touches)", "DENY", "`DENY_BLAST_RADIUS`"],
+        [f"Would leave a role below its capacity floor ({floors})", "DENY", "`DENY_ROLE_CAPACITY_FLOOR`"],
+        [f"Fleet-wide campaign (at least 2 hosts and >= {c.canary['fleet_fraction']:.0%} of the fleet): "
+         "a canary must verify first", "DENY until verified", "`DENY_CANARY_PENDING`, `DENY_CANARY_FAILED`"],
+        [f"DESTRUCTIVE runbook ({d['required']} of {', '.join(d['roles'])})", "NEEDS_APPROVAL",
+         "`APPROVAL_DESTRUCTIVE_TIER`"],
+        [f"DISRUPTIVE runbook ({p['required']} of {', '.join(p['roles'])})", "NEEDS_APPROVAL",
+         "`APPROVAL_DISRUPTIVE_TIER`"],
+        [f"Any action touching a protected role ({', '.join(sorted(c.protected_roles))}); stacks with the tier above "
+         f"({r['required']} of {', '.join(r['roles'])}, different people)", "NEEDS_APPROVAL",
+         "`APPROVAL_PROTECTED_ROLE`"],
+        ["REVERSIBLE runbook on an unprotected host, every limit passed", "ALLOW", "`ALLOW_REVERSIBLE`"],
+    ]
+    return md_table(["Check (in this order, first hit wins)", "Verdict", "Reason code"], rows, "lll")
 
 
-def render_readme(text: str) -> str:
+def tiers_block() -> str:
+    rows = [[f"**{t.name}**", len(REGISTRY.by_tier(t)), ", ".join(code(r.id) for r in
+                                                                 sorted(REGISTRY.by_tier(t), key=lambda r: r.id))]
+            for t in Tier]
+    return md_table(["tier", "runbooks", "ids"], rows, "lrl")
+
+
+def numbers_block() -> str:
+    r = _results()
+    t = r["adversarial"]["total"]
+    q = _quality()
+    parts = [f"{len(FAULT_SPECS)} fault types plus {len(GROUP_FAULTS)} rack-level ones",
+             f"{len(CATALOG)} runbooks in 3 risk tiers", f"{len(load_scenarios())} scenarios",
+             f"{len(available_policies())} policies", f"{len(Reason)} reason codes",
+             f"{t['runs']} hostile-planner runs ({t['gate_evaluations']} gate evaluations) with "
+             f"{t['violations']} safety violations", f"{r['montecarlo']['runs']} Monte Carlo policy runs"]
+    if q:
+        parts.append(f"{q['tests']} tests at {q['coverage_total']}% line+branch coverage")
+    return "- " + "\n- ".join(parts)
+
+
+def example_block() -> str:
+    """Real output of a real command (run in-process with the fixed arguments below)."""
+    import contextlib
+    import io
+
+    from fleetgate.cli import main as cli_main
+
+    args = ["simulate", "--scenario", "disk_failing_worker", "--approver", "auto", "--quiet"]
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        cli_main(args)
+    return "```text\n$ fleetgate " + " ".join(args) + "\n" + buf.getvalue().rstrip() + "\n```"
+
+
+BLOCKS = {"facts": facts_block, "gate": gate_block, "tiers": tiers_block, "evals": eval_block,
+          "numbers": numbers_block, "example": example_block}
+
+
+def render_markers(text: str, path: str) -> str:
+    """Fill every <!-- BEGIN:name --> ... <!-- END:name --> block present in `text` from BLOCKS."""
     for name, fn in BLOCKS.items():
-        pat = re.compile(rf"(<!-- BEGIN:{name} -->\n)(.*?)(\n<!-- END:{name} -->)", re.S)
-        if not pat.search(text):
-            raise SystemExit(f"README.md is missing the <!-- BEGIN:{name} --> / <!-- END:{name} --> markers")
-        text = pat.sub(lambda m: m.group(1) + fn() + m.group(3), text)
+        pat = re.compile(rf"<!-- BEGIN:{name} -->.*?<!-- END:{name} -->", re.S)
+        if pat.search(text):
+            replacement = f"<!-- BEGIN:{name} -->\n{fn()}\n<!-- END:{name} -->"
+            text = pat.sub(lambda m, r=replacement: r, text)
+    begins, ends = len(re.findall(r"<!-- BEGIN:", text)), len(re.findall(r"<!-- END:", text))
+    if begins != ends:
+        raise SystemExit(f"{path}: unbalanced generated-block markers ({begins} BEGIN, {ends} END)")
     return text
+
+
+def flowcharts_md() -> str:
+    usage = (DOCS / "diagrams" / "usage.mmd").read_text().rstrip()
+    trouble = (DOCS / "diagrams" / "troubleshooting.mmd").read_text().rstrip()
+    return "\n".join([
+        GENERATED_NOTE, "# Flowcharts\n",
+        "Both charts live as Mermaid source in `docs/diagrams/` (GitHub renders the blocks below directly) and as "
+        "pre-rendered SVGs next to them. Re-render with `scripts/render_diagrams.sh`.\n",
+        "## Usage: from scenario to postmortem\n",
+        "[Open the SVG](diagrams/usage.svg)\n", "```mermaid", usage, "```\n",
+        "## Troubleshooting: decision tree by symptom\n",
+        "Every branch is a real symptom with a concrete fix. The reason codes are the machine-readable codes the gate "
+        "emits (`fleetgate explain CODE` prints the same guidance; the full table is in [POLICY.md](POLICY.md)). "
+        "The chart is tall: [open the SVG](diagrams/troubleshooting.svg) for full size.\n",
+        "```mermaid", trouble, "```\n"])
 
 
 # ---- driver ----------------------------------------------------------------------------------------------
 
 
 def targets() -> dict[Path, str]:
-    readme = (ROOT / "README.md").read_text()
-    return {
+    out = {
         DOCS / "RUNBOOKS.md": runbooks_md() + "\n",
         DOCS / "SCENARIOS.md": scenarios_md() + "\n",
         DOCS / "POLICY.md": policy_md() + "\n",
-        ROOT / "README.md": render_readme(readme),
+        DOCS / "FLOWCHARTS.md": flowcharts_md() + "\n",
     }
+    for path in [ROOT / "README.md", *sorted((DOCS / "launch").glob("*.md"))]:
+        if path.exists():
+            out[path] = render_markers(path.read_text(), path.name)
+    return out
 
 
 def main(argv: list[str] | None = None) -> int:

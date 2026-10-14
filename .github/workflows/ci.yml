@@ -1,17 +1,27 @@
 name: ci
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python: ["3.10", "3.12"]
+        python: ["3.10", "3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
+          cache: pip
       - run: pip install -e ".[dev]"
-      - run: ruff check .
-      - run: pytest -q
-      - run: python evals/run_evals.py --min-resolved 0.8
+      - name: Lint
+        run: ruff check .
+      - name: Tests with coverage
+        run: pytest -q --cov --cov-report=term --cov-fail-under=90
+      - name: Generated docs are up to date
+        run: python scripts/gen_docs.py --check
+      - name: Eval regression gate
+        run: python evals/regression_gate.py

@@ -1,0 +1,8 @@
+{
+ "tests": 778,
+ "coverage_total": 99.2,
+ "coverage_lines": 99.7,
+ "statements": 3709,
+ "python": "3.13.16",
+ "utc": "2026-10-14T01:45:10Z"
+}
