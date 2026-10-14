@@ -9,8 +9,6 @@
   summary in ordinary words: the question, one chart, the finding, and why it
   matters. No background assumed.
 - [GLOSSARY.md](GLOSSARY.md) &mdash; every abbreviation this repo uses, defined.
-- [What does all this mean?](https://claude.ai/artifact/Mctu5EP8YgfjGx6fcCHDgs)
-  &mdash; the across-the-whole-project explainer, with all six repos on one page.
 
 ![license: MIT](https://img.shields.io/badge/license-MIT-blue) ![python: 3.10+](https://img.shields.io/badge/python-3.10%2B-blue) ![runtime dependencies: none](https://img.shields.io/badge/runtime%20dependencies-none-brightgreen)
 
