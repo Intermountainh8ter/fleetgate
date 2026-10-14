@@ -1,0 +1,31 @@
+flowchart TD
+    A["Pick a scenario<br/>fleetgate scenarios"] --> B["Simulate<br/>fleetgate simulate --scenario X --ticks N<br/>--policy P --approver auto|deny|interactive"]
+    B --> D["Detect<br/>threshold / EWMA / seasonal,<br/>a signal must persist 2 ticks"]
+    D --> E{"Same rack, PDU or<br/>cooling zone?"}
+    E -->|yes| F["Correlate: ONE group incident"]
+    E -->|no| G["Host incident"]
+    F --> H
+    G --> H["Triage and root cause<br/>(an LLM may only write the summary)"]
+    H --> I["Plan: playbook or LLM JSON plan<br/>names catalogue runbook ids only"]
+    I --> J{"Policy gate<br/>deterministic, default-deny"}
+    J -->|DENY + reason code| K["Step denied and logged<br/>plan stops, human paged"]
+    J -->|NEEDS_APPROVAL| L{"Approval queue<br/>N-of-M, page at 3 ticks,<br/>expire at 12"}
+    L -->|approved| M
+    L -->|rejected or expired| K
+    J -->|ALLOW| M["Execute runbook<br/>(--dry-run: record only)"]
+    M --> N{"Verify: re-read metrics<br/>after the runbook's duration"}
+    N -->|probes pass| O{"More steps?"}
+    O -->|yes| J
+    O -->|no| P["Resolved, or contained<br/>(host drained, fault remains)"]
+    N -->|probes fail| Q["Rollback proposed through the gate<br/>plan stops, human paged"]
+    Q --> J
+    P --> R["Postmortem, metrics, replay<br/>fleetgate postmortem / export-metrics / audit replay"]
+    K --> R
+    M -.-> AUD[("Hash-chained audit log<br/>each verdict, vote, execution,<br/>verification; Merkle checkpoints;<br/>optional HMAC")]
+    AUD --> V["fleetgate audit verify FILE"]
+    classDef gate fill:#ffe9b8,stroke:#b07a00,color:#000
+    classDef stop fill:#f9d2d2,stroke:#a33,color:#000
+    classDef ok fill:#d6f0d8,stroke:#2b7a2f,color:#000
+    class J,L gate
+    class K,Q stop
+    class P ok
