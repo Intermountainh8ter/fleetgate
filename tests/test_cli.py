@@ -369,3 +369,12 @@ def test_simulate_with_a_scripted_llm_writes_summaries_only(capsys, monkeypatch)
     monkeypatch.setattr(cli, "make_llm", lambda name: ScriptedLLM(["A one-line summary."]) if name != "none" else None)
     code, doc, _ = jrun(capsys, "simulate", "--scenario", SCN, "--approver", "auto", "--llm", "anthropic", "--json")
     assert code == 0 and doc["summary"]["faults_resolved"] == 1
+
+
+def test_empty_or_missing_scenario_directory_is_a_clear_error(capsys, tmp_path):
+    code, _, err = run(capsys, "scenarios", "--scenario-dir", str(tmp_path))
+    assert code == 2 and "no scenario files found" in err and "--scenario-dir" in err
+    code, _, err = run(capsys, "bench", "--scenario-dir", str(tmp_path))
+    assert code == 2 and "no scenario files found" in err
+    code, _, err = run(capsys, "simulate", "--scenario", "x", "--scenario-dir", str(tmp_path))
+    assert code == 2 and "known: none found in" in err

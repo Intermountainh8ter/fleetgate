@@ -24,7 +24,7 @@ postmortem.
 - **32 runbooks** in three risk tiers (17 reversible, 10 disruptive, 5 destructive) with preconditions, verification probes, 9 rollback pairs and a dry-run mode
 - **42 named scenarios** (`scenarios/*.json`), schema-validated, each with recorded regression bounds
 - **5 bundled policies** and **23 machine-readable reason codes**
-- **778 tests** (the first release had 19), **99.2% line+branch coverage** (99.7% of lines) of `src/fleetgate`, measured by `scripts/record_quality.py`
+- **779 tests** (the first release had 19), **99.2% line+branch coverage** (99.7% of lines) of `src/fleetgate`, measured by `scripts/record_quality.py`
 <!-- END:facts -->
 
 Zero required runtime dependencies (the optional `anthropic` SDK is only for the LLM-backed agents). Tests and evals

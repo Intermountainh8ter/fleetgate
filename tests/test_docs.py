@@ -157,7 +157,8 @@ def test_the_unfixable_fraction_claim_in_the_readme_is_true():
 def test_no_placeholder_markers_or_stray_model_identifiers_in_the_repo():
     banned_markers = re.compile(r"\b(TO" + r"DO|FIX" + r"ME|X" + r"XX)\b")
     banned_models = re.compile(r"(?i)\b(claude|sonnet|opus|haiku|gpt-?\d|gemini|llama|mistral)\b")
-    skip = {".git", ".ruff_cache", ".pytest_cache", "__pycache__", "fleetgate.egg-info", ".venv", "htmlcov"}
+    skip = {".git", ".ruff_cache", ".pytest_cache", "__pycache__", "fleetgate.egg-info", ".venv", "htmlcov", "build",
+            "dist"}  # build outputs are gitignored copies of src/
     for path in ROOT.rglob("*"):
         if not path.is_file() or any(part in skip or part.endswith(".egg-info") for part in path.parts):
             continue

@@ -200,7 +200,7 @@ def bench_cell(scenarios: dict[str, Scenario], names: list[str], pol: str | None
 
 
 def cmd_bench(a: argparse.Namespace) -> int:
-    scenarios = load_scenarios(a.scenario_dir)
+    scenarios = require_scenarios(a.scenario_dir)
     names = sorted(scenarios)
     if a.quick:
         names = names[::3]
@@ -327,8 +327,16 @@ def cmd_export_metrics(a: argparse.Namespace) -> int:
 # ---- catalogue browsing -----------------------------------------------------------------------------------
 
 
+def require_scenarios(directory: str | None) -> dict[str, Scenario]:
+    sc = load_scenarios(directory)
+    if not sc:
+        raise CliError("no scenario files found; run from the repository root, or pass --scenario-dir DIR / set "
+                       "$FLEETGATE_SCENARIO_DIR (a pip-installed fleetgate does not bundle the scenarios)")
+    return sc
+
+
 def cmd_scenarios(a: argparse.Namespace) -> int:
-    sc = load_scenarios(a.scenario_dir)
+    sc = require_scenarios(a.scenario_dir)
     if a.json:
         emit([s.to_dict() for s in sc.values()])
         return 0

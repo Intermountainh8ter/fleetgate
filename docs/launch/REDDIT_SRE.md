@@ -40,7 +40,7 @@ denied step in a plan used to be skipped, so a later `undrain_host` un-contained
 - 23 reason codes
 - 2460 hostile-planner runs (104828 gate evaluations) with 0 safety violations
 - 288 Monte Carlo policy runs
-- 778 tests at 99.2% line+branch coverage
+- 779 tests at 99.2% line+branch coverage
 <!-- END:numbers -->
 
 **What this is not:** real. It's a simulator. Faults are injected steps/ramps/intermittents on Gaussian noise; fixes

@@ -36,7 +36,7 @@ numbers (from real runs):
 - 23 reason codes
 - 2460 hostile-planner runs (104828 gate evaluations) with 0 safety violations
 - 288 Monte Carlo policy runs
-- 778 tests at 99.2% line+branch coverage
+- 779 tests at 99.2% line+branch coverage
 <!-- END:numbers -->
 
 The honest caveat: it is a simulator. The faults are injected, the noise is Gaussian, the humans are a latency model,

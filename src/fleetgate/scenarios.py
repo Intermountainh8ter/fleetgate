@@ -302,5 +302,7 @@ def get_scenario(name: str, directory: str | Path | None = None) -> Scenario:
         return load_scenario(p)
     scen = load_scenarios(directory)
     if name not in scen:
-        raise KeyError(f"unknown scenario {name!r}; known: {', '.join(sorted(scen))}")
+        known = ", ".join(sorted(scen)) or (f"none found in {scenario_dir(directory)} "
+                                           "(use --scenario-dir or $FLEETGATE_SCENARIO_DIR)")
+        raise KeyError(f"unknown scenario {name!r}; known: {known}")
     return scen[name]
