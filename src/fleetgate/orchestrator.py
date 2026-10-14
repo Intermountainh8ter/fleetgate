@@ -91,6 +91,7 @@ class PlanStep:
     hosts: list[str] = field(default_factory=list)
     is_rollback: bool = False
     waits: int = 0  # ticks spent on a transient denial
+    parent: PlanStep | None = None  # for a rollback step: the step whose failed verification caused it
 
     def to_dict(self) -> dict[str, Any]:
         return {"runbook": self.proposal.runbook, "host": self.proposal.host, "status": self.status,
@@ -293,30 +294,40 @@ class Orchestrator:
                 self._deny_step(rec, step, v)
                 return
             if v.decision == Decision.NEEDS_APPROVAL:
-                assert v.requirement is not None
-                req = self.approvals.submit(rec.incident.id, step.proposal.runbook, step.proposal.host,
-                                            step.proposal.rationale, v.requirement, self.fleet.tick)
-                step.request_id = req.id
-                self._step_by_request[req.id] = (rec, step)
-                self.audit.append("approval_request", tick=self.fleet.tick, id=rec.incident.id, request_id=req.id,
-                                  runbook=req.runbook, host=req.host, required=req.requirement.required,
-                                  roles=list(req.requirement.roles), code=v.code.value)
-                self._audit_votes(req)
-                if req.status == "approved":
-                    self._audit_resolved(req)
-                    if self._execute(rec, step) and step.status == "verifying":
-                        return
-                    continue
-                if req.status in ("rejected", "expired"):
-                    self._audit_resolved(req)
-                    self._deny_step(rec, step, Verdict(Decision.DENY, f"approval {req.status}",
-                                                       Reason.APPROVAL_REJECTED if req.status == "rejected"
-                                                       else Reason.APPROVAL_TIMEOUT))
+                if not self._request_approval(rec, step, v):
                     return
-                step.status = "awaiting_approval"
-                return
+                continue
             if not self._execute(rec, step) or step.status == "verifying":
                 return
+
+    def _request_approval(self, rec: IncidentRecord, step: PlanStep, v: Verdict) -> bool:
+        """Ask for approval. Returns True only if the step was approved *and* executed with nothing left to wait for
+        (so the caller may move on to the next step); every other outcome leaves the step waiting or denied."""
+        if v.requirement is None:  # contract violation by the gate: fail closed
+            self._deny_step(rec, step, Verdict(Decision.DENY, "approval required but no requirement given",
+                                               Reason.INTERNAL_ERROR))
+            return False
+        req = self.approvals.submit(rec.incident.id, step.proposal.runbook, step.proposal.host,
+                                    step.proposal.rationale, v.requirement, self.fleet.tick)
+        step.request_id = req.id
+        self._step_by_request[req.id] = (rec, step)
+        self.audit.append("approval_request", tick=self.fleet.tick, id=rec.incident.id, request_id=req.id,
+                          runbook=req.runbook, host=req.host, required=req.requirement.required,
+                          roles=list(req.requirement.roles), code=v.code.value,
+                          pools=[[n, list(rs)] for n, rs in req.requirement.pools])
+        self._audit_votes(req)
+        if req.status == "approved":
+            self._audit_resolved(req)
+            return self._execute(rec, step) and step.status != "verifying"
+        if req.status in ("rejected", "expired"):
+            self._audit_resolved(req)
+            denial = Verdict(Decision.DENY, f"approval {req.status}",
+                             Reason.APPROVAL_REJECTED if req.status == "rejected" else Reason.APPROVAL_TIMEOUT)
+            self._audit_policy(rec, step, denial, phase="approval")
+            self._deny_step(rec, step, denial)
+            return False
+        step.status = "awaiting_approval"
+        return False
 
     def _merge(self, old: IncidentRecord, group: IncidentRecord) -> None:
         """Fold a standalone host record into a group record: its remaining plan stops, no page."""
@@ -341,6 +352,8 @@ class Orchestrator:
         rec.plan_aborted = True
         skipped = 0
         for s in rec.steps:
+            if s.is_rollback:
+                continue  # a rollback is what we are trying to get done: never cancel it
             if s.status == "pending":
                 s.status, skipped = "skipped", skipped + 1
             elif s.status == "awaiting_approval" and s.request_id:
@@ -375,6 +388,10 @@ class Orchestrator:
         self.audit.append("executed", tick=self.fleet.tick, id=rec.incident.id, runbook=p.runbook, host=p.host,
                           hosts=result.hosts, changes=result.changes[:20], dry_run=self.dry_run,
                           request_id=step.request_id, rollback=step.is_rollback, tier=rb.tier.name)
+        if step.is_rollback:
+            rec.rollbacks.append(f"{p.runbook}@{p.host}")
+            if step.parent is not None and step.parent.status == "failed":
+                step.parent.status = "rolled_back"
         if rb.verify and not self.dry_run:
             step.status = "verifying"
             step.verify_at = self.verifier.due_at(rb, self.fleet.tick)
@@ -404,7 +421,7 @@ class Orchestrator:
         # approved steps that hit a transient denial at execution time are retried here each tick
         for rec in list(self.records.values()):
             for step in rec.steps:
-                if step.status == "approved_waiting" and not rec.plan_aborted:
+                if step.status == "approved_waiting" and (not rec.plan_aborted or step.is_rollback):
                     self._execute(rec, step)
 
     def _audit_votes(self, req: ApprovalRequest, only_tick: int | None = None) -> None:
@@ -436,25 +453,24 @@ class Orchestrator:
                     continue
                 step.status = "failed"
                 rec.verify_failures += 1
-                for s in rec.steps:
-                    if s.status == "pending":
-                        s.status = "skipped"
-                if v.rollback is not None and not step.is_rollback:
-                    rb_step = PlanStep(v.rollback, is_rollback=True)
-                    rec.steps.append(rb_step)
-                    vd = self.policy.evaluate(v.rollback.runbook, v.rollback.host)
-                    rb_step.verdict = vd
-                    self._audit_policy(rec, rb_step, vd, phase="rollback")
-                    if vd.decision == Decision.ALLOW:
-                        if self._execute(rec, rb_step):
-                            rec.rollbacks.append(f"{v.rollback.runbook}@{v.rollback.host}")
-                            step.status = "rolled_back"
-                    elif vd.decision == Decision.NEEDS_APPROVAL:
-                        self._advance_plan(rec)  # submits the approval request for the rollback step
-                    else:
-                        rb_step.status = "denied"
-                        rec.denied.append(f"{v.rollback.runbook}@{v.rollback.host}")
                 self._abort_plan(rec, f"verification of {p.runbook}@{p.host} failed: {v.failed[0]}")
+                if v.rollback is not None and not step.is_rollback:
+                    self._rollback(rec, step, v.rollback)
+
+    def _rollback(self, rec: IncidentRecord, failed: PlanStep, proposal: Proposal) -> None:
+        """The verifier proposed a rollback: it goes through the same gate (and approval queue) as any other step."""
+        rb_step = PlanStep(proposal, is_rollback=True, parent=failed)
+        rec.steps.append(rb_step)
+        vd = self.policy.evaluate(proposal.runbook, proposal.host)
+        rb_step.verdict = vd
+        self._audit_policy(rec, rb_step, vd, phase="rollback")
+        if vd.decision == Decision.ALLOW:
+            self._execute(rec, rb_step)
+        elif vd.decision == Decision.NEEDS_APPROVAL:
+            self._request_approval(rec, rb_step, vd)
+        else:
+            rb_step.status = "denied"
+            rec.denied.append(f"{proposal.runbook}@{proposal.host}")
 
     # ---- bookkeeping -------------------------------------------------------------------------
     def _audit_policy(self, rec: IncidentRecord, step: PlanStep, v: Verdict, phase: str = "execute",

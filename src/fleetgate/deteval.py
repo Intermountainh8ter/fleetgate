@@ -7,6 +7,7 @@ detection in the run is a false positive (healthy host, or a metric the fault do
 """
 from __future__ import annotations
 
+import math
 import random
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -50,7 +51,7 @@ class FaultStats:
         if not self.ttds:
             return None
         s = sorted(self.ttds)
-        return s[min(len(s) - 1, int(round(0.9 * (len(s) - 1))))]
+        return s[max(0, math.ceil(0.9 * len(s)) - 1)]  # nearest-rank percentile
 
     def to_dict(self) -> dict[str, Any]:
         return {"fault": self.fault, "runs": self.runs, "detected": self.detected, "exact": self.exact, "tp": self.tp,

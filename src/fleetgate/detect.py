@@ -89,6 +89,10 @@ STD_FLOOR: dict[str, float] = {
     "p99_latency_ms": 2.0, "load_1m": 0.5, "cpu_mhz": 25.0, "ntp_offset_ms": 3.0, "inode_used_pct": 0.3,
     "swap_used_pct": 1.0, "packet_loss_pct": 0.05, "cert_days_left": 0.5, "nvme_wear_pct": 0.5,
     "ecc_ce_per_h": 1.5, "nic_crc_per_min": 1.5, "zombie_procs": 1.0, "smart_realloc": 1.0,
+    # state / binary metrics: any change is meaningful, so a flip must score far above the usual 4-sigma threshold
+    "service_up": 0.05, "psu_ok": 0.05, "raid_degraded": 0.05, "bmc_reachable": 0.05, "ssh_reachable": 0.05,
+    "ecc_ue": 0.05, "fw_mismatch": 0.05, "soft_lockups_per_h": 0.1, "oom_kills_per_h": 0.1,
+    "gpu_xid_per_h": 0.1, "link_flaps_per_h": 0.5,
 }
 DEFAULT_STD_FLOOR = 0.25
 
@@ -195,6 +199,11 @@ class _Stat:
     def z(self, x: float, floor: float) -> float:
         return (x - self.mean) / max(math.sqrt(max(self.var, 0.0)), floor)
 
+    def update_var(self, sq: float, alpha: float) -> None:
+        """Track an EWMA of squared residuals in `var` (used for pooled seasonal variance)."""
+        self.var = sq if self.n == 0 else self.var + alpha * (sq - self.var)
+        self.n += 1
+
 
 def _directional(z: float, metric: str) -> float:
     d = DIRECTION.get(metric, "up")
@@ -238,20 +247,31 @@ class EWMADetector(BaseDetector):
 
 
 class SeasonalDetector(BaseDetector):
-    """Diurnal-aware baseline: one EWMA per (host, metric, phase-of-day bin)."""
+    """Diurnal-aware baseline: one EWMA mean per (host, metric, phase-of-day bin).
+
+    Each bin is visited only once per cycle, so its own variance estimate is very noisy early on. The scale of a
+    z-score therefore shrinks the bin's variance toward a pooled residual variance for that (host, metric),
+    which is estimated from every bin and converges quickly (`shrinkage` pseudo-observations of the pool).
+    """
 
     name = "seasonal"
 
     def __init__(self, period: int = 48, bins: int = 8, alpha: float = 0.3, z_threshold: float = 4.0,
                  min_obs: int = 3, confirm_ticks: int = 2, clear_ticks: int = 3,
-                 metrics: Iterable[str] | None = None):
+                 metrics: Iterable[str] | None = None, shrinkage: float = 4.0, pool_alpha: float = 0.05):
         super().__init__(confirm_ticks, clear_ticks)
         self.period, self.bins, self.alpha, self.z, self.min_obs = period, bins, alpha, z_threshold, min_obs
+        self.shrinkage, self.pool_alpha = shrinkage, pool_alpha
         self.metrics = set(metrics) if metrics else None
         self.stats: dict[tuple[str, str, int], _Stat] = {}
+        self.pooled: dict[tuple[str, str], _Stat] = {}  # residual variance across all bins (mean field unused)
 
     def phase_bin(self, tick: int) -> int:
         return (tick % self.period) * self.bins // self.period
+
+    def _scale(self, st: _Stat, pool: _Stat, floor: float) -> float:
+        var = (st.n * st.var + self.shrinkage * pool.var) / (st.n + self.shrinkage) if pool.n else st.var
+        return max(math.sqrt(max(var, 0.0)), floor)
 
     def signals(self, host: str, m: dict[str, float], tick: int) -> dict[str, tuple[float, str]]:
         out: dict[str, tuple[float, str]] = {}
@@ -260,13 +280,18 @@ class SeasonalDetector(BaseDetector):
             if self.metrics is not None and metric not in self.metrics:
                 continue
             st = self.stats.setdefault((host, metric, b), _Stat())
+            pool = self.pooled.setdefault((host, metric), _Stat())
             if st.n < self.min_obs:
+                if st.n:
+                    pool.update_var((x - st.mean) ** 2, self.pool_alpha)
                 st.update(x, self.alpha)
                 continue
-            z = _directional(st.z(x, STD_FLOOR.get(metric, DEFAULT_STD_FLOOR)), metric)
+            floor = STD_FLOOR.get(metric, DEFAULT_STD_FLOOR)
+            z = _directional((x - st.mean) / self._scale(st, pool, floor), metric)
             if z > self.z:
                 out[f"seasonal:{metric}"] = (z, "high" if z > 2 * self.z else "medium")
             else:
+                pool.update_var((x - st.mean) ** 2, self.pool_alpha)
                 st.update(x, self.alpha)
         return out
 

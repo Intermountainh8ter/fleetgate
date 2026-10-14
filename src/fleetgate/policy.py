@@ -60,14 +60,52 @@ class Reason(str, Enum):
         return Decision(self.value.split("_", 1)[0].replace("APPROVAL", "NEEDS_APPROVAL"))
 
 
+Pool = tuple[int, tuple[str, ...]]  # (approvals needed, roles allowed to give them)
+
+
 @dataclass(frozen=True)
 class ApprovalRequirement:
+    """What a NEEDS_APPROVAL verdict asks for.
+
+    `pools` lists independent N-of-M requirements (the tier's pool, plus the protected-role pool when the action
+    touches a protected host). Every pool must be filled by *distinct* approvers, so a request that is both
+    destructive and protected cannot be satisfied by the weaker of the two groups. `required` is the total number
+    of approvals and `roles` the union of eligible roles in priority order (for display and approvers).
+    """
+
     required: int
     roles: tuple[str, ...]
     code: Reason
+    pools: tuple[Pool, ...] = ()
+
+    def __post_init__(self) -> None:
+        if not self.pools:
+            object.__setattr__(self, "pools", ((self.required, self.roles),))
+
+    @classmethod
+    def from_pools(cls, pools: list[Pool], code: Reason) -> ApprovalRequirement:
+        roles = tuple(dict.fromkeys(r for _, rs in pools for r in rs))
+        return cls(sum(n for n, _ in pools), roles, code, tuple(pools))
+
+    def satisfied_by(self, approvers: dict[str, str]) -> bool:
+        """`approvers` maps distinct approver name -> role. True if every pool slot can get its own approver."""
+        slots = [roles for n, roles in self.pools for _ in range(n)]
+        owner: dict[str, int] = {}  # approver -> slot index it currently fills
+
+        def place(slot: int, seen: set[str]) -> bool:
+            for name, role in approvers.items():
+                if role in slots[slot] and name not in seen:
+                    seen.add(name)
+                    if name not in owner or place(owner[name], seen):
+                        owner[name] = slot
+                        return True
+            return False
+
+        return all(place(i, set()) for i in range(len(slots)))
 
     def to_dict(self) -> dict[str, Any]:
-        return {"required": self.required, "roles": list(self.roles), "code": self.code.value}
+        return {"required": self.required, "roles": list(self.roles), "code": self.code.value,
+                "pools": [{"required": n, "roles": list(rs)} for n, rs in self.pools]}
 
 
 @dataclass
@@ -189,6 +227,13 @@ class PolicyConfig:
             if a["required"] > len(a["roles"]):
                 raise ValueError(f"policy {cfg.name!r}: {tier} approvals need {a['required']} of "
                                  f"{len(a['roles'])} roles")
+        for tier in ("DESTRUCTIVE", "DISRUPTIVE"):  # a tier plus the protected pool must still be fillable
+            combined = ApprovalRequirement.from_pools(
+                [(cfg.approvals[t]["required"], tuple(cfg.approvals[t]["roles"])) for t in (tier, "protected")],
+                Reason.PROTECTED_ROLE)
+            if not combined.satisfied_by({r: r for r in combined.roles}):
+                raise ValueError(f"policy {cfg.name!r}: {tier} + protected approvals can never be satisfied by "
+                                 "distinct approvers; add roles or lower 'required'")
         return cfg
 
     def to_dict(self) -> dict[str, Any]:
@@ -380,9 +425,7 @@ class Policy:
             parts.append((self.cfg.approvals["protected"], Reason.PROTECTED_ROLE))
         if not parts:
             return None
-        required = max(p["required"] for p, _ in parts)
-        roles = tuple(dict.fromkeys(r for p, _ in parts for r in p["roles"]))
-        return ApprovalRequirement(required, roles, parts[0][1])
+        return ApprovalRequirement.from_pools([(p["required"], tuple(p["roles"])) for p, _ in parts], parts[0][1])
 
     # ---- canary-first ------------------------------------------------------------------------
     def _campaign_threshold(self) -> int:
@@ -390,6 +433,8 @@ class Policy:
         return max(2, math.ceil(frac * len(self.fleet.hosts)))
 
     def _campaign_active(self, runbook_id: str, camp: _Campaign) -> bool:
+        if not self.cfg.canary.get("enabled", True):
+            return False
         window = int(self.cfg.canary.get("window_ticks", 10))
         live = [h for h, tk in camp.proposed.items() if self.fleet.tick - tk < window]
         return len(live) >= self._campaign_threshold()

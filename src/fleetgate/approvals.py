@@ -43,10 +43,14 @@ class ApprovalRequest:
     resolved_tick: int | None = None
 
     def valid_approvers(self) -> set[str]:
-        return {a.approver for a in self.approvals if a.approved and a.role in self.requirement.roles}
+        return set(self._valid_roles())
 
-    def satisfied(self) -> bool:
-        return len(self.valid_approvers()) >= self.requirement.required
+    def _valid_roles(self, extra: list[Approval] | None = None) -> dict[str, str]:
+        return {a.approver: a.role for a in [*self.approvals, *(extra or [])]
+                if a.approved and a.role in self.requirement.roles}
+
+    def satisfied(self, extra: list[Approval] | None = None) -> bool:
+        return self.requirement.satisfied_by(self._valid_roles(extra))
 
     def rejected(self) -> bool:
         return any(not a.approved for a in self.approvals)
@@ -78,11 +82,12 @@ class AutoApprover:
         if self.mode == "deny":
             return [Approval(f"{self.name}-{request.requirement.roles[0]}", request.requirement.roles[0], False, tick,
                              "auto-deny")]
-        have = request.valid_approvers()
-        out = []
+        out: list[Approval] = []
         for role in request.requirement.roles:
-            if len(have) + len(out) >= request.requirement.required:
+            if request.satisfied(out):
                 break
+            if f"{self.name}-{role}" in {a.approver for a in request.approvals}:
+                continue
             out.append(Approval(f"{self.name}-{role}", role, True, tick, "auto-approve"))
         return out
 
@@ -116,7 +121,7 @@ class InteractiveApprover:
                        f"  rationale: {request.rationale}")
         out: list[Approval] = []
         for role in req.roles:
-            if len(request.valid_approvers()) + len(out) >= req.required:
+            if request.satisfied(out):
                 break
             ans = self.input_fn(f"  approve as {role}? [y/N/h(old)] ").strip().lower()
             if ans == "h":
