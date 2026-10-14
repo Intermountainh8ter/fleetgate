@@ -42,6 +42,8 @@ filterwarnings = ["error::DeprecationWarning:fleetgate.*"]
 [tool.coverage.run]
 source = ["fleetgate"]
 branch = true
+# __main__.py is exercised by a subprocess test (`python -m fleetgate`), which coverage does not trace
+omit = ["*/fleetgate/__main__.py"]
 
 [tool.coverage.report]
 show_missing = false
