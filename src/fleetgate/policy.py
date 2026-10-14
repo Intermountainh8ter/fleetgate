@@ -60,6 +60,91 @@ class Reason(str, Enum):
         return Decision(self.value.split("_", 1)[0].replace("APPROVAL", "NEEDS_APPROVAL"))
 
 
+# Per-reason-code guidance: (what it means, how to fix it). Single source for `fleetgate explain`, docs/POLICY.md
+# and the troubleshooting flowchart.
+REASON_GUIDE: dict[Reason, tuple[str, str]] = {
+    Reason.UNKNOWN_RUNBOOK: (
+        "The proposed runbook id is not in the catalogue. Matching is exact: no trimming, case-folding or Unicode "
+        "normalisation, so 'drain_host ' and a Cyrillic-'a' lookalike are different strings.",
+        "Use an id from `fleetgate runbooks`. If an LLM planner produced it, read the 'plan_filtered' audit entry; "
+        "fix the prompt or switch to the heuristic planner. Never loosen the matching."),
+    Reason.UNKNOWN_HOST: (
+        "The host id is not in the fleet (typo, spoofed or stale id).",
+        "Check the host exists (`fleetgate simulate --json` lists hosts in incidents); for LLM plans the host must "
+        "also be inside the incident's scope."),
+    Reason.DENY_LIST: (
+        "The runbook is on the policy's deny_list, so it can never run under this policy, with or without approval.",
+        "Pick another runbook, or edit deny_list in your policy file (bundled policies are read-only references: copy "
+        "one and pass it with --policy)."),
+    Reason.FREEZE_WINDOW: (
+        "A change freeze is active and this runbook's tier is not in the window's allow_tiers.",
+        "Wait for the window to end, or define a maintenance window for the datacenter (re-opens DISRUPTIVE work on "
+        "unprotected hosts only; DESTRUCTIVE work stays frozen)."),
+    Reason.PRECONDITION_FAILED: (
+        "A precondition of the runbook does not hold (host_drained, ticket_open, bmc_reachable, ssh_reachable, ...). "
+        "The verdict's reason lists exactly which.",
+        "Run the prerequisite steps first (drain_host, open_ticket) and keep the playbook order; for bmc/ssh "
+        "preconditions the host's management path is down: reset_bmc or escalate."),
+    Reason.COOLDOWN: (
+        "The same runbook already ran on this host within cooldown_ticks (anti-flapping).",
+        "Wait it out (the orchestrator retries automatically for up to 20 ticks) or lower cooldown_ticks. Repeated "
+        "hits mean a playbook is looping."),
+    Reason.TICK_BUDGET: (
+        "max_actions_per_tick actions have already executed this tick.",
+        "Nothing to fix: the step retries next tick. Raise max_actions_per_tick if incident backlogs are long."),
+    Reason.RATE_LIMIT: (
+        "The runbook hit its rate_limits entry (max executions per window across the fleet).",
+        "Wait for the window to slide, or raise the limit for that runbook."),
+    Reason.QUOTA_ROLE: (
+        "Too many actions on hosts of this role inside the quota window.",
+        "Wait, or raise quotas.per_role for the role. Quotas exist so one noisy incident cannot churn the primaries."),
+    Reason.QUOTA_DC: (
+        "Too many actions in this datacenter inside the quota window.",
+        "Wait, or raise quotas.per_dc for the datacenter."),
+    Reason.BLAST_RADIUS: (
+        "Draining would push the drained fraction of the fleet above max_drained_fraction.",
+        "Return repaired hosts (undrain_host / restore_rack), add spare capacity (see the CapacityAgent report), or "
+        "raise max_drained_fraction in a copy of the policy. The plan is stopped and a human is paged."),
+    Reason.ROLE_CAPACITY_FLOOR: (
+        "The action would leave fewer active hosts of a role than min_active_per_role (e.g. the last db-primary).",
+        "Add a spare host of that role first, or lower the floor in your policy. The fault stays open and a human is "
+        "paged."),
+    Reason.CANARY_PENDING: (
+        "This runbook is being proposed against a large part of the fleet (a campaign): one canary host must run it "
+        "and pass verification before the rest.",
+        "Nothing to fix: the step waits (up to 20 ticks) for the canary's verification."),
+    Reason.CANARY_FAILED: (
+        "The campaign's canary failed verification, so the whole campaign is frozen for canary.window_ticks.",
+        "Fix the runbook or its probe, or wait for the window; look at the 'verify' audit entry of the canary."),
+    Reason.APPROVAL_TIMEOUT: (
+        "Nobody answered the approval request within expire_after_ticks.",
+        "Check approver coverage (page_after_ticks paged someone), then re-run; raise escalation.expire_after_ticks "
+        "if your humans are slower."),
+    Reason.APPROVAL_REJECTED: (
+        "An approver said no. Any single rejection rejects the request, and approval never overrides a DENY.",
+        "Read the approval note in the audit log; fix the plan, not the policy."),
+    Reason.INTERNAL_ERROR: (
+        "The gate raised while evaluating (malformed input, a bug). It fails closed.",
+        "Read the reason text; this should not happen with well-formed input, so please report it."),
+    Reason.DESTRUCTIVE_TIER: (
+        "The runbook is DESTRUCTIVE (irreversible or data-losing): it needs the DESTRUCTIVE approver pool.",
+        "Approve it (N-of-M from the pool in approvals.DESTRUCTIVE), or deny it."),
+    Reason.DISRUPTIVE_TIER: (
+        "The runbook is DISRUPTIVE (reboots, rebuilds): it needs the DISRUPTIVE approver pool unless a maintenance "
+        "window covers the datacenter.",
+        "Approve it, or add a maintenance window to the policy."),
+    Reason.PROTECTED_ROLE: (
+        "The action touches a host with a protected role (db-primary, validator, ...), including every host of a "
+        "rack-wide action.",
+        "Approve it from the protected pool (stacks with the tier's pool, filled by different people)."),
+    Reason.MAINTENANCE_WINDOW: (
+        "ALLOW: a DISRUPTIVE runbook on unprotected hosts inside a maintenance window needs no human.",
+        "Nothing to fix."),
+    Reason.CANARY: ("ALLOW: this host is the canary for a fleet-wide campaign.", "Nothing to fix."),
+    Reason.REVERSIBLE: ("ALLOW: a REVERSIBLE runbook on unprotected hosts, within every limit.", "Nothing to fix."),
+}
+
+
 Pool = tuple[int, tuple[str, ...]]  # (approvals needed, roles allowed to give them)
 
 

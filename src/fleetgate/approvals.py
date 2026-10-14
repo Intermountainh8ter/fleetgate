@@ -128,9 +128,12 @@ class ScriptedApprover:
 class InteractiveApprover:
     """Prompts a human on stdin for each role until the requirement is met (used by the CLI)."""
 
-    def __init__(self, input_fn: Callable[[str], str] = input, output_fn: Callable[[str], None] = print,
+    def __init__(self, input_fn: Callable[[str], str] | None = None, output_fn: Callable[[str], None] | None = None,
                  operator: str = "operator"):
-        self.input_fn, self.output_fn, self.operator = input_fn, output_fn, operator
+        # builtins are looked up when asked, not frozen at import, so a host that swaps stdin/stdout still works
+        self.input_fn = input_fn or (lambda prompt: input(prompt))
+        self.output_fn = output_fn or (lambda text: print(text))
+        self.operator = operator
 
     def review(self, request: ApprovalRequest, tick: int) -> list[Approval]:
         req = request.requirement

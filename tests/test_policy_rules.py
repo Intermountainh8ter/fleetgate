@@ -407,3 +407,13 @@ def test_a_flood_of_proposals_counts_toward_the_campaign_even_when_they_fail_oth
     assert p.evaluate("restart_service", ids[7]).code == Reason.CANARY  # first canary slot is offered
     p.record("restart_service", ids[7])
     assert p.evaluate("restart_service", ids[8]).code == Reason.CANARY_PENDING
+
+
+def test_every_reason_code_has_a_meaning_and_a_fix():
+    from fleetgate.policy import REASON_GUIDE
+
+    assert set(REASON_GUIDE) == set(Reason)
+    for code, (meaning, fix) in REASON_GUIDE.items():
+        assert len(meaning) > 20 and len(fix) > 10, code
+    allow = [c for c in Reason if c.decision == Decision.ALLOW]
+    assert all(REASON_GUIDE[c][1] == "Nothing to fix." or "Nothing to fix" in REASON_GUIDE[c][1] for c in allow)
