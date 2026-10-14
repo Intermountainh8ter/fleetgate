@@ -25,7 +25,7 @@ def render_tick(orch: Orchestrator, max_hosts: int = 12, width: int = 110) -> st
              f"tick {t:>5}  load x{s['load']:.2f}  hosts {s['active']}/{s['hosts']} active  {s['drained']} drained  "
              f"{s['faulty']} faulty | incidents open {s['open']} resolved {s['resolved']} contained {s['contained']}"
              f" | pending approvals {s['pending_approvals']}  pages {s['pages']}"]
-    opened = [r for r in orch.records.values() if r.status == "open"]
+    opened = [r for r in orch.records.values() if r.status != "resolved" or r.active]  # open, contained, or working
     cols = [("incident", 38), ("sev", 8), ("root cause", 20), ("hosts", 6), ("steps", 36)]
     if opened:
         lines.append("-" * width)

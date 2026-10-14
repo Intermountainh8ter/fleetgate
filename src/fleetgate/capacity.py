@@ -97,11 +97,15 @@ class CapacityAgent:
             headroom = min(headroom, headroom_role)
             ticks = (headroom / rate) if rate > 0 else None
             need = math.ceil(max(0.0, projected - c["drained"] - headroom) * self.safety)
-            if c["active"] - floor <= 0 and c["total"]:
+            no_headroom = c["total"] > 0 and c["active"] - floor <= 0
+            if no_headroom:
                 need = max(need, 1)
             roles.append(RoleCapacity(role, c["total"], c["active"], c["drained"], c["faulty"], rate, headroom, ticks,
                                       projected, need))
-            if need:
+            if need and no_headroom and rate == 0:
+                recs.append(f"{role}: {c['active']} active host(s) against a floor of {floor}: none can be drained "
+                            f"without breaching the floor; add {need} spare host(s)")
+            elif need:
                 if ticks is None:
                     eta = "n/a"
                 else:
