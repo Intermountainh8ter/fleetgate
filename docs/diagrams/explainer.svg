@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg xmlns='http://www.w3.org/2000/svg' width='1000' height='930' viewBox='0 0 1000 930' font-family='Inter, Helvetica Neue, Arial, sans-serif'>
+<rect width='100%' height='100%' fill='#ffffff'/>
+<rect x='0' y='0' width='1000' height='7' fill='#1d4ed8'/>
+<text x='44.0' y='64.0' font-size='34' font-weight='700' fill='#13161a' text-anchor='start'>fleetgate</text>
+<text x='44.0' y='90.0' font-size='16' font-weight='400' fill='#5b6472' text-anchor='start'>Can an automated operator be pushed into breaking its own safety rules?</text>
+<line x1='44.0' y1='106.0' x2='956.0' y2='106.0' stroke='#e3e7ec' stroke-width='1.5'/>
+<text x='44.0' y='140.0' font-size='13' font-weight='700' fill='#1d4ed8' letter-spacing='1.6'>THE QUESTION</text>
+<text x='44.0' y='180.4' font-size='21' font-weight='600' fill='#13161a' text-anchor='start'>Software that repairs broken servers automatically has to be</text>
+<text x='44.0' y='210.9' font-size='21' font-weight='600' fill='#13161a' text-anchor='start'>stopped from, say, rebooting every machine at once. Do those</text>
+<text x='44.0' y='241.3' font-size='21' font-weight='600' fill='#13161a' text-anchor='start'>brakes hold when everything goes wrong at the same time?</text>
+<text x='44.0' y='275.3' font-size='13' font-weight='700' fill='#1d4ed8' letter-spacing='1.6'>WHAT WE DID</text>
+<text x='44.0' y='308.5' font-size='16' font-weight='400' fill='#5b6472' text-anchor='start'>We simulated server rooms on fire: power failures, disk failures, cooling loss,</text>
+<text x='44.0' y='331.7' font-size='16' font-weight='400' fill='#5b6472' text-anchor='start'>network collapse, several at once. A hostile planner deliberately tried to trip the</text>
+<text x='44.0' y='354.9' font-size='16' font-weight='400' fill='#5b6472' text-anchor='start'>safety rules across 2,460 runs.</text>
+<text x='44.0' y='384.9' font-size='15' font-weight='700' fill='#13161a' text-anchor='start'>Average hours to fix a fault, under each safety setting</text>
+<text x='266.0' y='437.9' font-size='14' font-weight='400' fill='#13161a' text-anchor='end'>Drain limit: strict</text>
+<rect x='280.0' y='421.9' width='526.0' height='22.0' rx='4' fill='#f1f4f8'/>
+<rect x='280.0' y='421.9' width='512.0' height='22.0' rx='4' fill='#b91c1c'/>
+<text x='820.0' y='437.9' font-size='14' font-weight='700' fill='#13161a' text-anchor='start'>29.2</text>
+<text x='266.0' y='471.9' font-size='14' font-weight='400' fill='#13161a' text-anchor='end'>Drain limit: medium</text>
+<rect x='280.0' y='455.9' width='526.0' height='22.0' rx='4' fill='#f1f4f8'/>
+<rect x='280.0' y='455.9' width='382.2' height='22.0' rx='4' fill='#b45309'/>
+<text x='820.0' y='471.9' font-size='14' font-weight='700' fill='#13161a' text-anchor='start'>21.8</text>
+<text x='266.0' y='505.9' font-size='14' font-weight='400' fill='#13161a' text-anchor='end'>Drain limit: loose</text>
+<rect x='280.0' y='489.9' width='526.0' height='22.0' rx='4' fill='#f1f4f8'/>
+<rect x='280.0' y='489.9' width='317.4' height='22.0' rx='4' fill='#15803d'/>
+<text x='820.0' y='505.9' font-size='14' font-weight='700' fill='#13161a' text-anchor='start'>18.1</text>
+<text x='266.0' y='539.9' font-size='14' font-weight='400' fill='#13161a' text-anchor='end'>Sign-offs needed: 1 vs 3</text>
+<rect x='280.0' y='523.9' width='526.0' height='22.0' rx='4' fill='#f1f4f8'/>
+<rect x='280.0' y='523.9' width='408.5' height='22.0' rx='4' fill='#94a3b8'/>
+<text x='820.0' y='539.9' font-size='14' font-weight='700' fill='#13161a' text-anchor='start'>22.8 vs 23.3</text>
+<text x='266.0' y='573.9' font-size='14' font-weight='400' fill='#13161a' text-anchor='end'>Test-one-first: off vs on</text>
+<rect x='280.0' y='557.9' width='526.0' height='22.0' rx='4' fill='#f1f4f8'/>
+<rect x='280.0' y='557.9' width='408.5' height='22.0' rx='4' fill='#94a3b8'/>
+<text x='820.0' y='573.9' font-size='14' font-weight='700' fill='#13161a' text-anchor='start'>22.7 vs 23.3</text>
+<text x='44.0' y='594.9' font-size='12.5' font-weight='400' fill='#5b6472' text-anchor='start'>Grey bars are the settings that made no real difference. Shorter is better.</text>
+<text x='44.0' y='628.9' font-size='13' font-weight='700' fill='#1d4ed8' letter-spacing='1.6'>WHAT WE FOUND</text>
+<text x='44.0' y='666.9' font-size='30' font-weight='700' fill='#1d4ed8' text-anchor='start'>Zero failures. And two dials that do nothing.</text>
+<text x='44.0' y='696.9' font-size='16.5' font-weight='400' fill='#13161a' text-anchor='start'>Across 2,460 hostile runs and 104,828 rule checks, the safety rules were never</text>
+<text x='44.0' y='720.8' font-size='16.5' font-weight='400' fill='#13161a' text-anchor='start'>broken once. But only one of the four safety settings changed the outcome. Requiring</text>
+<text x='44.0' y='744.7' font-size='16.5' font-weight='400' fill='#13161a' text-anchor='start'>more human sign-offs, and testing one machine before the rest, made no measurable</text>
+<text x='44.0' y='768.6' font-size='16.5' font-weight='400' fill='#13161a' text-anchor='start'>difference at all.</text>
+<text x='44.0' y='802.6' font-size='13' font-weight='700' fill='#1d4ed8' letter-spacing='1.6'>WHY IT MATTERS</text>
+<text x='44.0' y='836.6' font-size='16.5' font-weight='400' fill='#13161a' text-anchor='start'>Controls that feel reassuring and do nothing are their own hazard: people trust</text>
+<text x='44.0' y='860.5' font-size='16.5' font-weight='400' fill='#13161a' text-anchor='start'>them. This repo measured its own safety dials and reported that half of them are</text>
+<text x='44.0' y='884.4' font-size='16.5' font-weight='400' fill='#13161a' text-anchor='start'>decoration.</text>
+</svg>
