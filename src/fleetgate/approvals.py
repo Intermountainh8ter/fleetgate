@@ -92,6 +92,24 @@ class AutoApprover:
         return out
 
 
+class LatencyApprover:
+    """Simulated human reviewers: the k-th approval of a request lands `base_delay + (k - 1) * per_vote` ticks after
+    it was filed, so stricter N-of-M policies cost more waiting time. `mode="deny"` rejects after `base_delay`."""
+
+    def __init__(self, base_delay: int = 2, per_vote: int = 1, mode: str = "approve", name: str = "oncall"):
+        if base_delay < 0 or per_vote < 1:
+            raise ValueError("base_delay must be >= 0 and per_vote >= 1")
+        self.base_delay, self.per_vote = base_delay, per_vote
+        self._auto = AutoApprover(mode, name)
+
+    def review(self, request: ApprovalRequest, tick: int) -> list[Approval]:
+        age = tick - request.opened_tick
+        if age < self.base_delay:
+            return []
+        due = (age - self.base_delay) // self.per_vote + 1  # cumulative votes that have arrived by now
+        return self._auto.review(request, tick)[:max(0, due - len(request.approvals))]
+
+
 class ScriptedApprover:
     """Deterministic approver for tests: a list of (approver, role, approved) answered after `delay` ticks."""
 

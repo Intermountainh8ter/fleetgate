@@ -168,3 +168,27 @@ def test_detectors_tolerate_missing_metrics(det):
     for t in range(1, 30):
         det.observe(t, {"h": {"temp_c": 60.0}})  # nearly everything missing
     assert det.open_signals("h") == []
+
+
+def test_seasonal_stays_quiet_until_it_has_learned_each_metric_spread():
+    d = SeasonalDetector(period=8, bins=2, confirm_ticks=1, min_obs=2, metrics=["temp_c"], min_pool=30)
+    series = [60.0, 60.2, 59.9, 60.1, 60.0, 90.0]  # an early outlier: nothing is known about the spread yet
+    out = [d.observe(t, {"h": {"temp_c": v}}) for t, v in enumerate(series, start=1)]
+    assert all(o == [] for o in out)
+    eager = SeasonalDetector(period=8, bins=2, confirm_ticks=1, min_obs=2, metrics=["temp_c"], min_pool=0)
+    out = [eager.observe(t, {"h": {"temp_c": v}}) for t, v in enumerate(series, start=1)]
+    assert out[-1] and out[-1][0].signal == "seasonal:temp_c"  # without the guard the same outlier alarms
+
+
+def test_pooled_variance_starts_as_a_running_mean_not_a_single_sample():
+    from fleetgate.detect import _Stat
+
+    st = _Stat()
+    for sq in (4.0, 4.0, 4.0, 4.0):
+        st.update_var(sq, alpha=0.02)
+    assert st.var == pytest.approx(4.0) and st.n == 4
+    st.update_var(100.0, alpha=0.02)  # 5th sample moves it by 1/5 (running mean), not by alpha
+    assert st.var == pytest.approx(4.0 + (100.0 - 4.0) / 5)
+    for _ in range(500):
+        st.update_var(4.0, alpha=0.02)
+    assert st.var == pytest.approx(4.0, abs=0.3)  # then it settles to an EWMA of squared residuals

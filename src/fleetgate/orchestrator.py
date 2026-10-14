@@ -384,6 +384,9 @@ class Orchestrator:
                 self._deny_step(rec, step, v)
                 return False
         rb = CATALOG[p.runbook]
+        # judged before the effects land: failover_db_primary changes the very role we are asking about
+        protected = any(self.fleet.hosts[h].role in self.policy.cfg.protected_roles
+                        for h in rb.target_hosts(self.fleet, p.host))
         result = rb.apply(self.fleet, p.host, dry_run=self.dry_run)
         step.hosts = result.hosts
         step.executed_tick = self.fleet.tick
@@ -391,8 +394,9 @@ class Orchestrator:
         self.executed.append((self.fleet.tick, p.runbook, p.host))
         rec.executed.append(f"{p.runbook}@{p.host}")
         self.audit.append("executed", tick=self.fleet.tick, id=rec.incident.id, runbook=p.runbook, host=p.host,
-                          hosts=result.hosts, changes=result.changes[:20], dry_run=self.dry_run,
-                          request_id=step.request_id, rollback=step.is_rollback, tier=rb.tier.name)
+                          hosts=result.hosts, changes=result.changes[:64], dry_run=self.dry_run,
+                          request_id=step.request_id, rollback=step.is_rollback, tier=rb.tier.name,
+                          protected=protected, gate=step.verdict.code.value if step.verdict else None)
         if step.is_rollback:
             rec.rollbacks.append(f"{p.runbook}@{p.host}")
             if step.parent is not None and step.parent.status == "failed":

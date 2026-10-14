@@ -7,6 +7,7 @@ from fleetgate.approvals import (
     ApprovalRequest,
     AutoApprover,
     InteractiveApprover,
+    LatencyApprover,
     LegacyApprover,
     ScriptedApprover,
     as_approver,
@@ -175,3 +176,29 @@ def test_requirement_to_dict_lists_pools_and_defaults_to_one_pool():
     assert REQ2.pools == ((2, ("sre-lead", "dc-ops", "change-manager")),)
     stacked = ApprovalRequirement.from_pools([(1, ("a",)), (1, ("b",))], Reason.PROTECTED_ROLE)
     assert stacked.to_dict()["pools"] == [{"required": 1, "roles": ["a"]}, {"required": 1, "roles": ["b"]}]
+
+
+def test_latency_approver_models_slow_humans_and_stricter_policies_cost_more_ticks():
+    q, r = queue(LatencyApprover(base_delay=2, per_vote=1), req=REQ2)  # opened at tick 10, needs two votes
+    assert r.status == "pending"
+    assert q.poll(11)[0] == []  # age 1: nobody has looked yet
+    q.poll(12)  # age 2: first reviewer answers
+    assert r.status == "pending" and len(r.approvals) == 1
+    resolved, _, changed = q.poll(13)  # age 3: second reviewer answers
+    assert resolved == [r] and r.status == "approved" and r.resolved_tick == 13 and changed == [r]
+    q1, r1 = queue(LatencyApprover(base_delay=2, per_vote=1), req=REQ1)
+    q1.poll(12)
+    assert r1.status == "approved" and r1.resolved_tick == 12  # one approval is a tick faster than two
+
+
+def test_latency_approver_deny_mode_and_validation():
+    q, r = queue(LatencyApprover(base_delay=1, mode="deny"))
+    assert r.status == "pending"
+    q.poll(11)
+    assert r.status == "rejected"
+    with pytest.raises(ValueError):
+        LatencyApprover(base_delay=-1)
+    with pytest.raises(ValueError):
+        LatencyApprover(per_vote=0)
+    q0, r0 = queue(LatencyApprover(base_delay=0, per_vote=1), req=REQ2)
+    assert r0.status == "pending" and len(r0.approvals) == 1  # zero base delay: first vote is immediate

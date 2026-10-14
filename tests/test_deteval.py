@@ -80,3 +80,10 @@ def test_healthy_false_positives_counts_incidents_on_clean_fleets():
     assert n == 0 and host_ticks == 2 * 15 * 40
     noisy, _ = healthy_false_positives(lambda: ThresholdDetector(margin=0.1), fleets=1, fleet_size=15, ticks=30)
     assert noisy > 0  # absurdly tight thresholds do fire on healthy hosts
+
+
+def test_warmup_jitter_varies_the_injection_phase_but_not_the_verdict():
+    a = evaluate_detector(ThresholdDetector, faults=["service_down"], warmup_jitter=0, **FAST)
+    b = evaluate_detector(ThresholdDetector, faults=["service_down"], warmup_jitter=47, **FAST)
+    assert a.host_ticks != b.host_ticks  # different warm-up lengths were run
+    assert b.per_fault["service_down"].recall == 1.0 and b.per_fault["service_down"].ttd_mean == 2.0

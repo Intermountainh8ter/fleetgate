@@ -1,0 +1,135 @@
+{
+ "detection": {
+  "flat": {
+   "threshold": {
+    "macro_recall": 1.0,
+    "macro_f1": 1.0,
+    "healthy_fp_incidents": 0
+   },
+   "ewma": {
+    "macro_recall": 0.9821428571428571,
+    "macro_f1": 0.9859943977591037,
+    "healthy_fp_incidents": 0
+   },
+   "seasonal": {
+    "macro_recall": 1.0,
+    "macro_f1": 1.0,
+    "healthy_fp_incidents": 0
+   }
+  },
+  "diurnal": {
+   "threshold": {
+    "macro_recall": 1.0,
+    "macro_f1": 1.0,
+    "healthy_fp_incidents": 0
+   },
+   "ewma": {
+    "macro_recall": 0.9821428571428571,
+    "macro_f1": 0.9338935574229692,
+    "healthy_fp_incidents": 2
+   },
+   "seasonal": {
+    "macro_recall": 1.0,
+    "macro_f1": 1.0,
+    "healthy_fp_incidents": 0
+   }
+  }
+ },
+ "policy": {
+  "canary/instant": {
+   "resolve_rate": 0.9615384615384616,
+   "mttr_mean": 8.12,
+   "violations": 0
+  },
+  "canary/humans": {
+   "resolve_rate": 0.9615384615384616,
+   "mttr_mean": 9.28,
+   "violations": 0
+  },
+  "canary/nobody": {
+   "resolve_rate": 0.7307692307692307,
+   "mttr_mean": 4.894736842105263,
+   "violations": 0
+  },
+  "default/instant": {
+   "resolve_rate": 0.9230769230769231,
+   "mttr_mean": 8.291666666666666,
+   "violations": 0
+  },
+  "default/humans": {
+   "resolve_rate": 0.9230769230769231,
+   "mttr_mean": 9.5,
+   "violations": 0
+  },
+  "default/nobody": {
+   "resolve_rate": 0.5769230769230769,
+   "mttr_mean": 3.7333333333333334,
+   "violations": 0
+  },
+  "freeze/instant": {
+   "resolve_rate": 0.6153846153846154,
+   "mttr_mean": 3.6875,
+   "violations": 0
+  },
+  "freeze/humans": {
+   "resolve_rate": 0.6153846153846154,
+   "mttr_mean": 3.8125,
+   "violations": 0
+  },
+  "freeze/nobody": {
+   "resolve_rate": 0.5769230769230769,
+   "mttr_mean": 3.7333333333333334,
+   "violations": 0
+  },
+  "permissive/instant": {
+   "resolve_rate": 1.0,
+   "mttr_mean": 8.307692307692308,
+   "violations": 0
+  },
+  "permissive/humans": {
+   "resolve_rate": 1.0,
+   "mttr_mean": 9.23076923076923,
+   "violations": 0
+  },
+  "permissive/nobody": {
+   "resolve_rate": 0.7307692307692307,
+   "mttr_mean": 4.894736842105263,
+   "violations": 0
+  },
+  "strict/instant": {
+   "resolve_rate": 0.8076923076923077,
+   "mttr_mean": 5.333333333333333,
+   "violations": 0
+  },
+  "strict/humans": {
+   "resolve_rate": 0.8076923076923077,
+   "mttr_mean": 7.619047619047619,
+   "violations": 0
+  },
+  "strict/nobody": {
+   "resolve_rate": 0.19230769230769232,
+   "mttr_mean": 5.2,
+   "violations": 0
+  }
+ },
+ "adversarial": {
+  "violations": 0,
+  "exceptions": 0,
+  "runs": 390,
+  "gate_evaluations": 13933
+ },
+ "montecarlo": {
+  "violations": 0,
+  "runs": 216,
+  "best_censored_mttr": 17.440677966101696,
+  "mean_resolve_rate": 0.7556497175141242
+ },
+ "tolerance": {
+  "detection_recall": 0.02,
+  "detection_f1": 0.05,
+  "resolve_rate": 0.03,
+  "mttr_factor": 1.2,
+  "mttr_slack": 0.5,
+  "mc_mttr_factor": 1.15
+ }
+}

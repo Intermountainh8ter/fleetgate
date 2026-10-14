@@ -89,7 +89,9 @@ class EvalResult:
 
 def evaluate_detector(factory: DetectorFactory, faults: list[str] | None = None, seeds: int = 5, fleet_size: int = 20,
                       warmup: int = 30, horizon: int = 40, load: LoadPattern | None = None, name: str | None = None,
-                      noise_scale: float = 1.0) -> EvalResult:
+                      noise_scale: float = 1.0, warmup_jitter: int = 0) -> EvalResult:
+    """`warmup_jitter` adds a seeded 0..jitter extra warm-up ticks per run so that, under a diurnal load, the fault
+    lands at a different phase of the day in different runs."""
     faults = faults or list(FAULT_SPECS)
     per: dict[str, FaultStats] = {f: FaultStats(f) for f in faults}
     fp_total, host_ticks = 0, 0
@@ -102,7 +104,7 @@ def evaluate_detector(factory: DetectorFactory, faults: list[str] | None = None,
             host = rng.choice(sorted(fleet.hosts))
             st = per[fault]
             st.runs += 1
-            for _ in range(warmup):
+            for _ in range(warmup + (rng.randrange(warmup_jitter + 1) if warmup_jitter else 0)):
                 data = fleet.step()
                 for _ in det.observe(fleet.tick, data):
                     fp_total += 1

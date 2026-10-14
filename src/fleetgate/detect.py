@@ -201,7 +201,8 @@ class _Stat:
 
     def update_var(self, sq: float, alpha: float) -> None:
         """Track an EWMA of squared residuals in `var` (used for pooled seasonal variance)."""
-        self.var = sq if self.n == 0 else self.var + alpha * (sq - self.var)
+        # cumulative average while the sample is small (an EWMA seeded with one residual would badly under-estimate)
+        self.var = sq if self.n == 0 else self.var + max(alpha, 1.0 / (self.n + 1)) * (sq - self.var)
         self.n += 1
 
 
@@ -258,10 +259,11 @@ class SeasonalDetector(BaseDetector):
 
     def __init__(self, period: int = 48, bins: int = 8, alpha: float = 0.3, z_threshold: float = 4.0,
                  min_obs: int = 3, confirm_ticks: int = 2, clear_ticks: int = 3,
-                 metrics: Iterable[str] | None = None, shrinkage: float = 4.0, pool_alpha: float = 0.05):
+                 metrics: Iterable[str] | None = None, shrinkage: float = 12.0, pool_alpha: float = 0.02,
+                 min_pool: int = 30):
         super().__init__(confirm_ticks, clear_ticks)
         self.period, self.bins, self.alpha, self.z, self.min_obs = period, bins, alpha, z_threshold, min_obs
-        self.shrinkage, self.pool_alpha = shrinkage, pool_alpha
+        self.shrinkage, self.pool_alpha, self.min_pool = shrinkage, pool_alpha, min_pool
         self.metrics = set(metrics) if metrics else None
         self.stats: dict[tuple[str, str, int], _Stat] = {}
         self.pooled: dict[tuple[str, str], _Stat] = {}  # residual variance across all bins (mean field unused)
@@ -270,7 +272,10 @@ class SeasonalDetector(BaseDetector):
         return (tick % self.period) * self.bins // self.period
 
     def _scale(self, st: _Stat, pool: _Stat, floor: float) -> float:
-        var = (st.n * st.var + self.shrinkage * pool.var) / (st.n + self.shrinkage) if pool.n else st.var
+        # A bin's own EWMA variance averages only ~1/alpha recent samples however long the bin has been observed,
+        # so its weight is capped at that effective sample size; the pooled estimate carries the rest.
+        own = min(st.n, 1.0 / self.alpha)
+        var = (own * st.var + self.shrinkage * pool.var) / (own + self.shrinkage) if pool.n else st.var
         return max(math.sqrt(max(var, 0.0)), floor)
 
     def signals(self, host: str, m: dict[str, float], tick: int) -> dict[str, tuple[float, str]]:
@@ -281,7 +286,7 @@ class SeasonalDetector(BaseDetector):
                 continue
             st = self.stats.setdefault((host, metric, b), _Stat())
             pool = self.pooled.setdefault((host, metric), _Stat())
-            if st.n < self.min_obs:
+            if st.n < self.min_obs or pool.n < self.min_pool:  # still learning this bin / this metric's spread
                 if st.n:
                     pool.update_var((x - st.mean) ** 2, self.pool_alpha)
                 st.update(x, self.alpha)
