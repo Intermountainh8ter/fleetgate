@@ -2,6 +2,14 @@
 
 **Agents propose. A deterministic gate disposes. Every step lands in a tamper-evident log.**
 
+
+## For the lay reader
+
+- [docs/diagrams/explainer.svg](docs/diagrams/explainer.svg) &mdash; a one-page
+  summary in ordinary words: the question, one chart, the finding, and why it
+  matters. No background assumed.
+- [GLOSSARY.md](GLOSSARY.md) &mdash; every abbreviation this repo uses, defined.
+
 ![license: MIT](https://img.shields.io/badge/license-MIT-blue) ![python: 3.10+](https://img.shields.io/badge/python-3.10%2B-blue) ![runtime dependencies: none](https://img.shields.io/badge/runtime%20dependencies-none-brightgreen)
 
 fleetgate is multi-agent incident response for a **simulated** bare-metal fleet, built around one rule: triage and
