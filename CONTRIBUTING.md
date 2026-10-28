@@ -58,3 +58,17 @@ plan that executes without a verdict) is the most valuable bug there is. Please 
 reproduction, or email the maintainer if you would rather not post it publicly.
 
 By contributing you agree your work is released under the MIT license.
+
+## Publishing to PyPI
+
+Maintainer steps. Nothing is published until you do them; the workflow in `.github/workflows/publish.yml`
+only runs when a GitHub Release is published.
+
+1. On pypi.org, add a *pending trusted publisher* for the project name `fleetgate`: owner `Intermountainh8ter`,
+   repository `fleetgate`, workflow `publish.yml`, environment `pypi`. (No API token is needed or stored.)
+2. In this repository's Settings, create an environment named `pypi` (optionally with required reviewers).
+3. Make sure `version` in `pyproject.toml` is the version you want, and that CI is green on `main`.
+4. Create a GitHub Release whose tag is `v<version>` (for example `v0.2.0`). The workflow builds the
+   sdist and wheel, runs `twine check`, and uploads them.
+5. A PyPI version can never be re-uploaded, so check the built files first with `python -m build`
+   and `twine check dist/*`.
