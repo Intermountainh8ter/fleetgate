@@ -1,7 +1,7 @@
 # LinkedIn post
 
 Plain text, ready to paste. Put the repository link in the first comment (LinkedIn suppresses posts with links in the
-body). The bullet list under "numbers" is regenerated from real runs by `scripts/gen_docs.py`.
+body): https://github.com/Intermountainh8ter/fleetgate. The bullet list under "numbers" is regenerated from real runs by `scripts/gen_docs.py`.
 
 ---
 

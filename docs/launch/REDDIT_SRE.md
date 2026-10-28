@@ -57,5 +57,5 @@ Questions I'd actually like answered by people who run fleets:
 3. What would you want in a verification probe beyond "metric X is back under Y"?
 4. Which failure modes of an approval flow (fatigue, rubber-stamping, latency) would you model first?
 
-MIT, zero runtime deps, everything runs offline. Repo link in a comment or at the end of the post, as the sub's rules
-allow.
+MIT, zero runtime deps, everything runs offline. Repo: https://github.com/Intermountainh8ter/fleetgate (put it in a comment or at the end of the post, as the sub's
+rules allow).

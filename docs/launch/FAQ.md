@@ -82,11 +82,12 @@ without the key. A full rewrite by someone with the key, or a truncation, is onl
 
 ## Was AI used to build this?
 
-Yes. This repository was built with an AI coding assistant working in long sessions: it wrote most of the code, the
-tests and the documentation and ran the tests and evals, and the git history shows it. The author, Ammon Jackson,
-chose the design rule and the scope and owns the result. Do not trust a paragraph on who typed what: the evidence is
-that the tests, the mutation check on the fuzzer and the evals can be re-run (`make check`, `python evals/run_evals.py`)
-and that every number in the docs is generated from them. Read the code and the tests, and tell me what is wrong.
+Yes. An AI coding assistant wrote most of the code, tests and documentation in this repository (the commits are
+co-authored in the git history). I directed the work and own the result; no real language model has been run through
+the planner or triage paths yet, and the simulator is idealised. Do not trust a paragraph on who typed what: the
+evidence is that the tests, the mutation check on the fuzzer and the evals can be re-run (`make check`,
+`python evals/run_evals.py`) and that every number in the docs is generated from them. Read the code and the tests, and
+tell me what is wrong.
 
 ## What would you do next?
 
