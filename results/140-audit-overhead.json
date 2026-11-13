@@ -1,0 +1,60 @@
+{
+  "audit_overhead": {
+    "all_verify_ok": true,
+    "bytes_per_entry_ratio_100k_over_1k": 1.00755293000884,
+    "scales": {
+      "1000": {
+        "append_hash_ops": 2984,
+        "append_hash_ops_per_entry": 2.8942774005819594,
+        "appended": 1000,
+        "bytes_per_entry": 287.9340446168768,
+        "checkpoints": 31,
+        "entries": 1031,
+        "total_bytes": 296860,
+        "verify_hash_ops": 2984,
+        "verify_hash_ops_per_entry": 2.8942774005819594,
+        "verify_ok": true
+      },
+      "10000": {
+        "append_hash_ops": 29968,
+        "append_hash_ops_per_entry": 2.906128782001552,
+        "appended": 10000,
+        "bytes_per_entry": 289.04005042668734,
+        "checkpoints": 312,
+        "entries": 10312,
+        "total_bytes": 2980581,
+        "verify_hash_ops": 29968,
+        "verify_hash_ops_per_entry": 2.906128782001552,
+        "verify_ok": true
+      },
+      "100000": {
+        "append_hash_ops": 300000,
+        "append_hash_ops_per_entry": 2.909090909090909,
+        "appended": 100000,
+        "bytes_per_entry": 290.1087903030303,
+        "checkpoints": 3125,
+        "entries": 103125,
+        "total_bytes": 29917469,
+        "verify_hash_ops": 300000,
+        "verify_hash_ops_per_entry": 2.909090909090909,
+        "verify_ok": true
+      }
+    },
+    "verify_ops_per_entry_ratio_100k_over_1k": 1.0051182061905923
+  },
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.audit_overhead --seed 7 --out results/140-audit-overhead.json",
+    "data_sources": [
+      {
+        "license": "none used; simulated data only",
+        "url": "https://arxiv.org/pdf/2609.00275"
+      }
+    ],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-13T10:58:16Z",
+    "wall_s": 3.566
+  }
+}
