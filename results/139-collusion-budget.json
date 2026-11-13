@@ -1,0 +1,47 @@
+{
+  "collusion": {
+    "audit_chain_verified": {
+      "atomic_gate": true,
+      "check_then_act_gate": true,
+      "per_call_gate": true
+    },
+    "audit_entries_per_arm": 35949,
+    "mean_overshoot_units": {
+      "atomic_gate": 0.0,
+      "check_then_act_gate": 17.763,
+      "per_call_gate": 97.862
+    },
+    "pass_through_rate": {
+      "atomic_gate": 0.0,
+      "check_then_act_gate": 0.929,
+      "per_call_gate": 1.0
+    },
+    "violating_sequences_passed": {
+      "atomic_gate": 0,
+      "check_then_act_gate": 929,
+      "per_call_gate": 1000
+    }
+  },
+  "config": {
+    "all_sequences_violate_in_aggregate": true,
+    "fleet_budget": 100,
+    "n_agents": 8,
+    "n_sequences": 1000,
+    "per_call_cap": 10
+  },
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.collusion --seed 7 --out results/139-collusion-budget.json",
+    "data_sources": [
+      {
+        "license": "none used; simulated data only",
+        "url": "https://arxiv.org/pdf/2609.00275"
+      }
+    ],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-13T10:53:19Z",
+    "wall_s": 3.048
+  }
+}
