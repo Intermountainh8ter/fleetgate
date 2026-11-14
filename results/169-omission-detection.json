@@ -1,0 +1,27 @@
+{
+  "omission": {
+    "detection_rate": {
+      "middle_deletion_chain_only": 1.0,
+      "middle_deletion_with_counter": 1.0,
+      "never_written_chain_only": 0.0,
+      "never_written_with_counter": 1.0,
+      "tail_truncation_chain_only": 0.0,
+      "tail_truncation_with_counter": 1.0
+    },
+    "dropped_per_log": [
+      1,
+      5
+    ],
+    "logs_per_type": 1000
+  },
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.omission_eval --seed 7 --out results/169-omission-detection.json",
+    "data_sources": [],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-14T11:07:15Z",
+    "wall_s": 3.725
+  }
+}

@@ -13,3 +13,11 @@ Hypothesis: serialized audit size per entry stays within 20% between 1,000 and 1
 Metric: /audit_overhead/bytes_per_entry_ratio_100k_over_1k. Expected: stays within 0.8 to 1.2 (about 1.0).
 
 Falsifier: bytes-per-entry ratio outside 0.8-1.2, per-entry verify operation ratio above 1.1, or any verify_full failure at any scale.
+
+## 2026-11-14T11:06:55Z omission-detection proposal:0a23b1d2304d9a50d40a793fda4577ec9b6e4e23257801a0daa45a290def0dc6
+
+Hypothesis: on 1000 seeded SIMULATED logs per omission type (k in 1..5 decisions dropped), verify_full with no anchors detects 100% of middle deletions but 0% of never-written decisions and of tail truncations; adding a gate-side decision counter (issued decisions vs decision entries in the log) raises detection of both to 100%.
+
+Metric: /omission/detection_rate/tail_truncation_chain_only. Expected: decreases to at most 0.10.
+
+Falsifier: a chain-only tail-truncation detection rate above 0.10, a chain-only middle-deletion rate below 1.0, or a counter-augmented arm detecting fewer than 100% of any omission type.
