@@ -21,3 +21,11 @@ Hypothesis: on 1000 seeded SIMULATED logs per omission type (k in 1..5 decisions
 Metric: /omission/detection_rate/tail_truncation_chain_only. Expected: decreases to at most 0.10.
 
 Falsifier: a chain-only tail-truncation detection rate above 0.10, a chain-only middle-deletion rate below 1.0, or a counter-augmented arm detecting fewer than 100% of any omission type.
+
+## 2026-11-15T11:24:38Z gate-arg-mutation proposal:de3d1c8d253bffa069dfa7300353adc15b5b77b3458802d920c4725da4a7ed98
+
+Hypothesis: across at least 400 SIMULATED mutated variants (case, whitespace, Unicode, type-confusion and repeated-id mutations of runbook and host arguments) of calls Policy.evaluate canonically denies, Policy.evaluate returns ALLOW or NEEDS_APPROVAL for none of them (overall pass rate 0, Wilson 95% upper bound below 0.01 at n=480), because ids are exact-match lookups that fail closed to DENY or exceptions to INTERNAL_ERROR.
+
+Metric: /mutation/pass_rate/overall. Expected: stays at 0.0; Wilson 95% upper bound below 0.01.
+
+Falsifier: any mutated variant of a canonically denied call that receives ALLOW or NEEDS_APPROVAL, i.e. an overall pass rate above 0.

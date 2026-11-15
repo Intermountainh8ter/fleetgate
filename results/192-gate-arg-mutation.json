@@ -1,0 +1,59 @@
+{
+  "mutation": {
+    "canonical_kinds": [
+      "denylisted_runbook",
+      "unknown_runbook",
+      "unknown_host"
+    ],
+    "deny_reason_codes": {
+      "DENY_INTERNAL_ERROR": 49,
+      "DENY_UNKNOWN_HOST": 138,
+      "DENY_UNKNOWN_RUNBOOK": 293
+    },
+    "n": {
+      "case": 96,
+      "overall": 480,
+      "repeated_id": 96,
+      "type_confusion": 96,
+      "unicode": 96,
+      "whitespace": 96
+    },
+    "pass_rate": {
+      "case": 0.0,
+      "overall": 0.0,
+      "repeated_id": 0.0,
+      "type_confusion": 0.0,
+      "unicode": 0.0,
+      "whitespace": 0.0
+    },
+    "passes": {
+      "case": 0,
+      "overall": 0,
+      "repeated_id": 0,
+      "type_confusion": 0,
+      "unicode": 0,
+      "whitespace": 0
+    },
+    "wilson95_overall": [
+      0.0,
+      0.00793978855890027
+    ],
+    "wilson95_upper": {
+      "case": 0.03847694748481595,
+      "repeated_id": 0.03847694748481595,
+      "type_confusion": 0.03847694748481595,
+      "unicode": 0.03847694748481595,
+      "whitespace": 0.03847694748481595
+    }
+  },
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.mutation_eval --seed 7 --n 480 --out results/192-gate-arg-mutation.json",
+    "data_sources": [],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-15T11:24:38Z",
+    "wall_s": 0.007
+  }
+}

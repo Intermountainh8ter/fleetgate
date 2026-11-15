@@ -326,3 +326,7 @@ rewrite or a truncation. The test-suite has a tamper test for each of these atta
 ## License
 
 MIT. Copyright (c) 2026 Ammon Jackson. See [LICENSE](LICENSE).
+
+## Argument-mutation check (simulated)
+
+`python3 -m fleetgate.mutation_eval --seed 7 --n 480 --out results/192-gate-arg-mutation.json` mutates the id arguments of canonically denied calls (case, whitespace, Unicode, type confusion, repeated ids). Result in `results/192-gate-arg-mutation.json`: 0 of 480 variants passed (Wilson 95% upper bound 0.00793978855890027); every variant was denied. Simulated fleet, exact-match ids only; this says nothing about semantic or multi-step bypasses.
