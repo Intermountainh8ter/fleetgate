@@ -1,0 +1,54 @@
+{
+  "drift": {
+    "arms": {
+      "benign_reword": {
+        "differs": 334,
+        "hash_pass": 146,
+        "n": 480,
+        "schema_pass": 480
+      },
+      "first_listing_poison": {
+        "differs": 480,
+        "hash_pass": 480,
+        "n": 480,
+        "schema_pass": 480
+      },
+      "semantic_post_baseline": {
+        "differs": 480,
+        "hash_pass": 0,
+        "n": 480,
+        "schema_pass": 480
+      },
+      "structural_post_baseline": {
+        "differs": 480,
+        "hash_pass": 0,
+        "n": 480,
+        "schema_pass": 480
+      }
+    },
+    "benign_flagged_as_drift_rate": 0.6958333333333333,
+    "pass_rate": {
+      "benign_reword": 0.30416666666666664,
+      "first_listing_poison": 1.0,
+      "schema_only": {
+        "benign_reword": 1.0,
+        "first_listing_poison": 1.0,
+        "semantic_post_baseline": 1.0,
+        "structural_post_baseline": 1.0
+      },
+      "semantic_post_baseline": 0.0,
+      "structural_post_baseline": 0.0
+    },
+    "wilson95_upper_semantic_post_baseline": 0.00793978855890027
+  },
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.drift_eval --seed 7 --n 480 --out results/193-tool-drift-fingerprint.json",
+    "data_sources": [],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-15T11:28:39Z",
+    "wall_s": 0.031
+  }
+}

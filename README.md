@@ -330,3 +330,11 @@ MIT. Copyright (c) 2026 Ammon Jackson. See [LICENSE](LICENSE).
 ## Argument-mutation check (simulated)
 
 `python3 -m fleetgate.mutation_eval --seed 7 --n 480 --out results/192-gate-arg-mutation.json` mutates the id arguments of canonically denied calls (case, whitespace, Unicode, type confusion, repeated ids). Result in `results/192-gate-arg-mutation.json`: 0 of 480 variants passed (Wilson 95% upper bound 0.00793978855890027); every variant was denied. Simulated fleet, exact-match ids only; this says nothing about semantic or multi-step bypasses.
+
+## Tool-registry drift (SIMULATED)
+
+`fleetgate.drift_eval` compares a hash-fingerprint gate with a schema-validation-only gate on a simulated tool registry
+(results: `results/193-tool-drift-fingerprint.json`). Over 480 semantic-drift variants of baselined tools the hash gate
+passed 0 (Wilson 95% upper bound 0.00794 at n=480) while the schema-only gate passed 480 of 480. Tools poisoned from
+their first listing passed the hash gate at a rate of 1.0, and benign rewordings were flagged as drift at a rate of
+0.6958333333333333. The simulator is idealised; this says nothing about real MCP servers.

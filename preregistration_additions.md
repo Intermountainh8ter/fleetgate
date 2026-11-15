@@ -29,3 +29,11 @@ Hypothesis: across at least 400 SIMULATED mutated variants (case, whitespace, Un
 Metric: /mutation/pass_rate/overall. Expected: stays at 0.0; Wilson 95% upper bound below 0.01.
 
 Falsifier: any mutated variant of a canonically denied call that receives ALLOW or NEEDS_APPROVAL, i.e. an overall pass rate above 0.
+
+## 2026-11-15T11:28:30Z tool-drift-fingerprint proposal:d17044fca44f447a622e35655c39b3d57516067f577c5df258245bd88ae65d32
+
+Hypothesis: over at least 400 SIMULATED semantic-drift mutations (same schema shape, changed description wording) of a baselined tool, a canonical-hash fingerprint gate passes none (pass rate 0, Wilson 95% upper bound below 0.01 at n=480), a schema-validation-only gate passes all of them, and the hash gate passes 100% of tools poisoned from their first listing while flagging a nonzero share of benign rewordings as drift.
+
+Metric: /drift/pass_rate/semantic_post_baseline. Expected: stays at 0.0 for the hash-fingerprint gate; Wilson 95% upper bound below 0.01.
+
+Falsifier: any post-baseline semantic-drift variant that the hash-fingerprint gate passes (pass rate above 0), or a first-listing-poison pass rate below 1.0 for the hash gate.
