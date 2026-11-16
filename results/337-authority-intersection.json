@@ -1,0 +1,74 @@
+{
+  "arms": {
+    "intersection": {
+      "benign_false_block_rate": 0.0,
+      "entries_equal_decisions": true,
+      "excess_mean": 0.0,
+      "out_of_scope_max_by_level": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "out_of_scope_max_round": 0,
+      "out_of_scope_mean": 0.0,
+      "verify_full_ok": true
+    },
+    "parent_copy": {
+      "benign_false_block_rate": 0.3625,
+      "entries_equal_decisions": true,
+      "excess_mean": 30.95,
+      "out_of_scope_max_by_level": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "out_of_scope_max_round": 0,
+      "out_of_scope_mean": 0.0,
+      "verify_full_ok": true
+    },
+    "union": {
+      "benign_false_block_rate": 0.0,
+      "entries_equal_decisions": true,
+      "excess_mean": 0.0,
+      "out_of_scope_max_by_level": [
+        0,
+        12,
+        53,
+        149
+      ],
+      "out_of_scope_max_round": 203,
+      "out_of_scope_mean": 179.75,
+      "verify_full_ok": true
+    }
+  },
+  "authority": {
+    "benign_false_block_rate_intersection": 0.0,
+    "excess_parent_copy_mean": 30.95,
+    "out_of_scope_grants_intersection": 0,
+    "out_of_scope_grants_parent_copy": 0,
+    "out_of_scope_grants_union_mean": 179.75
+  },
+  "config": {
+    "agents": 85,
+    "catalogue": 8,
+    "depth": 3,
+    "fanout": 4,
+    "p_inside_parent": 0.9,
+    "p_outside_parent": 0.5,
+    "policy_allows": 6,
+    "root_holds": 4,
+    "rounds": 20
+  },
+  "provenance": {
+    "command": "python3 -m fleetgate authority-intersection --seeds 7 --rounds 20 --out results/337-authority-intersection.json",
+    "data_sources": [],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-16T23:57:39Z",
+    "wall_s": 0.314
+  }
+}

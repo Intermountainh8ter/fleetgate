@@ -149,3 +149,11 @@ Hypothesis: on seeded SIMULATED rounds with three sibling delegation subtrees (f
 Metric: /subtree_collusion/breaches_root_atomic. Expected: equals 0 in every round; per-subtree overdraw ratio equals 1.5 (range 1.49 to 1.51); per-agent-only ratio equals 6.3.
 
 Falsifier: any root-atomic breach above 0, a per-subtree ratio outside 1.49 to 1.51, a per-agent-only ratio below 6.0, any benign false block under the root-atomic rule, or any audit log failing verify_full.
+
+## 2026-11-16T23:57:39Z authority-intersection proposal:783602759fc9ec0c69229eeeb4703a41590e1c9d9a9f3157211e7d51e5d442fc
+
+Hypothesis: on seeded SIMULATED delegation trees (fan-out 4, depth 3, 85 agents, 8-permission catalogue, policy allowing 6, root holding 4, each child requesting every permission outside its parent's set with probability 0.5 and every parent permission with probability 0.9), the request-as-granted arm grants a nonzero number of out-of-scope permissions per tree (mean at least 20 across 20 rounds), the parent-copy arm grants 0 out-of-scope permissions but over-grants unrequested parent permissions (excess above 0), and the gate-enforced intersection arm yields exactly 0 out-of-scope grants in every round and every level, with a benign false-block rate of 0.0 for requests already inside parent and policy, and every audit log passing verify_full with one entry per decision.
+
+Metric: /authority/out_of_scope_grants_intersection. Expected: equals 0 in every round; request-as-granted mean out-of-scope grants per tree at least 20.
+
+Falsifier: any out-of-scope grant under the intersection arm in any round, a request-as-granted mean below 20 per tree, any benign false block under the intersection arm, or any audit log failing verify_full.
