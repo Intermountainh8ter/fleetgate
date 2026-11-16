@@ -1,0 +1,61 @@
+{
+  "agents": 8,
+  "arms": {
+    "chain_serialised": {
+      "append_hash_ops": 5000,
+      "bytes_per_record": 247.199,
+      "entries": 5000,
+      "first_bad_seq": null,
+      "verify_ok": true
+    },
+    "chain_serialised_checkpointed": {
+      "append_hash_ops": 14984,
+      "bytes_per_record": 259.8212,
+      "entries": 5156,
+      "first_bad_seq": null,
+      "verify_ok": true
+    },
+    "chain_stale_head": {
+      "collisions": 53,
+      "entries": 5000,
+      "first_bad_seq": 109,
+      "first_collision_index": 109,
+      "verify_ok": false
+    },
+    "plain": {
+      "append_hash_ops": 0,
+      "bytes_per_record": 95.199,
+      "entries": 5000,
+      "first_bad_seq": null,
+      "verify_ok": null
+    }
+  },
+  "overhead": {
+    "bytes_per_record_by_log": {
+      "chain_serialised": 247.199,
+      "plain": 95.199
+    },
+    "hash_ops_per_record_by_log": {
+      "chain_serialised": 1.0,
+      "chain_serialised_checkpointed": 2.9968,
+      "plain": 0.0
+    }
+  },
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.serialised_append --seed 7 --agents 8 --records 5000 --out results/247-serialised-append.json",
+    "data_sources": [
+      {
+        "license": "MIT (repo-internal synthetic data)",
+        "url": "simulated: fleetgate seeded multi-agent record stream"
+      }
+    ],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-16T13:47:56Z",
+    "wall_s": 0.355
+  },
+  "records": 5000,
+  "stale_head_detected": true
+}

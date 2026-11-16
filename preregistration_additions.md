@@ -53,3 +53,11 @@ Hypothesis: on 1000 seeded SIMULATED sequences (8 agents, per-call cap, fleet bu
 Metric: /replay/detection_rate/per_call_gate. Expected: stays at 1.0 for the per-call and check-then-act arms; zero false flags on the atomic arm; tampered logs rejected in every case.
 
 Falsifier: a per-call or check-then-act breach not flagged by replay, any atomic-arm sequence flagged, or a middle-deleted log that verify_full accepts.
+
+## 2026-11-16T13:47:40Z serialised-append proposal:942ad4477fd8d3f3402135e431e8fdb941cef17ed5e867c9e8c36a8825022d39
+
+Hypothesis: on a seeded SIMULATED 8-agent interleaved stream of 5000 records, the serialised hash-chained log performs between 1.0 and 1.1 SHA-256 operations per record on append and passes verify_full, the plain log performs 0 hash operations, and a stale-head unserialised writer (two writers reading the same last hash) produces a chain that fails verify_full at the first collision.
+
+Metric: /overhead/hash_ops_per_record_by_log/chain_serialised. Expected: stays between 1.0 and 1.1; plain log 0.0; stale-head chain fails verification.
+
+Falsifier: chain_serialised hash ops per record outside the stated range, serialised chain failing verify_full, plain log performing any hash operation, or the stale-head chain passing verify_full.

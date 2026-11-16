@@ -338,3 +338,11 @@ MIT. Copyright (c) 2026 Ammon Jackson. See [LICENSE](LICENSE).
 passed 0 (Wilson 95% upper bound 0.00794 at n=480) while the schema-only gate passed 480 of 480. Tools poisoned from
 their first listing passed the hash gate at a rate of 1.0, and benign rewordings were flagged as drift at a rate of
 0.6958333333333333. The simulator is idealised; this says nothing about real MCP servers.
+
+## Serialised append: hash chain vs plain log (simulated)
+
+`PYTHONPATH=src python3 -m fleetgate.serialised_append --seed 7 --agents 8 --records 5000 --out results/247-serialised-append.json`
+interleaves 5000 records from 8 simulated agents. Source: `results/247-serialised-append.json`. The serialised chain does
+1.0 SHA-256 operations per record on append (2.9968 with the default checkpoint cadence) and verifies; the plain log does 0.0.
+Bytes per record are 247.199 for the chain and 95.199 for the plain log. A stale-head writer (53 collisions) fails
+`verify_full` at entry 109, the first collision. Simulated, single process; no concurrent writers or durable flush were measured.
