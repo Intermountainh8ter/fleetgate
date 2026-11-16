@@ -350,3 +350,11 @@ Bytes per record are 247.199 for the chain and 95.199 for the plain log. A stale
 ## Approval collusion (iteration 260)
 
 `fleetgate.approval_collusion` drives colluding approvers through the real `ApprovalQueue` with the default DESTRUCTIVE plus protected pools (SIMULATED, 1000 rounds per arm, seed 7). Per `results/260-approval-collusion.json`, the bypass rate is 0.0 for duplicate-name and wrong-role sybils and 1.0 for forged-role sybils (`/approval_bypass_rate/forged_role_sybil`), because `Approval.role` is self-declared. A roster check on (name, role) brings the forged-role rate to 0.0 and the honest approval rate stays 1.0. Every audit log verifies.
+
+## Split-caller gate (iteration 286, SIMULATED)
+
+`python3 -m fleetgate.split_caller --seed 7 --rounds 1000 --out results/286-split-caller-gate.json` sends 4 to 12 reversible
+proposals per tick through the real `Policy`. A shared gate admitted a share of 0.377453447408153 whether one actor or
+many agents proposed (difference 0.0), because the per-tick budget keys nothing on caller identity. One `Policy`
+instance per agent admitted a share of 1.0, so splitting callers across gate instances bypasses `max_actions_per_tick`.
+Every audit log verified. Source: `results/286-split-caller-gate.json`.

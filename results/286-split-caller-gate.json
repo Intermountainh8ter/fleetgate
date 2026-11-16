@@ -1,0 +1,55 @@
+{
+  "admit_rate_by_arm": {
+    "per_agent_gate": 1.0,
+    "shared_gate": 0.377453447408153,
+    "single_actor": 0.377453447408153
+  },
+  "admit_rate_difference_shared_vs_single": 0.0,
+  "admitted_by_arm": {
+    "per_agent_gate": 7948,
+    "shared_gate": 3000,
+    "single_actor": 3000
+  },
+  "audit_checkpoint_entries_by_arm": {
+    "per_agent_gate": 248,
+    "shared_gate": 248,
+    "single_actor": 248
+  },
+  "audit_decision_entries_by_arm": {
+    "per_agent_gate": 7948,
+    "shared_gate": 7948,
+    "single_actor": 7948
+  },
+  "config": {
+    "fleet_size": 40,
+    "k_range": [
+      4,
+      12
+    ],
+    "max_actions_per_tick": 3,
+    "policy": "default",
+    "proposals": 7948,
+    "rounds": 1000,
+    "runbook_pool": 12
+  },
+  "entries_equal_decisions": {
+    "per_agent_gate": true,
+    "shared_gate": true,
+    "single_actor": true
+  },
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.split_caller --seed 7 --rounds 1000 --out results/286-split-caller-gate.json",
+    "data_sources": [],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-16T18:50:10Z",
+    "wall_s": 2.016
+  },
+  "verify_full_ok": {
+    "per_agent_gate": true,
+    "shared_gate": true,
+    "single_actor": true
+  }
+}

@@ -77,3 +77,11 @@ Hypothesis: in seeded SIMULATED rounds on the real ApprovalQueue with the defaul
 Metric: /approval_bypass_rate/forged_role_sybil. Expected: 1.0 without a roster; duplicate_name and wrong_role_sybil stay at 0.0; roster arm forged-role rate 0.0; roster arm honest approval rate 1.0.
 
 Falsifier: a forged-role sybil bypass rate below 0.99 without a roster, any duplicate-name or wrong-role bypass above 0.0, a roster-arm forged bypass above 0.0, honest approvals rejected by the roster arm, or any verify_full failure.
+
+## 2026-11-16T18:49:30Z split-caller-gate proposal:1007b07142318f0db29db0ce09eb350d3ad324d03698c6bc2d0ba48a2a285639
+
+Hypothesis: on seeded SIMULATED rounds (K in 4..12 reversible proposals on distinct hosts in one tick, default PolicyConfig, max_actions_per_tick 3), a single shared Policy admits exactly the same number of proposals whether they come from one actor or are split across K agents (difference 0.0, because the gate keys no state on caller identity), while one Policy instance per agent over the same fleet admits at least 0.9 of the proposals, so the per-tick budget is bypassed by splitting. Every audit log verifies and holds one entry per decision.
+
+Metric: /admit_rate_by_arm/per_agent_gate. Expected: at least 0.9; shared_gate equals single_actor exactly.
+
+Falsifier: a shared-gate admitted share that differs between single_actor and split arms, a per_agent_gate admit rate below 0.9, or any audit log that fails verify_full or has other than one entry per decision.
