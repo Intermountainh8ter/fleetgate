@@ -117,3 +117,11 @@ Hypothesis: on seeded SIMULATED rounds of 40 proposals per caller (one per tick)
 Metric: /degenerate/constant_caller_admit_rate. Expected: at most 0.25; empty_caller_admit_rate equals 0.0; replay_caller_admit_rate at most 0.25; honest admit rate above constant.
 
 Falsifier: an empty-caller admit rate above 0.0, a constant or replay caller admit rate above 0.25, a constant admit rate not below the honest caller's, or any audit log that fails verify_full or has other than one entry per decision.
+
+## 2026-11-16T22:32:41Z fleet-overdraw proposal:4f34f3450671561dd23e21a8f402db77335aba3a6d89f205cde64c0632ee4749
+
+Hypothesis: on seeded SIMULATED fleets where every agent stays within a per-agent quota of 10 units against a fixed fleet limit of 100 units, the per-agent rule admits total units equal to N times the quota, so the overdraw ratio (admitted units over fleet limit) at N=32 is at least 3.0, while a cumulative atomic rule holds the ratio at or below 1.0 at every N (N in 2, 8, 32, 128), with a benign false-block rate of 0.0 for fleets whose joint demand is within the limit and every audit log passing verify_full.
+
+Metric: /fleet_overdraw/per_agent_rule_overdraw_ratio_n32. Expected: at least 3.0 (range 3.0 to 3.3); cumulative rule ratio at most 1.0.
+
+Falsifier: a per-agent overdraw ratio at N=32 below 3.0, any cumulative-rule ratio above 1.0 at any N, any benign false block under the cumulative rule, or any audit log that fails verify_full.
