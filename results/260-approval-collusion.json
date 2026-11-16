@@ -1,0 +1,112 @@
+{
+  "all_logs_verify": true,
+  "approval_bypass_rate": {
+    "duplicate_name": 0.0,
+    "forged_role_sybil": 1.0,
+    "wrong_role_sybil": 0.0
+  },
+  "approval_bypass_rate_roster": {
+    "duplicate_name": 0.0,
+    "forged_role_sybil": 0.0,
+    "wrong_role_sybil": 0.0
+  },
+  "arms": {
+    "no_roster": {
+      "duplicate_name": {
+        "approved": 0,
+        "rate": 0.0,
+        "rounds": 1000,
+        "verify_ok": true
+      },
+      "forged_role_sybil": {
+        "approved": 1000,
+        "rate": 1.0,
+        "rounds": 1000,
+        "verify_ok": true
+      },
+      "honest": {
+        "approved": 1000,
+        "rate": 1.0,
+        "rounds": 1000,
+        "verify_ok": true
+      },
+      "wrong_role_sybil": {
+        "approved": 0,
+        "rate": 0.0,
+        "rounds": 1000,
+        "verify_ok": true
+      }
+    },
+    "roster": {
+      "duplicate_name": {
+        "approved": 0,
+        "rate": 0.0,
+        "rounds": 1000,
+        "verify_ok": true
+      },
+      "forged_role_sybil": {
+        "approved": 0,
+        "rate": 0.0,
+        "rounds": 1000,
+        "verify_ok": true
+      },
+      "honest": {
+        "approved": 1000,
+        "rate": 1.0,
+        "rounds": 1000,
+        "verify_ok": true
+      },
+      "wrong_role_sybil": {
+        "approved": 0,
+        "rate": 0.0,
+        "rounds": 1000,
+        "verify_ok": true
+      }
+    }
+  },
+  "honest_approval_rate": {
+    "no_roster": 1.0,
+    "roster": 1.0
+  },
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.approval_collusion --seed 7 --rounds 1000 --out results/260-approval-collusion.json",
+    "data_sources": [
+      {
+        "license": "MIT (own code)",
+        "url": "simulated: seeded in-process generator, no external data"
+      }
+    ],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-16T15:17:08Z",
+    "wall_s": 0.323
+  },
+  "requirement": {
+    "code": "APPROVAL_DESTRUCTIVE_TIER",
+    "pools": [
+      {
+        "required": 2,
+        "roles": [
+          "sre-lead",
+          "dc-ops"
+        ]
+      },
+      {
+        "required": 1,
+        "roles": [
+          "sre-lead",
+          "db-owner"
+        ]
+      }
+    ],
+    "required": 3,
+    "roles": [
+      "sre-lead",
+      "dc-ops",
+      "db-owner"
+    ]
+  },
+  "rounds": 1000
+}

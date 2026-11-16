@@ -346,3 +346,7 @@ interleaves 5000 records from 8 simulated agents. Source: `results/247-serialise
 1.0 SHA-256 operations per record on append (2.9968 with the default checkpoint cadence) and verifies; the plain log does 0.0.
 Bytes per record are 247.199 for the chain and 95.199 for the plain log. A stale-head writer (53 collisions) fails
 `verify_full` at entry 109, the first collision. Simulated, single process; no concurrent writers or durable flush were measured.
+
+## Approval collusion (iteration 260)
+
+`fleetgate.approval_collusion` drives colluding approvers through the real `ApprovalQueue` with the default DESTRUCTIVE plus protected pools (SIMULATED, 1000 rounds per arm, seed 7). Per `results/260-approval-collusion.json`, the bypass rate is 0.0 for duplicate-name and wrong-role sybils and 1.0 for forged-role sybils (`/approval_bypass_rate/forged_role_sybil`), because `Approval.role` is self-declared. A roster check on (name, role) brings the forged-role rate to 0.0 and the honest approval rate stays 1.0. Every audit log verifies.

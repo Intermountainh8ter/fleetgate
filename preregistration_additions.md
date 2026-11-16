@@ -69,3 +69,11 @@ Hypothesis: on seeded SIMULATED AuditLogs with no HMAC key, an unanchored verify
 Metric: /undetected_rate_by_interval/50/rehashed_edit. Expected: between 0.0 and 0.06; unanchored rehashed-edit rate is 1.0.
 
 Falsifier: an unanchored rehashed tamper that verify_full rejects, a whole-log replacement missed with an anchor present, a rehashed-edit undetected rate at interval 50 above 0.06, or an undetected rate that is not non-decreasing across intervals 10, 50, 250.
+
+## 2026-11-16T15:17:08Z approval-collusion proposal:ad981078712b6662473bf0f64ce985f299de621adff4eb12d9e5160e1a4f5f25
+
+Hypothesis: in seeded SIMULATED rounds on the real ApprovalQueue with the default DESTRUCTIVE plus protected-host pools, colluding approvers that vote repeatedly under one name, or under distinct names with an ineligible role, never satisfy the requirement; distinct sybil names that declare an eligible role satisfy it in every round because the queue trusts the self-declared role field on the Approval. A roster check that rejects approvals whose (name, role) pair is not registered brings the forged-role bypass rate to zero while honest approvers are still admitted. Every audit log verifies.
+
+Metric: /approval_bypass_rate/forged_role_sybil. Expected: 1.0 without a roster; duplicate_name and wrong_role_sybil stay at 0.0; roster arm forged-role rate 0.0; roster arm honest approval rate 1.0.
+
+Falsifier: a forged-role sybil bypass rate below 0.99 without a roster, any duplicate-name or wrong-role bypass above 0.0, a roster-arm forged bypass above 0.0, honest approvals rejected by the roster arm, or any verify_full failure.
