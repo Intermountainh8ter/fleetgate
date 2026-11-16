@@ -101,3 +101,11 @@ Hypothesis: on seeded SIMULATED runs where approvals are granted under the defau
 Metric: /stale_execute_rate_by_arm/trust_stored_approval. Expected: equals 1.0; re_evaluate equals 0.0.
 
 Falsifier: a trust_stored_approval rate below 0.99, a re_evaluate rate above 0.0, any disagreement between arms on plans the strict policy still allows, or any audit log that fails verification.
+
+## 2026-11-16T22:11:49Z split-action proposal:f0f0d178995e13aa99e2d2f8eaee20c3e6ebbe82f090c536e19891e9337b1e41
+
+Hypothesis: on seeded SIMULATED composites split into 8 sub-steps (one reversible restart per tick across one rack, more than a cumulative budget of 4 per rack), the default per-action Policy admits the whole composite in every round (composite admit rate 1.0 at depth 8), while a cumulative-effect rule that tracks per-rack effect across ticks admits none of them (0.0) and falsely blocks no benign sequence of equal length that stays under the cumulative budget (benign false-block rate 0.0); a per-role quota is reported as a comparison arm. Every audit log verifies.
+
+Metric: /collusion/default_policy_composite_admit_rate_depth8. Expected: equals 1.0 (at least 0.99); cumulative_rule_composite_admit_rate_depth8 equals 0.0; benign false-block rate under the cumulative rule 0.0.
+
+Falsifier: a default-policy composite admit rate at depth 8 below 0.99, a cumulative-rule admit rate above 0.0, any benign false block under the cumulative rule, or any audit log that fails verification.

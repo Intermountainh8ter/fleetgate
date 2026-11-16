@@ -1,0 +1,79 @@
+{
+  "collusion": {
+    "benign_false_block_rate_cumulative_rule": 0.0,
+    "benign_false_block_rate_default_policy": 0.0,
+    "benign_false_block_rate_quota_per_role": 1.0,
+    "composite_admit_rate_by_depth": {
+      "cumulative_rule": {
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "4": 1.0,
+        "5": 0.0,
+        "6": 0.0,
+        "7": 0.0,
+        "8": 0.0
+      },
+      "default_policy": {
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "4": 1.0,
+        "5": 1.0,
+        "6": 1.0,
+        "7": 1.0,
+        "8": 1.0
+      },
+      "quota_per_role": {
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "4": 1.0,
+        "5": 0.0,
+        "6": 0.0,
+        "7": 0.0,
+        "8": 0.0
+      }
+    },
+    "cumulative_rule_composite_admit_rate_depth8": 0.0,
+    "default_policy_composite_admit_rate_depth8": 1.0,
+    "quota_per_role_composite_admit_rate_depth8": 0.0
+  },
+  "config": {
+    "depths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "max_actions_per_tick": 3,
+    "policy": "default",
+    "rack_budget": 4,
+    "rounds": 200,
+    "runbook_pool": 12
+  },
+  "entries_equal_decisions": {
+    "cumulative_rule": true,
+    "default_policy": true,
+    "quota_per_role": true
+  },
+  "provenance": {
+    "command": "python3 -m fleetgate split-action --seeds 7 --out results/316-split-action.json",
+    "data_sources": [],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-16T22:12:41Z",
+    "wall_s": 2.764
+  },
+  "verify_full_ok": {
+    "cumulative_rule": true,
+    "default_policy": true,
+    "quota_per_role": true
+  }
+}

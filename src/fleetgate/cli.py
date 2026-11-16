@@ -517,6 +517,10 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    raw = list(sys.argv[1:] if argv is None else argv)
+    if raw[:1] == ["split-action"]:
+        from .split_action import main as split_action_main
+        return split_action_main(raw[1:])
     args = build_parser().parse_args(argv)
     try:
         return int(args.fn(args))
