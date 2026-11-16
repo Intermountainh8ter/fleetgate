@@ -109,3 +109,11 @@ Hypothesis: on seeded SIMULATED composites split into 8 sub-steps (one reversibl
 Metric: /collusion/default_policy_composite_admit_rate_depth8. Expected: equals 1.0 (at least 0.99); cumulative_rule_composite_admit_rate_depth8 equals 0.0; benign false-block rate under the cumulative rule 0.0.
 
 Falsifier: a default-policy composite admit rate at depth 8 below 0.99, a cumulative-rule admit rate above 0.0, any benign false block under the cumulative rule, or any audit log that fails verification.
+
+## 2026-11-16T22:18:03Z degenerate-caller proposal:9500f2f8e52908b8ba32330b986f9e439a2597e05b4ebd1d1eb797106b54c18f
+
+Hypothesis: on seeded SIMULATED rounds of 40 proposals per caller (one per tick) against the default PolicyConfig, an empty caller (empty runbook and host ids) is admitted 0.0 of the time with every verdict a DENY, a constant caller that repeats one valid reversible proposal on one host (recording each admitted execution) is admitted at most 0.25 of the time because cooldown and per-host state accumulate, a replay caller that re-sends an earlier admitted proposal from an honest log is admitted at most 0.25 of the time, and the constant admit rate is strictly below the matched honest caller admit rate; every audit log verifies and holds one entry per decision.
+
+Metric: /degenerate/constant_caller_admit_rate. Expected: at most 0.25; empty_caller_admit_rate equals 0.0; replay_caller_admit_rate at most 0.25; honest admit rate above constant.
+
+Falsifier: an empty-caller admit rate above 0.0, a constant or replay caller admit rate above 0.25, a constant admit rate not below the honest caller's, or any audit log that fails verify_full or has other than one entry per decision.

@@ -1,0 +1,57 @@
+{
+  "config": {
+    "cooldown_ticks": 5,
+    "policy": "default",
+    "proposals_per_caller": 40,
+    "rounds": 100,
+    "runbook_pool": 12
+  },
+  "degenerate": {
+    "constant_caller_admit_rate": 0.2,
+    "empty_caller_admit_rate": 0.0,
+    "honest_caller_admit_rate": 0.7255,
+    "replay_caller_admit_rate": 0.0235,
+    "verdict_codes_by_caller": {
+      "constant": {
+        "ALLOW_REVERSIBLE": 800,
+        "DENY_COOLDOWN": 3200
+      },
+      "empty": {
+        "DENY_UNKNOWN_RUNBOOK": 4000
+      },
+      "honest": {
+        "ALLOW_CANARY": 832,
+        "ALLOW_REVERSIBLE": 2070,
+        "DENY_CANARY_PENDING": 1098
+      },
+      "replay": {
+        "ALLOW_CANARY": 680,
+        "ALLOW_REVERSIBLE": 2787,
+        "DENY_CANARY_PENDING": 1160,
+        "DENY_COOLDOWN": 3373
+      }
+    }
+  },
+  "entries_equal_decisions": {
+    "constant": true,
+    "empty": true,
+    "honest": true,
+    "replay": true
+  },
+  "provenance": {
+    "command": "python3 -m fleetgate degenerate-caller --seeds 7 --out results/317-degenerate-caller.json",
+    "data_sources": [],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-16T22:18:06Z",
+    "wall_s": 0.859
+  },
+  "verify_full_ok": {
+    "constant": true,
+    "empty": true,
+    "honest": true,
+    "replay": true
+  }
+}

@@ -521,6 +521,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     if raw[:1] == ["split-action"]:
         from .split_action import main as split_action_main
         return split_action_main(raw[1:])
+    if raw[:1] == ["degenerate-caller"]:
+        from .degenerate_caller import main as degenerate_caller_main
+        return degenerate_caller_main(raw[1:])
     args = build_parser().parse_args(argv)
     try:
         return int(args.fn(args))
