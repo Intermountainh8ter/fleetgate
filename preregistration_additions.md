@@ -133,3 +133,11 @@ Hypothesis: on seeded SIMULATED rounds where a colluder with a per-agent denial 
 Metric: /identity_rotation/rotating_colluder_admit_count_cumulative_rule. Expected: equals 4; per-agent rule rotating admit count equals 16.
 
 Falsifier: a cumulative-rule admit count for the rotating colluder other than 4, a per-agent-rule rotating admit count below 16, any benign false block under the cumulative rule, or any audit log failing verify_full.
+
+## 2026-11-16T23:28:39Z delegation-subtree proposal:0814df2898922e0f0889ed31161ec49d33a5a1606fb4221c0d39719b6793d1b8
+
+Hypothesis: on seeded SIMULATED delegation trees where every agent spends its full per-agent quota of 10 units against a root-principal limit of 100 units, with fan-out 4: the per-agent rule admits units equal to tree size times quota, so overdraw ratio at depth 3 (85 agents) is at least 8.0; a depth cap of 2 (21 agents) still overdraws at a ratio of 2.1; the subtree-cumulative rule holds the ratio at or below 1.0 at every depth (1 to 3) and fan-out (2 and 4), with a benign false-block rate of 0.0 for trees whose joint demand is within the limit and every audit log passing verify_full.
+
+Metric: /delegation_subtree/depth_capped_overdraw_ratio_fanout4_cap2. Expected: equals 2.1 (range 2.0 to 2.2); per-agent ratio at fanout 4 depth 3 equals 8.5; subtree-cumulative ratio at most 1.0.
+
+Falsifier: a depth-capped ratio below 2.0 at fan-out 4 cap 2, a per-agent ratio below 8.0 at fan-out 4 depth 3, any subtree-cumulative ratio above 1.0, any benign false block under the subtree rule, or any audit log failing verify_full.
