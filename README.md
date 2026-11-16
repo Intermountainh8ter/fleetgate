@@ -358,3 +358,12 @@ proposals per tick through the real `Policy`. A shared gate admitted a share of 
 many agents proposed (difference 0.0), because the per-tick budget keys nothing on caller identity. One `Policy`
 instance per agent admitted a share of 1.0, so splitting callers across gate instances bypasses `max_actions_per_tick`.
 Every audit log verified. Source: `results/286-split-caller-gate.json`.
+
+## Gate restart (iteration 306, SIMULATED)
+
+`PYTHONPATH=src python3 -m fleetgate.gate_restart --seed 7 --rounds 1000 --out results/306-gate-restart.json` replays
+campaigns of 6 to 9 same-runbook proposals on distinct hosts through the real `Policy`. A persistent gate admitted a
+share of 0.2656042496679947. A fresh `Policy` before every proposal admitted a share of 1.0
+(`/admit_rate_by_arm/restart_each`), because campaign, cooldown and tick-budget state live in the `Policy` instance and
+not in the audit log. A restart that copies that state, and a swap to an equal `PolicyConfig`, both matched the
+persistent gate (admit count difference 0). Every audit log verified. Source: `results/306-gate-restart.json`.

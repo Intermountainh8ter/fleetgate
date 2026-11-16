@@ -85,3 +85,11 @@ Hypothesis: on seeded SIMULATED rounds (K in 4..12 reversible proposals on disti
 Metric: /admit_rate_by_arm/per_agent_gate. Expected: at least 0.9; shared_gate equals single_actor exactly.
 
 Falsifier: a shared-gate admitted share that differs between single_actor and split arms, a per_agent_gate admit rate below 0.9, or any audit log that fails verify_full or has other than one entry per decision.
+
+## 2026-11-16T20:55:23Z gate-restart proposal:62606df77adb7f3a009499d5d827f9cde3d1c79a3b17502423f3e0474fc1779e
+
+Hypothesis: on seeded SIMULATED campaigns (6 to 9 proposals of one reversible non-draining runbook on distinct hosts of a 40-host fleet, one proposal per tick, default PolicyConfig, no verification feedback), a persistent Policy admits only the canary-first prefix (at most 2 proposals, an admit rate of at most 0.34 per campaign), while constructing a fresh Policy before every proposal admits every proposal (admit rate 1.0) because campaign, cooldown and tick-budget state live in the Policy instance and not in the audit log; a restart that copies campaigns, recent, history and actions_this_tick to the new instance, and a swap of cfg to an equal PolicyConfig, both match the persistent gate exactly (difference 0.0). Every audit log verifies and holds one decision entry per verdict.
+
+Metric: /admit_rate_by_arm/restart_each. Expected: equals 1.0; persistent at most 0.34; state_carry and config_swap equal persistent.
+
+Falsifier: a restart_each admit rate below 0.99, a persistent admit rate above 0.34, a state_carry or config_swap admit count that differs from persistent, or any audit log that fails verify_full or has other than one entry per decision.

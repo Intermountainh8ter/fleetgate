@@ -1,0 +1,71 @@
+{
+  "admit_count_difference_vs_persistent": {
+    "config_swap": 0,
+    "persistent": 0,
+    "restart_each": 5530,
+    "state_carry": 0
+  },
+  "admit_rate_by_arm": {
+    "config_swap": 0.2656042496679947,
+    "persistent": 0.2656042496679947,
+    "restart_each": 1.0,
+    "state_carry": 0.2656042496679947
+  },
+  "admitted_by_arm": {
+    "config_swap": 2000,
+    "persistent": 2000,
+    "restart_each": 7530,
+    "state_carry": 2000
+  },
+  "audit_checkpoint_entries_by_arm": {
+    "config_swap": 235,
+    "persistent": 235,
+    "restart_each": 235,
+    "state_carry": 235
+  },
+  "audit_decision_entries_by_arm": {
+    "config_swap": 7530,
+    "persistent": 7530,
+    "restart_each": 7530,
+    "state_carry": 7530
+  },
+  "config": {
+    "fleet_size": 40,
+    "k_range": [
+      6,
+      9
+    ],
+    "policy": "default",
+    "proposals": 7530,
+    "rounds": 1000,
+    "runbook_pool": 12
+  },
+  "entries_equal_decisions": {
+    "config_swap": true,
+    "persistent": true,
+    "restart_each": true,
+    "state_carry": true
+  },
+  "max_round_admit_rate_by_arm": {
+    "config_swap": 0.3333333333333333,
+    "persistent": 0.3333333333333333,
+    "restart_each": 1.0,
+    "state_carry": 0.3333333333333333
+  },
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.gate_restart --seed 7 --rounds 1000 --out results/306-gate-restart.json",
+    "data_sources": [],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-16T20:55:43Z",
+    "wall_s": 2.549
+  },
+  "verify_full_ok": {
+    "config_swap": true,
+    "persistent": true,
+    "restart_each": true,
+    "state_carry": true
+  }
+}
