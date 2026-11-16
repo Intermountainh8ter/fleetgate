@@ -61,3 +61,11 @@ Hypothesis: on a seeded SIMULATED 8-agent interleaved stream of 5000 records, th
 Metric: /overhead/hash_ops_per_record_by_log/chain_serialised. Expected: stays between 1.0 and 1.1; plain log 0.0; stale-head chain fails verification.
 
 Falsifier: chain_serialised hash ops per record outside the stated range, serialised chain failing verify_full, plain log performing any hash operation, or the stale-head chain passing verify_full.
+
+## 2026-11-16T14:26:57Z anchor-tamper-matrix proposal:b437c2db7aa7cd9dcd61d1c08e00963810280967e06d4c490b006cf674aa28e2
+
+Hypothesis: on seeded SIMULATED AuditLogs with no HMAC key, an unanchored verify_full detects every in-place edit without rehashing but misses every rehashed edit, delete, reorder, tail truncation and whole-log replacement; with an external anchor at a fixed entry interval, a rehashed edit at a uniformly random position is missed only when it lands after the last anchored checkpoint, so its undetected rate at interval 50 is small, whole-log replacement is detected in every case, and the rehashed-edit undetected rate is non-decreasing across anchor intervals 10, 50, 250.
+
+Metric: /undetected_rate_by_interval/50/rehashed_edit. Expected: between 0.0 and 0.06; unanchored rehashed-edit rate is 1.0.
+
+Falsifier: an unanchored rehashed tamper that verify_full rejects, a whole-log replacement missed with an anchor present, a rehashed-edit undetected rate at interval 50 above 0.06, or an undetected rate that is not non-decreasing across intervals 10, 50, 250.

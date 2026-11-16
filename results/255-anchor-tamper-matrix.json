@@ -1,0 +1,157 @@
+{
+  "intervals": [
+    10,
+    50,
+    250
+  ],
+  "logs": 1000,
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.anchor_matrix --seed 7 --logs 1000 --records 1000 --intervals 10,50,250 --out results/255-anchor-tamper-matrix.json",
+    "data_sources": [
+      {
+        "license": "MIT (repo-internal synthetic data)",
+        "url": "simulated: fleetgate seeded audit record stream"
+      }
+    ],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-16T14:27:38Z",
+    "wall_s": 475.872
+  },
+  "records": 1000,
+  "rehashed_edit_non_decreasing_in_interval": true,
+  "unanchored_undetected_rate_by_interval": {
+    "10": {
+      "inplace_edit": 0.0,
+      "rehashed_delete": 1.0,
+      "rehashed_edit": 1.0,
+      "rehashed_reorder": 1.0,
+      "tail_truncation": 1.0,
+      "whole_log_replacement": 1.0
+    },
+    "250": {
+      "inplace_edit": 0.0,
+      "rehashed_delete": 1.0,
+      "rehashed_edit": 1.0,
+      "rehashed_reorder": 1.0,
+      "tail_truncation": 1.0,
+      "whole_log_replacement": 1.0
+    },
+    "50": {
+      "inplace_edit": 0.0,
+      "rehashed_delete": 1.0,
+      "rehashed_edit": 1.0,
+      "rehashed_reorder": 1.0,
+      "tail_truncation": 1.0,
+      "whole_log_replacement": 1.0
+    }
+  },
+  "undetected_counts": {
+    "10": {
+      "inplace_edit": {
+        "anchored": 0,
+        "unanchored": 0
+      },
+      "rehashed_delete": {
+        "anchored": 0,
+        "unanchored": 1000
+      },
+      "rehashed_edit": {
+        "anchored": 0,
+        "unanchored": 1000
+      },
+      "rehashed_reorder": {
+        "anchored": 0,
+        "unanchored": 1000
+      },
+      "tail_truncation": {
+        "anchored": 0,
+        "unanchored": 1000
+      },
+      "whole_log_replacement": {
+        "anchored": 0,
+        "unanchored": 1000
+      }
+    },
+    "250": {
+      "inplace_edit": {
+        "anchored": 0,
+        "unanchored": 0
+      },
+      "rehashed_delete": {
+        "anchored": 0,
+        "unanchored": 1000
+      },
+      "rehashed_edit": {
+        "anchored": 0,
+        "unanchored": 1000
+      },
+      "rehashed_reorder": {
+        "anchored": 0,
+        "unanchored": 1000
+      },
+      "tail_truncation": {
+        "anchored": 0,
+        "unanchored": 1000
+      },
+      "whole_log_replacement": {
+        "anchored": 0,
+        "unanchored": 1000
+      }
+    },
+    "50": {
+      "inplace_edit": {
+        "anchored": 0,
+        "unanchored": 0
+      },
+      "rehashed_delete": {
+        "anchored": 0,
+        "unanchored": 1000
+      },
+      "rehashed_edit": {
+        "anchored": 0,
+        "unanchored": 1000
+      },
+      "rehashed_reorder": {
+        "anchored": 0,
+        "unanchored": 1000
+      },
+      "tail_truncation": {
+        "anchored": 0,
+        "unanchored": 1000
+      },
+      "whole_log_replacement": {
+        "anchored": 0,
+        "unanchored": 1000
+      }
+    }
+  },
+  "undetected_rate_by_interval": {
+    "10": {
+      "inplace_edit": 0.0,
+      "rehashed_delete": 0.0,
+      "rehashed_edit": 0.0,
+      "rehashed_reorder": 0.0,
+      "tail_truncation": 0.0,
+      "whole_log_replacement": 0.0
+    },
+    "250": {
+      "inplace_edit": 0.0,
+      "rehashed_delete": 0.0,
+      "rehashed_edit": 0.0,
+      "rehashed_reorder": 0.0,
+      "tail_truncation": 0.0,
+      "whole_log_replacement": 0.0
+    },
+    "50": {
+      "inplace_edit": 0.0,
+      "rehashed_delete": 0.0,
+      "rehashed_edit": 0.0,
+      "rehashed_reorder": 0.0,
+      "tail_truncation": 0.0,
+      "whole_log_replacement": 0.0
+    }
+  }
+}
