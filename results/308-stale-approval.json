@@ -1,0 +1,54 @@
+{
+  "audit_verdict_entries_by_arm": {
+    "re_evaluate": 1000,
+    "trust_stored_approval": 1000
+  },
+  "config": {
+    "approvers": {
+      "alice": "sre",
+      "bob": "sre-lead"
+    },
+    "banned_in_strict": "raid_rebuild",
+    "fleet_size": 40,
+    "rounds": 1000,
+    "runbook_pool": [
+      "purge_inode_tmp",
+      "raid_rebuild",
+      "swapoff_swapon"
+    ],
+    "strict_policy": "strict + raid_rebuild on deny-list"
+  },
+  "disagreements_on_still_allowed": 0,
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.stale_approval --seed 7 --rounds 1000 --out results/308-stale-approval.json",
+    "data_sources": [],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-16T21:06:30Z",
+    "wall_s": 1.256
+  },
+  "stale_execute_rate_by_arm": {
+    "re_evaluate": 0.0,
+    "trust_stored_approval": 1.0
+  },
+  "stats_by_arm": {
+    "re_evaluate": {
+      "allowed_executed": 677,
+      "allowed_plans": 677,
+      "denied_executed": 0,
+      "denied_plans": 323
+    },
+    "trust_stored_approval": {
+      "allowed_executed": 677,
+      "allowed_plans": 677,
+      "denied_executed": 323,
+      "denied_plans": 323
+    }
+  },
+  "verify_full_ok": {
+    "re_evaluate": true,
+    "trust_stored_approval": true
+  }
+}

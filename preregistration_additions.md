@@ -93,3 +93,11 @@ Hypothesis: on seeded SIMULATED campaigns (6 to 9 proposals of one reversible no
 Metric: /admit_rate_by_arm/restart_each. Expected: equals 1.0; persistent at most 0.34; state_carry and config_swap equal persistent.
 
 Falsifier: a restart_each admit rate below 0.99, a persistent admit rate above 0.34, a state_carry or config_swap admit count that differs from persistent, or any audit log that fails verify_full or has other than one entry per decision.
+
+## 2026-11-16T21:05:55Z stale-approval proposal:8ed9f3399cf2ab3089f53f568085842c2fac3f2ea7c9e4346e013014301c38b3
+
+Hypothesis: on seeded SIMULATED runs where approvals are granted under the default Policy and the PolicyConfig is then swapped for a strict one before execution, an executor that trusts the stored approval executes every approved plan the strict policy would DENY (stale-execute rate 1.0 on those plans), while an executor that re-evaluates through the gate at execution time executes none of them (rate 0.0); on plans the strict policy still allows both arms agree exactly; every audit log verifies.
+
+Metric: /stale_execute_rate_by_arm/trust_stored_approval. Expected: equals 1.0; re_evaluate equals 0.0.
+
+Falsifier: a trust_stored_approval rate below 0.99, a re_evaluate rate above 0.0, any disagreement between arms on plans the strict policy still allows, or any audit log that fails verification.

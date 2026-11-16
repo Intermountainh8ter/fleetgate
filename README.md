@@ -367,3 +367,12 @@ share of 0.2656042496679947. A fresh `Policy` before every proposal admitted a s
 (`/admit_rate_by_arm/restart_each`), because campaign, cooldown and tick-budget state live in the `Policy` instance and
 not in the audit log. A restart that copies that state, and a swap to an equal `PolicyConfig`, both matched the
 persistent gate (admit count difference 0). Every audit log verified. Source: `results/306-gate-restart.json`.
+
+## Stale approvals (iteration 308, SIMULATED)
+
+`PYTHONPATH=src python3 -m fleetgate.stale_approval --seed 7 --rounds 1000 --out results/308-stale-approval.json`
+approves DISRUPTIVE plans under the default `Policy`, then swaps in the bundled strict config with `raid_rebuild` added
+to its deny-list before execution. An executor that trusted the stored approval executed a share of 1.0 of the 323
+plans the swapped gate would DENY (`/stale_execute_rate_by_arm/trust_stored_approval`); an executor that re-evaluated
+through the gate executed a share of 0.0. On the 677 plans the swapped gate still allowed, the arms disagreed on 0.
+Every audit log verified. Source: `results/308-stale-approval.json`.
