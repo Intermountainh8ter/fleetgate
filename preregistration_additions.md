@@ -37,3 +37,11 @@ Hypothesis: over at least 400 SIMULATED semantic-drift mutations (same schema sh
 Metric: /drift/pass_rate/semantic_post_baseline. Expected: stays at 0.0 for the hash-fingerprint gate; Wilson 95% upper bound below 0.01.
 
 Falsifier: any post-baseline semantic-drift variant that the hash-fingerprint gate passes (pass rate above 0), or a first-listing-poison pass rate below 1.0 for the hash gate.
+
+## 2026-11-16T12:15:30Z gate-interleave proposal:3487cd064f2e725af3e349f7e27b782f7c8b9f011598332ebf31610534b2207e
+
+Hypothesis: on the real fleetgate Policy with the default config, in 500 seeded SIMULATED rounds where 2 to 8 agents each propose a drain of a distinct host in the same role, sequential evaluate-then-execute never breaches the role capacity floor or max drained fraction (breach rate 0), while the stale-read interleaving, where every agent evaluates before any executes, approves a joint set that breaches the capacity floor in at least half of rounds whose total demand exceeds the floor headroom; a reservation-style re-check at execute time restores a breach rate of 0.
+
+Metric: /real_gate_interleave/breach_rate/stale_read. Expected: increases to at least 0.50; sequential and re-check arms stay at 0.0.
+
+Falsifier: a stale-read breach rate below 0.50, any breach in the sequential or execute-time re-check arm, or any verify_full failure on the audit log.

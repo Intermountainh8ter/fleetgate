@@ -1,0 +1,46 @@
+{
+  "config": {
+    "fleet_size": 40,
+    "n_rounds": 500,
+    "policy": "default",
+    "rounds_over_headroom": 309,
+    "runbook": "drain_host"
+  },
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.gate_interleave --seed 7 --n 500 --out results/238-gate-interleave.json",
+    "data_sources": [
+      {
+        "license": "none used; simulated data only",
+        "url": "https://arxiv.org/pdf/2609.00275"
+      }
+    ],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-16T12:15:38Z",
+    "wall_s": 0.974
+  },
+  "real_gate_interleave": {
+    "breach_rate": {
+      "recheck": 0.0,
+      "sequential": 0.0,
+      "stale_read": 1.0
+    },
+    "breach_rate_all_rounds": {
+      "recheck": 0.0,
+      "sequential": 0.0,
+      "stale_read": 0.618
+    },
+    "mean_approved": {
+      "recheck": 1.0,
+      "sequential": 2.0,
+      "stale_read": 4.054
+    },
+    "verify_full_ok": {
+      "recheck": true,
+      "sequential": true,
+      "stale_read": true
+    }
+  }
+}
