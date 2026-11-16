@@ -1,0 +1,58 @@
+{
+  "config": {
+    "fleet_budget": 100,
+    "n_sequences": 1000
+  },
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.collusion_replay --seed 7 --n 1000 --out results/241-collusion-replay.json",
+    "data_sources": [
+      {
+        "license": "none used; simulated data only",
+        "url": "https://arxiv.org/pdf/2603.14332"
+      }
+    ],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-16T12:27:38Z",
+    "wall_s": 4.168
+  },
+  "replay": {
+    "breaches_denied_at_least_once_online": {
+      "atomic_gate": 0,
+      "check_then_act_gate": 929,
+      "per_call_gate": 0
+    },
+    "breaching_sequences": {
+      "atomic_gate": 0,
+      "check_then_act_gate": 929,
+      "per_call_gate": 1000
+    },
+    "detection_rate": {
+      "atomic_gate": null,
+      "check_then_act_gate": 1.0,
+      "per_call_gate": 1.0
+    },
+    "false_flags": {
+      "atomic_gate": 0,
+      "check_then_act_gate": 0,
+      "per_call_gate": 0
+    },
+    "flagged_breaches": {
+      "atomic_gate": 0,
+      "check_then_act_gate": 929,
+      "per_call_gate": 1000
+    },
+    "mean_lag_entries": {
+      "atomic_gate": null,
+      "check_then_act_gate": 0.0,
+      "per_call_gate": 0.0
+    },
+    "tampered_log_rejection_rate": {
+      "atomic_gate": 1.0,
+      "check_then_act_gate": 1.0,
+      "per_call_gate": 1.0
+    }
+  }
+}

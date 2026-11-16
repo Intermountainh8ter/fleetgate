@@ -45,3 +45,11 @@ Hypothesis: on the real fleetgate Policy with the default config, in 500 seeded 
 Metric: /real_gate_interleave/breach_rate/stale_read. Expected: increases to at least 0.50; sequential and re-check arms stay at 0.0.
 
 Falsifier: a stale-read breach rate below 0.50, any breach in the sequential or execute-time re-check arm, or any verify_full failure on the audit log.
+
+## 2026-11-16T12:27:38Z collusion-replay proposal:b880937d0b32d2663ea470b252aa424a336e2fe1a606982320f2d1ee301e4d8f
+
+Hypothesis: on 1000 seeded SIMULATED sequences (8 agents, per-call cap, fleet budget as in results/139), replaying the verified audit chain of the per-call-only gate flags every sequence that breached the fleet budget (replay detection rate 1.0, zero false flags on the atomic arm), and the replay flags the breach at the first entry where cumulative admitted units exceed the budget, so the detection lag is zero entries behind the log; the check-then-act arm's breaches are also all flagged, while deleting one verdict entry from the middle of a log makes verify_full fail so replay refuses it.
+
+Metric: /replay/detection_rate/per_call_gate. Expected: stays at 1.0 for the per-call and check-then-act arms; zero false flags on the atomic arm; tampered logs rejected in every case.
+
+Falsifier: a per-call or check-then-act breach not flagged by replay, any atomic-arm sequence flagged, or a middle-deleted log that verify_full accepts.
