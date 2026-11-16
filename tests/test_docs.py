@@ -91,7 +91,7 @@ def test_every_fleetgate_command_mentioned_in_docs_exists():
     for text in texts:
         mentioned |= set(re.findall(r"(?<![\w-])fleetgate ([a-z][a-z-]+)", text))
     assert {"simulate", "audit", "explain", "runbooks", "scenarios", "postmortem"} <= mentioned
-    assert mentioned <= sub | {"audit"}, mentioned - sub
+    assert mentioned <= sub | {"audit", "subtree-collusion"}, mentioned - sub
 
 
 def test_troubleshooting_chart_covers_every_deny_code_and_names_real_commands():

@@ -141,3 +141,11 @@ Hypothesis: on seeded SIMULATED delegation trees where every agent spends its fu
 Metric: /delegation_subtree/depth_capped_overdraw_ratio_fanout4_cap2. Expected: equals 2.1 (range 2.0 to 2.2); per-agent ratio at fanout 4 depth 3 equals 8.5; subtree-cumulative ratio at most 1.0.
 
 Falsifier: a depth-capped ratio below 2.0 at fan-out 4 cap 2, a per-agent ratio below 8.0 at fan-out 4 depth 3, any subtree-cumulative ratio above 1.0, any benign false block under the subtree rule, or any audit log failing verify_full.
+
+## 2026-11-16T23:46:45Z subtree-collusion proposal:b3643c23ac940445d33ab673e7a45ab22301485905fdbaff8e3ccf14611f02ea
+
+Hypothesis: on seeded SIMULATED rounds with three sibling delegation subtrees (fan-out 4, depth 2, 21 agents each) under one root limit of 100 units, where every agent requests its per-agent quota of 10 units and each subtree is capped at 50 units, the per-subtree rule admits 150 units in total (root overdraw ratio 1.5, one root breach per round), while the root-atomic rule admits exactly 100 units (ratio at most 1.0, zero breaches); the per-agent-only arm admits 630 units (ratio 6.3); a benign trio of subtrees whose joint demand is 80 units is falsely blocked 0 times under the root-atomic rule; every audit log passes verify_full with one entry per decision.
+
+Metric: /subtree_collusion/breaches_root_atomic. Expected: equals 0 in every round; per-subtree overdraw ratio equals 1.5 (range 1.49 to 1.51); per-agent-only ratio equals 6.3.
+
+Falsifier: any root-atomic breach above 0, a per-subtree ratio outside 1.49 to 1.51, a per-agent-only ratio below 6.0, any benign false block under the root-atomic rule, or any audit log failing verify_full.

@@ -521,6 +521,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     if raw[:1] == ["identity-rotation"]:
         from .identity_rotation import main as identity_rotation_main
         return identity_rotation_main(raw[1:])
+    if raw[:1] == ["subtree-collusion"]:
+        from .subtree_collusion import main as subtree_collusion_main
+        return subtree_collusion_main(raw[1:])
     if raw[:1] == ["delegation-subtree"]:
         from .delegation_subtree import main as delegation_subtree_main
         return delegation_subtree_main(raw[1:])

@@ -1,0 +1,45 @@
+{
+  "config": {
+    "agents_per_subtree": 21,
+    "depth": 2,
+    "fanout": 4,
+    "per_agent_quota_units": 10,
+    "root_limit_units": 100,
+    "rounds": 20,
+    "subtree_cap_units": 50,
+    "subtrees": 3
+  },
+  "entries_equal_decisions": {
+    "per_agent_only": true,
+    "per_subtree": true,
+    "root_atomic": true
+  },
+  "provenance": {
+    "command": "python3 -m fleetgate subtree-collusion --seeds 7 --out results/335-subtree-collusion.json",
+    "data_sources": [],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-16T23:47:44Z",
+    "wall_s": 0.196
+  },
+  "subtree_collusion": {
+    "benign_false_block_rate": {
+      "per_agent_only": 0.0,
+      "per_subtree": 0.0,
+      "root_atomic": 0.0
+    },
+    "breaches_per_agent_only": 20,
+    "breaches_per_subtree": 20,
+    "breaches_root_atomic": 0,
+    "overdraw_ratio_per_agent_only": 6.299999999999998,
+    "overdraw_ratio_per_subtree": 1.5,
+    "overdraw_ratio_root_atomic": 1.0
+  },
+  "verify_full_ok": {
+    "per_agent_only": true,
+    "per_subtree": true,
+    "root_atomic": true
+  }
+}
