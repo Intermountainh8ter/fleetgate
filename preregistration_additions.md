@@ -125,3 +125,11 @@ Hypothesis: on seeded SIMULATED fleets where every agent stays within a per-agen
 Metric: /fleet_overdraw/per_agent_rule_overdraw_ratio_n32. Expected: at least 3.0 (range 3.0 to 3.3); cumulative rule ratio at most 1.0.
 
 Falsifier: a per-agent overdraw ratio at N=32 below 3.0, any cumulative-rule ratio above 1.0 at any N, any benign false block under the cumulative rule, or any audit log that fails verify_full.
+
+## 2026-11-16T22:48:32Z identity-rotation proposal:96feb6ab6933fa791ef9bc974ba8bcff09378e66f6b8ca238be58c2690df8164
+
+Hypothesis: on seeded SIMULATED rounds where a colluder with a per-agent denial budget of 3 per rack re-presents under a fresh identity after each denial, attempting 16 reversible restarts on one rack against a cumulative per-rack budget of 4, the per-agent rule admits all 16 attempts (rotating admit count 16) while the cumulative rule admits exactly 4 regardless of identity; a non-rotating colluder is capped at 3 by the per-agent rule; a benign sequence of 4 restarts across the same rack is falsely blocked 0 times under the cumulative rule; every audit log passes verify_full with one entry per decision.
+
+Metric: /identity_rotation/rotating_colluder_admit_count_cumulative_rule. Expected: equals 4; per-agent rule rotating admit count equals 16.
+
+Falsifier: a cumulative-rule admit count for the rotating colluder other than 4, a per-agent-rule rotating admit count below 16, any benign false block under the cumulative rule, or any audit log failing verify_full.

@@ -1,0 +1,34 @@
+{
+  "config": {
+    "attempts": 16,
+    "cumulative_budget": 4,
+    "per_agent_budget": 3,
+    "rounds": 20
+  },
+  "entries_equal_decisions": {
+    "cumulative_rule": true,
+    "per_agent_rule": true
+  },
+  "identity_rotation": {
+    "benign_false_blocks_cumulative_rule": 0.0,
+    "benign_false_blocks_per_agent_rule": 0.0,
+    "rotating_colluder_admit_count_cumulative_rule": 4.0,
+    "rotating_colluder_admit_count_per_agent_rule": 16.0,
+    "static_colluder_admit_count_cumulative_rule": 4.0,
+    "static_colluder_admit_count_per_agent_rule": 3.0
+  },
+  "provenance": {
+    "command": "python3 -m fleetgate identity-rotation --seeds 7 --out results/323-identity-rotation.json",
+    "data_sources": [],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-16T22:49:27Z",
+    "wall_s": 0.047
+  },
+  "verify_full_ok": {
+    "cumulative_rule": true,
+    "per_agent_rule": true
+  }
+}
