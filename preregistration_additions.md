@@ -181,3 +181,13 @@ Hypothesis: on seeded SIMULATED hash-chained audit logs of 1,000, 10,000 and 100
 Metric: /suffix_verify/hash_ops_ratio_100k_over_1k. Expected: ratio within 0.9 to 1.1 (about 1.0); verify_full operation ratio at least 90.
 
 Falsifier: a suffix-verify operation ratio outside 0.9-1.1, a verify_full operation ratio below 90, suffix detection below 100% after the anchor or above 0% before it, verify_full detecting fewer than 100% of either tamper placement, or any untampered log failing either verifier.
+
+## 2026-11-17T00:57:33Z gate-state-cost proposal:ef1325bd764f8dceb36519c919c0b5c5c62282a27cae7242b78757b2e94af1a7
+
+Hypothesis: on seeded SIMULATED logs of 1,000, 10,000 and 100,000 entries with 500 seeded rate-limit decisions per scale, the stateless and in-memory stateful arms perform 0 SHA-256 operations per decision at every scale, a log-derived arm that re-verifies the whole log before reading caller history performs a per-decision operation count equal to the log length within 10% (90,000 to 110,000 at 100,000 entries), a log-derived arm that verifies only from the latest checkpoint stays under 100 operations per decision at every scale, all three arms return identical verdicts on untampered logs, and on 200 seeded tampers of pre-checkpoint history the full-verify arm refuses 100% of decisions while the in-memory and suffix arms refuse 0%.
+
+Metric: /ops_per_decision_by_arm/log_derived_full/100000. Expected: increases to between 90,000 and 110,000.
+
+Falsifier: log_derived_full ops per decision at 100,000 entries outside 90,000-110,000, any stateless or in-memory arm above 0, suffix arm at or above 100 at any scale, verdict disagreement between arms on an untampered log, or the full-verify arm refusing fewer than 100% (or the in-memory or suffix arm refusing more than 0%) of decisions after pre-checkpoint tampering.
+
+Design note: the rate rule caps a caller's units over the last 64 log entries at a cap that the seeded workload cannot reach, so verdict agreement across arms holds by construction; the experiment measures cost and tamper refusal, not verdict differences.

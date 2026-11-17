@@ -385,3 +385,7 @@ checkpoint, a 20-entry tail after it), verifying only from the anchor costs 20 S
 99.22646657571623). Of 200 single-entry tampers per placement, the suffix verifier detected 1.0 of those after the
 anchor and 0.0 of those before it; `verify_full` detected 1.0 of both. Suffix verification trades coverage for constant
 cost. Source: `results/344-audit-suffix-verify.json`; simulated data only.
+
+## Gate state cost (iteration 347, simulated)
+
+Pre-registered hypothesis refuted on one point: a log-derived gate that re-verifies the whole log before each decision performed 290932.0 SHA-256 operations per decision at 100,000 entries (results/347-gate-state-cost.json, `/ops_per_decision_by_arm/log_derived_full/100000`), outside the pre-registered 90,000 to 110,000 range, because verify_full also hashes Merkle blocks. Checkpoint-suffix verification stayed at 20.0 operations per decision at every scale, and the stateless and in-memory arms performed 0.0. After pre-checkpoint tampering the full-verify arm refused 1.0 of decisions and the in-memory and suffix arms 0.0. Verdict agreement across arms holds by construction (the rate cap never binds in this workload).

@@ -1,0 +1,114 @@
+{
+  "decisions_per_scale": 500,
+  "ops_per_decision_by_arm": {
+    "in_memory": {
+      "1000": 0.0,
+      "10000": 0.0,
+      "100000": 0.0
+    },
+    "log_derived_full": {
+      "1000": 2932.0,
+      "10000": 29111.0,
+      "100000": 290932.0
+    },
+    "log_derived_suffix": {
+      "1000": 20.0,
+      "10000": 20.0,
+      "100000": 20.0
+    },
+    "stateless": {
+      "1000": 0.0,
+      "10000": 0.0,
+      "100000": 0.0
+    }
+  },
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.gate_state_cost --seed 7 --out results/347-gate-state-cost.json",
+    "data_sources": [
+      {
+        "license": "MIT (repository code)",
+        "url": "simulated: seeded in-process audit logs, no external data"
+      }
+    ],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-17T00:57:33Z",
+    "wall_s": 564.419
+  },
+  "refusal_rate_after_tamper_by_arm": {
+    "in_memory": {
+      "1000": 0.0,
+      "10000": 0.0,
+      "100000": 0.0
+    },
+    "log_derived_full": {
+      "1000": 1.0,
+      "10000": 1.0,
+      "100000": 1.0
+    },
+    "log_derived_suffix": {
+      "1000": 0.0,
+      "10000": 0.0,
+      "100000": 0.0
+    },
+    "stateless": {
+      "1000": 0.0,
+      "10000": 0.0,
+      "100000": 0.0
+    }
+  },
+  "scales": {
+    "1000": {
+      "entries": 1021,
+      "ops": {
+        "in_memory": 0.0,
+        "log_derived_full": 2932.0,
+        "log_derived_suffix": 20.0,
+        "stateless": 0.0
+      },
+      "refusal_rate_after_tamper": {
+        "in_memory": 0.0,
+        "log_derived_full": 1.0,
+        "log_derived_suffix": 0.0,
+        "stateless": 0.0
+      },
+      "verdicts_identical": true
+    },
+    "10000": {
+      "entries": 10021,
+      "ops": {
+        "in_memory": 0.0,
+        "log_derived_full": 29111.0,
+        "log_derived_suffix": 20.0,
+        "stateless": 0.0
+      },
+      "refusal_rate_after_tamper": {
+        "in_memory": 0.0,
+        "log_derived_full": 1.0,
+        "log_derived_suffix": 0.0,
+        "stateless": 0.0
+      },
+      "verdicts_identical": true
+    },
+    "100000": {
+      "entries": 100021,
+      "ops": {
+        "in_memory": 0.0,
+        "log_derived_full": 290932.0,
+        "log_derived_suffix": 20.0,
+        "stateless": 0.0
+      },
+      "refusal_rate_after_tamper": {
+        "in_memory": 0.0,
+        "log_derived_full": 1.0,
+        "log_derived_suffix": 0.0,
+        "stateless": 0.0
+      },
+      "verdicts_identical": true
+    }
+  },
+  "tampers_per_scale": 200,
+  "verdicts_identical_all_scales": true
+}
