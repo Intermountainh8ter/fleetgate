@@ -223,3 +223,11 @@ Falsifier: sampled reconstruction cost at 1000 agents outside 0.05-0.12 per deci
 Design note: one operation is one call to hashlib.sha256 inside the audit module. A sampled reconstruction recomputes the entry digest, hashes the entry hash as a Merkle leaf, and walks the Merkle path through its 32-entry checkpoint block to the stored root; the checkpoint entry's own digest is not rechecked.
 
 Outcome note (written after the run, not part of the pre-registration): the primary metric was refuted. Sampled reconstruction at 1000 agents cost 0.035 operations per decision (700 operations over 20000 decisions), below the pre-registered 0.05-0.12, because a proof walks a 32-entry checkpoint block (7 operations per sampled entry), not the whole log. Chained append was 3.0 at 1000 agents and full verification 3.0 per decision, not 1 per entry, since checkpoint Merkle hashing is included. The full-verification total ratio was 102.73972602739725 (within 90-110); sampled detection was 1.0 and unsampled 0.0. The design was not changed to fit the result.
+
+## 2026-11-17T01:49:36Z veto-liveness proposal:19fdd569f05565bb5e5ab611ece38f405d4827350b97263c70e1fb65c7bb578a
+
+Hypothesis: because the real ApprovalQueue treats any single reject vote as a rejection, with 5 approvers in seeded random vote order, a quorum of 3, honest approvers erring (rejecting) independently at 0.1, and a stream of legitimate NEEDS_APPROVAL plans, one always-reject colluder raises the blocked legitimate share of the quorum_trusted arm to between 0.60 and 0.80 (about 1-(2/5)*0.9^3), 2 vetoers to at least 0.90, 3 or more vetoers to exactly 1.0, while the gate_rederived arm (which executes ALLOW-class legitimate plans without votes) keeps a blocked legitimate share of 0.0 at every vetoer count and executes 0 DENY-class plans.
+
+Metric: /blocked_legitimate_share_by_veto/1/quorum_trusted. Expected: between 0.60 and 0.80; 2 vetoers at least 0.90; 3 vetoers exactly 1.0; gate_rederived 0.0 in every cell.
+
+Falsifier: quorum_trusted blocked share at 1 vetoer outside 0.60-0.80, at 2 vetoers below 0.90, at 3 vetoers below 1.0, gate_rederived blocked share above 0.0 in any cell, or any gate_rederived executed DENY plan.

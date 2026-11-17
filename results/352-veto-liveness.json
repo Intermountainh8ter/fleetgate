@@ -1,0 +1,45 @@
+{
+  "all_logs_verify": true,
+  "approvers": 5,
+  "blocked_legitimate_share_by_veto": {
+    "0": {
+      "gate_rederived": 0.0,
+      "quorum_trusted": 0.4065
+    },
+    "1": {
+      "gate_rederived": 0.0,
+      "quorum_trusted": 1.0
+    },
+    "2": {
+      "gate_rederived": 0.0,
+      "quorum_trusted": 1.0
+    },
+    "3": {
+      "gate_rederived": 0.0,
+      "quorum_trusted": 1.0
+    },
+    "4": {
+      "gate_rederived": 0.0,
+      "quorum_trusted": 1.0
+    }
+  },
+  "gate_rederived_executed_deny_total": 0,
+  "independent_error_rate": 0.1,
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.veto_liveness --seed 7 --rounds 2000 --out results/352-veto-liveness.json",
+    "data_sources": [
+      {
+        "license": "MIT (repo)",
+        "url": "simulated: seeded in-repo fleet simulator"
+      }
+    ],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-17T01:49:51Z",
+    "wall_s": 0.722
+  },
+  "quorum": 3,
+  "rounds": 2000
+}
