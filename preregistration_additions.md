@@ -191,3 +191,13 @@ Metric: /ops_per_decision_by_arm/log_derived_full/100000. Expected: increases to
 Falsifier: log_derived_full ops per decision at 100,000 entries outside 90,000-110,000, any stateless or in-memory arm above 0, suffix arm at or above 100 at any scale, verdict disagreement between arms on an untampered log, or the full-verify arm refusing fewer than 100% (or the in-memory or suffix arm refusing more than 0%) of decisions after pre-checkpoint tampering.
 
 Design note: the rate rule caps a caller's units over the last 64 log entries at a cap that the seeded workload cannot reach, so verdict agreement across arms holds by construction; the experiment measures cost and tamper refusal, not verdict differences.
+
+## 2026-11-17T01:21:36Z shared-quorum proposal:2704e4406748891852f88a9c2bf19b11166d7dca1efdf460ff79b56d02f6e6f7
+
+Hypothesis: when every approver in a 5-approver majority quorum shares the same corrupted input (shared fraction 1.0), the quorum_trusted arm executes at least 90% of DENY-class plans, equal to a single approver, while the gate_rederived arm executes 0% at every shared fraction; adding approvers (1, 3, 5, 9) does not reduce the quorum_trusted executed-deny share at shared fraction 1.0.
+
+Metric: /executed_deny_share_by_arm/quorum_trusted (shared fraction 1.0, 5 approvers). Expected: at least 0.90 (range 0.9 to 1.0).
+
+Falsifier: quorum_trusted executed-deny share below 0.50 at shared fraction 1.0 with 5 approvers, or gate_rederived share above 0 in any cell.
+
+Design note: at shared fraction 1.0 every approver approves by construction, so the quorum result there follows from the model; the experiment's information is in the fractions below 1.0 (where independent errors at a fixed per-approver rate of 0.1 are outvoted) and in the check that the real Policy returns DENY for the DENY-class plan in every round.

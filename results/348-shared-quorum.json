@@ -1,0 +1,271 @@
+{
+  "all_logs_verify": true,
+  "benign_gate_exec_share_min": 1.0,
+  "executed_deny_share_by_arm": {
+    "distinct_principal": 1.0,
+    "gate_rederived": 0.0,
+    "quorum_trusted": 1.0
+  },
+  "gate_rederived_max_share": 0.0,
+  "grid": {
+    "0.0": {
+      "1": {
+        "benign_gate_exec_share": 1.0,
+        "executed_deny_share": {
+          "distinct_principal": 0.097,
+          "gate_rederived": 0.0,
+          "quorum_trusted": 0.097
+        },
+        "policy_deny_share": 1.0,
+        "single_approver_share": 0.0,
+        "verify_ok": true
+      },
+      "3": {
+        "benign_gate_exec_share": 1.0,
+        "executed_deny_share": {
+          "distinct_principal": 0.001,
+          "gate_rederived": 0.0,
+          "quorum_trusted": 0.001
+        },
+        "policy_deny_share": 1.0,
+        "single_approver_share": 0.0,
+        "verify_ok": true
+      },
+      "5": {
+        "benign_gate_exec_share": 1.0,
+        "executed_deny_share": {
+          "distinct_principal": 0.0,
+          "gate_rederived": 0.0,
+          "quorum_trusted": 0.0
+        },
+        "policy_deny_share": 1.0,
+        "single_approver_share": 0.0,
+        "verify_ok": true
+      },
+      "9": {
+        "benign_gate_exec_share": 1.0,
+        "executed_deny_share": {
+          "distinct_principal": 0.0,
+          "gate_rederived": 0.0,
+          "quorum_trusted": 0.0
+        },
+        "policy_deny_share": 1.0,
+        "single_approver_share": 0.0,
+        "verify_ok": true
+      }
+    },
+    "0.25": {
+      "1": {
+        "benign_gate_exec_share": 1.0,
+        "executed_deny_share": {
+          "distinct_principal": 0.317,
+          "gate_rederived": 0.0,
+          "quorum_trusted": 0.317
+        },
+        "policy_deny_share": 1.0,
+        "single_approver_share": 0.0,
+        "verify_ok": true
+      },
+      "3": {
+        "benign_gate_exec_share": 1.0,
+        "executed_deny_share": {
+          "distinct_principal": 0.248,
+          "gate_rederived": 0.0,
+          "quorum_trusted": 0.248
+        },
+        "policy_deny_share": 1.0,
+        "single_approver_share": 0.0,
+        "verify_ok": true
+      },
+      "5": {
+        "benign_gate_exec_share": 1.0,
+        "executed_deny_share": {
+          "distinct_principal": 0.259,
+          "gate_rederived": 0.0,
+          "quorum_trusted": 0.259
+        },
+        "policy_deny_share": 1.0,
+        "single_approver_share": 0.0,
+        "verify_ok": true
+      },
+      "9": {
+        "benign_gate_exec_share": 1.0,
+        "executed_deny_share": {
+          "distinct_principal": 0.256,
+          "gate_rederived": 0.0,
+          "quorum_trusted": 0.256
+        },
+        "policy_deny_share": 1.0,
+        "single_approver_share": 0.0,
+        "verify_ok": true
+      }
+    },
+    "0.5": {
+      "1": {
+        "benign_gate_exec_share": 1.0,
+        "executed_deny_share": {
+          "distinct_principal": 0.579,
+          "gate_rederived": 0.0,
+          "quorum_trusted": 0.579
+        },
+        "policy_deny_share": 1.0,
+        "single_approver_share": 0.0,
+        "verify_ok": true
+      },
+      "3": {
+        "benign_gate_exec_share": 1.0,
+        "executed_deny_share": {
+          "distinct_principal": 0.493,
+          "gate_rederived": 0.0,
+          "quorum_trusted": 0.493
+        },
+        "policy_deny_share": 1.0,
+        "single_approver_share": 0.0,
+        "verify_ok": true
+      },
+      "5": {
+        "benign_gate_exec_share": 1.0,
+        "executed_deny_share": {
+          "distinct_principal": 0.503,
+          "gate_rederived": 0.0,
+          "quorum_trusted": 0.503
+        },
+        "policy_deny_share": 1.0,
+        "single_approver_share": 0.0,
+        "verify_ok": true
+      },
+      "9": {
+        "benign_gate_exec_share": 1.0,
+        "executed_deny_share": {
+          "distinct_principal": 0.523,
+          "gate_rederived": 0.0,
+          "quorum_trusted": 0.523
+        },
+        "policy_deny_share": 1.0,
+        "single_approver_share": 0.0,
+        "verify_ok": true
+      }
+    },
+    "0.75": {
+      "1": {
+        "benign_gate_exec_share": 1.0,
+        "executed_deny_share": {
+          "distinct_principal": 0.747,
+          "gate_rederived": 0.0,
+          "quorum_trusted": 0.747
+        },
+        "policy_deny_share": 1.0,
+        "single_approver_share": 1.0,
+        "verify_ok": true
+      },
+      "3": {
+        "benign_gate_exec_share": 1.0,
+        "executed_deny_share": {
+          "distinct_principal": 0.755,
+          "gate_rederived": 0.0,
+          "quorum_trusted": 0.755
+        },
+        "policy_deny_share": 1.0,
+        "single_approver_share": 1.0,
+        "verify_ok": true
+      },
+      "5": {
+        "benign_gate_exec_share": 1.0,
+        "executed_deny_share": {
+          "distinct_principal": 0.759,
+          "gate_rederived": 0.0,
+          "quorum_trusted": 0.759
+        },
+        "policy_deny_share": 1.0,
+        "single_approver_share": 1.0,
+        "verify_ok": true
+      },
+      "9": {
+        "benign_gate_exec_share": 1.0,
+        "executed_deny_share": {
+          "distinct_principal": 0.783,
+          "gate_rederived": 0.0,
+          "quorum_trusted": 0.783
+        },
+        "policy_deny_share": 1.0,
+        "single_approver_share": 1.0,
+        "verify_ok": true
+      }
+    },
+    "1.0": {
+      "1": {
+        "benign_gate_exec_share": 1.0,
+        "executed_deny_share": {
+          "distinct_principal": 1.0,
+          "gate_rederived": 0.0,
+          "quorum_trusted": 1.0
+        },
+        "policy_deny_share": 1.0,
+        "single_approver_share": 1.0,
+        "verify_ok": true
+      },
+      "3": {
+        "benign_gate_exec_share": 1.0,
+        "executed_deny_share": {
+          "distinct_principal": 1.0,
+          "gate_rederived": 0.0,
+          "quorum_trusted": 1.0
+        },
+        "policy_deny_share": 1.0,
+        "single_approver_share": 1.0,
+        "verify_ok": true
+      },
+      "5": {
+        "benign_gate_exec_share": 1.0,
+        "executed_deny_share": {
+          "distinct_principal": 1.0,
+          "gate_rederived": 0.0,
+          "quorum_trusted": 1.0
+        },
+        "policy_deny_share": 1.0,
+        "single_approver_share": 1.0,
+        "verify_ok": true
+      },
+      "9": {
+        "benign_gate_exec_share": 1.0,
+        "executed_deny_share": {
+          "distinct_principal": 1.0,
+          "gate_rederived": 0.0,
+          "quorum_trusted": 1.0
+        },
+        "policy_deny_share": 1.0,
+        "single_approver_share": 1.0,
+        "verify_ok": true
+      }
+    }
+  },
+  "headline_cell": {
+    "approvers": 5,
+    "shared": 1.0
+  },
+  "independent_error_rate": 0.1,
+  "policy_deny_share_min": 1.0,
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.shared_quorum --seed 7 --rounds 1000 --out results/348-shared-quorum.json",
+    "data_sources": [
+      {
+        "license": "MIT (own code)",
+        "url": "simulated: seeded in-process generator, no external data"
+      }
+    ],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-17T01:21:46Z",
+    "wall_s": 1.932
+  },
+  "quorum_trusted_by_approvers_at_shared_1": {
+    "1": 1.0,
+    "3": 1.0,
+    "5": 1.0,
+    "9": 1.0
+  },
+  "rounds": 1000,
+  "single_approver_share": 1.0
+}
