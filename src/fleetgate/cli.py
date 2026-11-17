@@ -524,6 +524,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     if raw[:1] == ["authority-intersection"]:
         from .authority_intersection import main as authority_intersection_main
         return authority_intersection_main(raw[1:])
+    if raw[:1] == ["grant-revocation"]:
+        from .grant_revocation import main as grant_revocation_main
+        return grant_revocation_main(raw[1:])
     if raw[:1] == ["log-tamper-collusion"]:
         from .log_tamper_collusion import main as log_tamper_collusion_main
         return log_tamper_collusion_main(raw[1:])

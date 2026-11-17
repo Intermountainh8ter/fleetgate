@@ -165,3 +165,11 @@ Hypothesis: on seeded SIMULATED rounds with three sibling subtrees under per-sub
 Metric: /tamper/undetected_breaches_writable_log. Expected: equals 1.0; anchored undetected rate equals 0.0.
 
 Falsifier: a hash-chain-only undetected rate below 1.0, an anchored undetected rate above 0.0, or any benign untampered log flagged under either verifier.
+
+## 2026-11-17T00:14:20Z grant-revocation proposal:428dec94a91a561d3e1cf5afba4e51f837e10bd13aa9bb43a3fa9517e2738413
+
+Hypothesis: on seeded SIMULATED delegation trees (fan-out 4, depth 3, 85 agents, 8-permission catalogue, policy allowing 6, root holding 4) where the root revokes one of its 4 permissions at the midpoint of 20 rounds of 10 calls per agent and every agent exercises each held permission with probability 0.5 per call, a gate that checks grants only at delegation time lets descendants keep exercising the revoked permission (mean at least 50 post-revocation uses per tree), while a gate that re-evaluates the live intersection at call time permits exactly 0 post-revocation uses in every round, with a benign false-deny rate of 0.0 for calls on permissions that were not revoked, and every audit log passing verify_full with one entry per decision.
+
+Metric: /revocation/post_revocation_uses_live_intersection. Expected: equals 0 in every round; delegation-time-cached gate mean post-revocation uses per tree at least 50.
+
+Falsifier: any post-revocation use under the live-intersection gate in any round, a cached-gate mean below 50 per tree, any benign false-deny under the live-intersection gate, or any audit log failing verify_full.

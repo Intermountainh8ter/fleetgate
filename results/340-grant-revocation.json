@@ -1,0 +1,48 @@
+{
+  "arms": {
+    "cached": {
+      "benign_calls": 29805,
+      "benign_false_deny_rate": 0.0,
+      "entries_equal_decisions": true,
+      "post_revocation_uses_max_round": 442,
+      "post_revocation_uses_mean_per_round": 422.0,
+      "post_revocation_uses_total": 4220,
+      "verify_full_ok": true
+    },
+    "live": {
+      "benign_calls": 29805,
+      "benign_false_deny_rate": 0.0,
+      "entries_equal_decisions": true,
+      "post_revocation_uses_max_round": 0,
+      "post_revocation_uses_mean_per_round": 0.0,
+      "post_revocation_uses_total": 0,
+      "verify_full_ok": true
+    }
+  },
+  "config": {
+    "agents": 85,
+    "calls_per_agent": 10,
+    "depth": 3,
+    "fanout": 4,
+    "p_use": 0.5,
+    "policy_allows": 6,
+    "revoke_round": 10,
+    "root_holds": 4,
+    "rounds": 20
+  },
+  "provenance": {
+    "command": "python3 -m fleetgate grant-revocation --seeds 7 --rounds 20 --out results/340-grant-revocation.json",
+    "data_sources": [],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-17T00:14:54Z",
+    "wall_s": 1.809
+  },
+  "revocation": {
+    "benign_false_deny_rate_live": 0.0,
+    "post_revocation_uses_cached_mean_per_round": 422.0,
+    "post_revocation_uses_live_intersection": 0
+  }
+}
