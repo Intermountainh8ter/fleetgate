@@ -173,3 +173,11 @@ Hypothesis: on seeded SIMULATED delegation trees (fan-out 4, depth 3, 85 agents,
 Metric: /revocation/post_revocation_uses_live_intersection. Expected: equals 0 in every round; delegation-time-cached gate mean post-revocation uses per tree at least 50.
 
 Falsifier: any post-revocation use under the live-intersection gate in any round, a cached-gate mean below 50 per tree, any benign false-deny under the live-intersection gate, or any audit log failing verify_full.
+
+## 2026-11-17T00:35:10Z audit-suffix-verify proposal:ff104167fe109735ea13b09907cbb602b14cf98bfcbcaaa89cb244580c5dd56e
+
+Hypothesis: on seeded SIMULATED hash-chained audit logs of 1,000, 10,000 and 100,000 entries with checkpoints every 32 entries and an external anchor at the last checkpoint, a suffix verification from that anchor performs a SHA-256 operation count that does not grow with log size (ratio of operations at 100,000 over 1,000 entries between 0.9 and 1.1), while verify_full operations grow at least 90-fold over the same range; the suffix verifier detects 100% of 200 seeded single-entry tampers placed after the anchor at every scale and 0% of 200 tampers placed before the anchor, and verify_full detects 100% of both, so suffix verification trades coverage for constant cost.
+
+Metric: /suffix_verify/hash_ops_ratio_100k_over_1k. Expected: ratio within 0.9 to 1.1 (about 1.0); verify_full operation ratio at least 90.
+
+Falsifier: a suffix-verify operation ratio outside 0.9-1.1, a verify_full operation ratio below 90, suffix detection below 100% after the anchor or above 0% before it, verify_full detecting fewer than 100% of either tamper placement, or any untampered log failing either verifier.

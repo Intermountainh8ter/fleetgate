@@ -1,0 +1,84 @@
+{
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.audit_suffix --seed 7 --out results/344-audit-suffix-verify.json",
+    "data_sources": [
+      {
+        "license": "none used; simulated data only",
+        "url": "https://arxiv.org/pdf/2609.00275"
+      }
+    ],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-17T00:37:49Z",
+    "wall_s": 308.2
+  },
+  "suffix_verify": {
+    "all_untampered_ok": true,
+    "hash_ops_ratio_100k_over_1k": 1.0,
+    "scales": {
+      "1000": {
+        "anchor_seq": 1000,
+        "detect_rate": {
+          "after": {
+            "full": 1.0,
+            "suffix": 1.0
+          },
+          "before": {
+            "full": 1.0,
+            "suffix": 0.0
+          }
+        },
+        "entries": 1021,
+        "full_ok": true,
+        "suffix_hash_ops": 20,
+        "suffix_ok": true,
+        "tail_entries": 20,
+        "tampers_per_placement": 200,
+        "verify_full_hash_ops": 2932
+      },
+      "10000": {
+        "anchor_seq": 10000,
+        "detect_rate": {
+          "after": {
+            "full": 1.0,
+            "suffix": 1.0
+          },
+          "before": {
+            "full": 1.0,
+            "suffix": 0.0
+          }
+        },
+        "entries": 10021,
+        "full_ok": true,
+        "suffix_hash_ops": 20,
+        "suffix_ok": true,
+        "tail_entries": 20,
+        "tampers_per_placement": 200,
+        "verify_full_hash_ops": 29111
+      },
+      "100000": {
+        "anchor_seq": 100000,
+        "detect_rate": {
+          "after": {
+            "full": 1.0,
+            "suffix": 1.0
+          },
+          "before": {
+            "full": 1.0,
+            "suffix": 0.0
+          }
+        },
+        "entries": 100021,
+        "full_ok": true,
+        "suffix_hash_ops": 20,
+        "suffix_ok": true,
+        "tail_entries": 20,
+        "tampers_per_placement": 200,
+        "verify_full_hash_ops": 290932
+      }
+    },
+    "verify_full_ops_ratio_100k_over_1k": 99.22646657571623
+  }
+}

@@ -376,3 +376,12 @@ to its deny-list before execution. An executor that trusted the stored approval 
 plans the swapped gate would DENY (`/stale_execute_rate_by_arm/trust_stored_approval`); an executor that re-evaluated
 through the gate executed a share of 0.0. On the 677 plans the swapped gate still allowed, the arms disagreed on 0.
 Every audit log verified. Source: `results/308-stale-approval.json`.
+
+## Suffix verification of the audit log (iteration 344, SIMULATED)
+
+On seeded simulated logs of 1000, 10000 and 100000 entries (checkpoints every 32 entries, an anchor at the last
+checkpoint, a 20-entry tail after it), verifying only from the anchor costs 20 SHA-256 operations at every scale
+(ratio 1.0 at 100000 over 1000 entries), while `verify_full` costs 2932, 29111 and 290932 operations (ratio
+99.22646657571623). Of 200 single-entry tampers per placement, the suffix verifier detected 1.0 of those after the
+anchor and 0.0 of those before it; `verify_full` detected 1.0 of both. Suffix verification trades coverage for constant
+cost. Source: `results/344-audit-suffix-verify.json`; simulated data only.
