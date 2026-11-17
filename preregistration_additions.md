@@ -211,3 +211,15 @@ Metric: /executed_deny_share_post_onset_by_colluders/2/quorum_trusted. Expected:
 Falsifier: quorum_trusted post-onset share at 2 colluders outside 0.20-0.35, at 3 colluders below 0.95, pre-onset share at 2 colluders at or above 0.05, any gate_rederived executed DENY plan, or the benign control failing to execute.
 
 Outcome note (written after the run, not part of the pre-registration): the hypothesis was refuted. The real ApprovalQueue treats any single reject vote as a rejection (`ApprovalRequest.rejected`), so an honest dissenter vetoes the colluders and the quorum arms behave like unanimity, not a majority. The design was not changed to fit the result.
+
+## 2026-11-17T01:39:41Z audit-fleet-cost proposal:79e685a4db015c8ff3a2e668a28132e54ea5662300a555fb9d592cb3700ba6aa
+
+Hypothesis: on seeded SIMULATED logs with 20 decisions per agent, chained-append cost is 1 to 3 SHA-256 operations per decision at every fleet size (10, 100, 1000), independent of fleet size; full verification cost per decision stays within 10% of 1 per entry at every fleet size while total full-verification operations grow linearly (the 1000-agent to 10-agent ratio within 10% of 100); and a sampled reconstruction check of 100 random entries costs between 0.05 and 0.12 operations per decision at 1000 agents, at least 10 times cheaper than full verification, while detecting a seeded single-entry tamper in the sampled set in 100% of 200 trials and an unsampled tamper in at most 5% of trials.
+
+Metric: /hash_ops_per_decision_by_fleet_size/1000/sampled_reconstruction. Expected: between 0.05 and 0.12.
+
+Falsifier: sampled reconstruction cost at 1000 agents outside 0.05-0.12 per decision; chained append outside 1-3 operations at any fleet size; full-verification total ratio between 1000 and 10 agents outside 90-110; sampled tamper detection below 100% on sampled entries; or unsampled tamper detection above 5%.
+
+Design note: one operation is one call to hashlib.sha256 inside the audit module. A sampled reconstruction recomputes the entry digest, hashes the entry hash as a Merkle leaf, and walks the Merkle path through its 32-entry checkpoint block to the stored root; the checkpoint entry's own digest is not rechecked.
+
+Outcome note (written after the run, not part of the pre-registration): the primary metric was refuted. Sampled reconstruction at 1000 agents cost 0.035 operations per decision (700 operations over 20000 decisions), below the pre-registered 0.05-0.12, because a proof walks a 32-entry checkpoint block (7 operations per sampled entry), not the whole log. Chained append was 3.0 at 1000 agents and full verification 3.0 per decision, not 1 per entry, since checkpoint Merkle hashing is included. The full-verification total ratio was 102.73972602739725 (within 90-110); sampled detection was 1.0 and unsampled 0.0. The design was not changed to fit the result.

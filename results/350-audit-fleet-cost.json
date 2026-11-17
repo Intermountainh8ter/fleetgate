@@ -1,0 +1,63 @@
+{
+  "decisions_per_agent": 20,
+  "full_to_sampled_cost_ratio_largest": 85.71428571428571,
+  "full_verification_total_ratio_largest_to_smallest": 102.73972602739725,
+  "hash_ops_per_decision_by_fleet_size": {
+    "10": {
+      "chained_append": 2.92,
+      "decisions": 200,
+      "entries": 206,
+      "full_verification": 2.92,
+      "full_verification_total": 584,
+      "full_verify_ok": true,
+      "sample_ok": true,
+      "sampled_reconstruction": 3.26,
+      "sampled_reconstruction_total": 652,
+      "sampled_tamper_detection": 1.0,
+      "unsampled_tamper_detection": 0.0
+    },
+    "100": {
+      "chained_append": 2.984,
+      "decisions": 2000,
+      "entries": 2062,
+      "full_verification": 2.984,
+      "full_verification_total": 5968,
+      "full_verify_ok": true,
+      "sample_ok": true,
+      "sampled_reconstruction": 0.35,
+      "sampled_reconstruction_total": 700,
+      "sampled_tamper_detection": 1.0,
+      "unsampled_tamper_detection": 0.0
+    },
+    "1000": {
+      "chained_append": 3.0,
+      "decisions": 20000,
+      "entries": 20625,
+      "full_verification": 3.0,
+      "full_verification_total": 60000,
+      "full_verify_ok": true,
+      "sample_ok": true,
+      "sampled_reconstruction": 0.035,
+      "sampled_reconstruction_total": 700,
+      "sampled_tamper_detection": 1.0,
+      "unsampled_tamper_detection": 0.0
+    }
+  },
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.audit_fleet_cost --seed 7 --decisions-per-agent 20 --out results/350-audit-fleet-cost.json",
+    "data_sources": [
+      {
+        "license": "MIT (repository code)",
+        "url": "simulated: seeded in-process audit logs, no external data"
+      }
+    ],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-17T01:40:04Z",
+    "wall_s": 2.084
+  },
+  "sample_size": 100,
+  "tamper_trials": 200
+}
