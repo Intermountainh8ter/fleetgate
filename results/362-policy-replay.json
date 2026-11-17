@@ -1,0 +1,41 @@
+{
+  "attribution": {
+    "attributable_stripped": 0,
+    "attributable_with_hash": 1000
+  },
+  "chain": {
+    "verifies_after_strip": false,
+    "verifies_with_hash_field": true
+  },
+  "logged_decision_counts": {
+    "ALLOW": 324,
+    "DENY": 548,
+    "NEEDS_APPROVAL": 128
+  },
+  "profiles": {
+    "default": "533290e8aa0d5585",
+    "mutated": "bd7977cd3b4bc784",
+    "strict": "5dfcaf966f0b7748"
+  },
+  "proposals": 1000,
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.policy_replay --seed 7 --proposals 1000 --out results/362-policy-replay.json",
+    "data_sources": [
+      {
+        "license": "MIT (repo)",
+        "url": "simulated: seeded in-repo fleet simulator"
+      }
+    ],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-17T02:43:55Z",
+    "wall_s": 0.07
+  },
+  "replay": {
+    "flip_rate_mutated_vs_logged": 0.039,
+    "flip_rate_same_profile": 0.0,
+    "flip_rate_strict_vs_logged": 0.049
+  }
+}

@@ -269,3 +269,15 @@ Falsifier: one_queue unsafe executions per 1000 at s = 1 below 990, all_paths ab
 Implementation note (written before the run): the ungated path is modelled as a per-agent Policy instance that is not wired to the queue, so a plan sent down it executes without a vote. The caller's first attempt always goes to the queue (rejection rate starts at 0). The 0.5 prediction was a rough estimate and may be refuted.
 
 Outcome note (written after the run, not part of the pre-registration): the primary metric held. At s = 1 one_queue executed 999.0 unsafe plans per 1000 attempts and all_paths 0.0. At s = 0.5 the secondary prediction was refuted: one_queue executed 868.45 per 1000 (predicted 700-800) against 499.56 for all_paths (within 450-550). At s = 0 both arms executed 1000.0. The design was not changed to fit the result.
+
+## 2026-11-17T02:43:51Z policy-replay proposal:c05752fd408898ada8ab253cd2bc3c151662a8f14569f977c33361fb4d036b6b
+
+Hypothesis: on 1000 seeded SIMULATED proposals (seed 7) gated under the default profile and logged with a profile hash, replaying under the same profile flips 0 decisions, replaying under the strict profile flips at least 5% of decisions, all logged decisions are attributable to a profile when the hash field is present and none when it is stripped, and the audit chain still verifies with the new field.
+
+Metric: /replay/flip_rate_strict_vs_logged. Expected: at least 0.05; flip_rate_same_profile equals 0.0.
+
+Falsifier: a same-profile replay that flips any decision, a strict-profile flip rate below 0.05, a log carrying the hash field that fails chain verification, or stripped-hash decisions still attributable.
+
+Implementation note (written before the run): proposals are random (runbook, host) pairs on a seeded 40-host fleet, evaluated with Policy.evaluate and no record() calls, so the gate is stateless across proposals. A flip is a change of the ALLOW / NEEDS_APPROVAL / DENY decision. Stripping the hash field is done on a copy and necessarily breaks that copy's chain; this is reported, not hidden. The mutated profile is the default with protected roles and the deny list emptied.
+
+Outcome note (written after the run, not part of the pre-registration): the primary metric was refuted. /replay/flip_rate_strict_vs_logged was 0.049 against the predicted floor of 0.05. The other predictions held: flip_rate_same_profile was 0.0, 1000 of 1000 decisions were attributable with the hash field and 0 with it stripped, and the chain verified with the field present (and, as noted beforehand, not after stripping). The design was not changed to fit the result.
