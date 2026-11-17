@@ -399,3 +399,7 @@ Reproduce: `PYTHONPATH=src python3 -m fleetgate.collusion_onset --seed 7 --round
 ### Approval ring (iteration 357, simulated)
 
 `results/357-approval-ring.json`: the pre-registered prediction for a ring of 3 (quorum arm without a distinct-proposer rule executing 0.55-0.70 of DENY-class plans) is refuted. The real `ApprovalQueue` rejects on any single reject vote, so honest rejections veto and the quorum arm executed 0.0065 of them; dropping the proposer's vote changed nothing at that ring size. Only a ring of 5 (all voters) reached 1.0 in both quorum arms; `gate_rederived` executed 0.0 at every ring size. Simulated votes only.
+
+### Approval fatigue (iteration 358, simulated)
+
+`results/358-approval-fatigue.json`: with the rejection probability of an unsafe DENY-class plan decaying as 0.9*exp(-d*n) over a 100-request shift, a single approver approved 0.09945 of unsafe plans at d = 0 and 0.81655 at d = 0.05; two independent fatigued approvers approved 0.71855 at d = 0.05. `gate_rederived` executed 0 unsafe plans in every cell. Simulated votes only.

@@ -1,0 +1,43 @@
+{
+  "base_reject": 0.9,
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.approval_fatigue --seed 7 --shifts 2000 --out results/358-approval-fatigue.json",
+    "data_sources": [
+      {
+        "license": "MIT (repo)",
+        "url": "simulated: seeded in-repo fleet simulator"
+      }
+    ],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-17T02:17:54Z",
+    "wall_s": 13.963
+  },
+  "shift_length": 100,
+  "shifts": 2000,
+  "sweeps": {
+    "decay_0": {
+      "analytic_single": 0.0999999999999992,
+      "gate_rederived_executed_unsafe": 0,
+      "requests": 200000,
+      "two_approver_unsafe_approval_rate": 0.01002,
+      "unsafe_approval_rate": 0.09945
+    },
+    "decay_0.01": {
+      "analytic_single": 0.42824221364327997,
+      "gate_rederived_executed_unsafe": 0,
+      "requests": 200000,
+      "two_approver_unsafe_approval_rate": 0.210765,
+      "unsafe_approval_rate": 0.426825
+    },
+    "decay_0.05": {
+      "analytic_single": 0.8167059054462235,
+      "gate_rederived_executed_unsafe": 0,
+      "requests": 200000,
+      "two_approver_unsafe_approval_rate": 0.71855,
+      "unsafe_approval_rate": 0.81655
+    }
+  }
+}

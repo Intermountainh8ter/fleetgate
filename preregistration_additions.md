@@ -249,3 +249,11 @@ Metric: /executed_deny_share_by_ring_size/3/quorum_no_distinct_rule. Expected: b
 Falsifier: quorum_no_distinct_rule at ring size 3 outside 0.55-0.70, the distinct-proposer arm above 0.35 at ring size 3, or any gate_rederived arm executing a DENY-class plan or blocking an ALLOW-class plan.
 
 Implementation note (written before the run): votes go through the real ApprovalQueue, in which any single reject vote rejects the request (see the veto-liveness section). Non-erring honest approvers therefore cast a reject, so the quorum arm needs unanimity among the votes cast; the prediction above did not account for this and may be refuted.
+
+## 2026-11-17T02:17:53Z approval-fatigue proposal:01b4d8750c85ec5aad02f480585310c3d7e751fdd2d443854da5085e9b52230b
+
+Hypothesis: with d = 0.05 and a 100-request shift, a single fatigued approver (probability of rejecting an unsafe DENY-class plan 0.9*exp(-d*n) for the n requests already handled) approves between 0.78 and 0.85 of unsafe plans (analytic mean about 0.815), two independent fatigued approvers (any reject vetoes, as in ApprovalQueue) approve between 0.62 and 0.72, the d = 0 single approver approves about 0.10 (0.07 to 0.13), and the gate_rederived arm executes 0 unsafe plans at every d.
+
+Metric: /sweeps/decay_0.05/unsafe_approval_rate. Expected: between 0.78 and 0.85, against about 0.10 at d = 0.
+
+Falsifier: single-approver unsafe approval rate at d = 0.05 outside 0.78-0.85, the d = 0 rate outside 0.07-0.13, the two-approver rate at d = 0.05 outside 0.62-0.72, or any gate_rederived arm executing an unsafe plan.
