@@ -1,0 +1,42 @@
+{
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.oversight_displacement --seed 7 --runs 200 --out results/359-oversight-displacement.json",
+    "data_sources": [
+      {
+        "license": "MIT (repo)",
+        "url": "simulated: seeded in-repo fleet simulator"
+      }
+    ],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-17T02:26:07Z",
+    "wall_s": 4.686
+  },
+  "strengths": [
+    0.0,
+    0.5,
+    1.0
+  ],
+  "sweeps": {
+    "oversight_0": {
+      "all_paths_unsafe_executions_per_1000": 1000.0,
+      "attempts_per_run": 1000,
+      "runs": 200,
+      "unsafe_executions_per_1000": 1000.0
+    },
+    "oversight_0.5": {
+      "all_paths_unsafe_executions_per_1000": 499.56,
+      "attempts_per_run": 1000,
+      "runs": 200,
+      "unsafe_executions_per_1000": 868.45
+    },
+    "oversight_1": {
+      "all_paths_unsafe_executions_per_1000": 0.0,
+      "attempts_per_run": 1000,
+      "runs": 200,
+      "unsafe_executions_per_1000": 999.0
+    }
+  }
+}

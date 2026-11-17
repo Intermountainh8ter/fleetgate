@@ -257,3 +257,15 @@ Hypothesis: with d = 0.05 and a 100-request shift, a single fatigued approver (p
 Metric: /sweeps/decay_0.05/unsafe_approval_rate. Expected: between 0.78 and 0.85, against about 0.10 at d = 0.
 
 Falsifier: single-approver unsafe approval rate at d = 0.05 outside 0.78-0.85, the d = 0 rate outside 0.07-0.13, the two-approver rate at d = 0.05 outside 0.62-0.72, or any gate_rederived arm executing an unsafe plan.
+
+## 2026-11-17T02:25:00Z oversight-displacement proposal:0481efbfee7aa127e66ee91fc9bef05824f4a8c78e10ce49031964d54fceb74f
+
+Hypothesis: over 1000 unsafe attempts per run and 200 seeded runs, with an approver that rejects an unsafe DENY-class plan with probability s: at s = 1 the one_queue arm executes between 990 and 1000 unsafe plans per 1000 attempts (about 999, because the first rejection drives the running rejection rate to 1 and the caller then always takes the ungated path) while the all_paths arm executes 0; at s = 0.5 one_queue executes between 700 and 800 per 1000 against 450 to 550 for all_paths; at s = 0 both arms execute 1000.
+
+Metric: /sweeps/oversight_1/unsafe_executions_per_1000 (the one_queue arm). Expected: at least 990 with all_paths at 0.
+
+Falsifier: one_queue unsafe executions per 1000 at s = 1 below 990, all_paths above 0 at s = 1, one_queue at s = 0.5 outside 700-800, or any audit log that fails verification.
+
+Implementation note (written before the run): the ungated path is modelled as a per-agent Policy instance that is not wired to the queue, so a plan sent down it executes without a vote. The caller's first attempt always goes to the queue (rejection rate starts at 0). The 0.5 prediction was a rough estimate and may be refuted.
+
+Outcome note (written after the run, not part of the pre-registration): the primary metric held. At s = 1 one_queue executed 999.0 unsafe plans per 1000 attempts and all_paths 0.0. At s = 0.5 the secondary prediction was refuted: one_queue executed 868.45 per 1000 (predicted 700-800) against 499.56 for all_paths (within 450-550). At s = 0 both arms executed 1000.0. The design was not changed to fit the result.
