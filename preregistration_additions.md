@@ -239,3 +239,13 @@ Hypothesis: with 5 approvers, a quorum of 3, honest approvers erring (approving 
 Metric: /executed_deny_share_by_rho/0.5/quorum_trusted. Expected: between 0.49 and 0.53; rho 0 below 0.01; rho 1 exactly 1.0; gate_rederived 0 in every cell.
 
 Falsifier: quorum_trusted executed DENY share at rho 0.5 outside 0.49-0.53, at rho 0 at or above 0.01, at rho 1 below 1.0, any gate_rederived executed DENY plan, or any gate_rederived blocked legitimate plan.
+
+## 2026-11-17T02:11:44Z approval-ring proposal:3bf170a0aaa71dcea4bdf9274146fb559704d0fec0271d82da3661ed417d483c
+
+Hypothesis: with 5 agents each proposing DENY-class plans in seeded random order, a quorum of 3, honest approvers erring independently at 0.1 and a ring of 3 that approves every ring-proposed plan, the quorum arm without a distinct-proposer rule executes between 0.55 and 0.70 of DENY-class plans (about 3/5 plus a small honest-error tail), the arm that drops the proposer's own vote executes at most 0.35 of them, and the gate_rederived arm executes 0 at every ring size while blocking 0.0 of legitimate ALLOW-class plans.
+
+Metric: /executed_deny_share_by_ring_size/3/quorum_no_distinct_rule. Expected: between 0.55 and 0.70 at ring size 3.
+
+Falsifier: quorum_no_distinct_rule at ring size 3 outside 0.55-0.70, the distinct-proposer arm above 0.35 at ring size 3, or any gate_rederived arm executing a DENY-class plan or blocking an ALLOW-class plan.
+
+Implementation note (written before the run): votes go through the real ApprovalQueue, in which any single reject vote rejects the request (see the veto-liveness section). Non-erring honest approvers therefore cast a reject, so the quorum arm needs unanimity among the votes cast; the prediction above did not account for this and may be refuted.

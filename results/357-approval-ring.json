@@ -1,0 +1,56 @@
+{
+  "agents": 5,
+  "all_logs_verify": true,
+  "executed_deny_share_by_ring_size": {
+    "0": {
+      "gate_rederived": 0.0,
+      "quorum_distinct_proposer": 0.0,
+      "quorum_no_distinct_rule": 0.0
+    },
+    "2": {
+      "gate_rederived": 0.0,
+      "quorum_distinct_proposer": 0.0005,
+      "quorum_no_distinct_rule": 0.0005
+    },
+    "3": {
+      "gate_rederived": 0.0,
+      "quorum_distinct_proposer": 0.0065,
+      "quorum_no_distinct_rule": 0.0065
+    },
+    "4": {
+      "gate_rederived": 0.0,
+      "quorum_distinct_proposer": 0.078,
+      "quorum_no_distinct_rule": 0.078
+    },
+    "5": {
+      "gate_rederived": 0.0,
+      "quorum_distinct_proposer": 1.0,
+      "quorum_no_distinct_rule": 1.0
+    }
+  },
+  "gate_rederived_blocked_legitimate_by_ring_size": {
+    "0": 0.0,
+    "2": 0.0,
+    "3": 0.0,
+    "4": 0.0,
+    "5": 0.0
+  },
+  "independent_error_rate": 0.1,
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.approval_ring --seed 7 --rounds 2000 --out results/357-approval-ring.json",
+    "data_sources": [
+      {
+        "license": "MIT (repo)",
+        "url": "simulated: seeded in-repo fleet simulator"
+      }
+    ],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-17T02:11:44Z",
+    "wall_s": 0.74
+  },
+  "quorum": 3,
+  "rounds": 2000
+}

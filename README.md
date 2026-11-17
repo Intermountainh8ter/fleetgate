@@ -395,3 +395,7 @@ Pre-registered hypothesis refuted on one point: a log-derived gate that re-verif
 `fleetgate.collusion_onset` runs the real `Policy` and `ApprovalQueue` with 5 approvers, a quorum of 3 and honest approvers erring at 0.1. The pre-registered hypothesis, that 2 colluders would raise the majority-quorum executed-deny share to 0.20-0.35, was **refuted**. With 2 colluders the post-onset share was 0.0007288629737609329, with 3 it was 0.008152173913043478, and with all 5 it was 1.0 (`results/349-collusion-onset.json`). The `gate_rederived` arm executed a share of 0.0 in every cell. `ApprovalQueue` rejects a request on any single reject vote, so one honest dissenter vetoes the colluders. Only unanimous collusion gets a DENY-class plan through the quorum arms.
 
 Reproduce: `PYTHONPATH=src python3 -m fleetgate.collusion_onset --seed 7 --rounds 2000 --out results/349-collusion-onset.json`
+
+### Approval ring (iteration 357, simulated)
+
+`results/357-approval-ring.json`: the pre-registered prediction for a ring of 3 (quorum arm without a distinct-proposer rule executing 0.55-0.70 of DENY-class plans) is refuted. The real `ApprovalQueue` rejects on any single reject vote, so honest rejections veto and the quorum arm executed 0.0065 of them; dropping the proposer's vote changed nothing at that ring size. Only a ring of 5 (all voters) reached 1.0 in both quorum arms; `gate_rederived` executed 0.0 at every ring size. Simulated votes only.
