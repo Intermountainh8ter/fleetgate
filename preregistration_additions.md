@@ -231,3 +231,11 @@ Hypothesis: because the real ApprovalQueue treats any single reject vote as a re
 Metric: /blocked_legitimate_share_by_veto/1/quorum_trusted. Expected: between 0.60 and 0.80; 2 vetoers at least 0.90; 3 vetoers exactly 1.0; gate_rederived 0.0 in every cell.
 
 Falsifier: quorum_trusted blocked share at 1 vetoer outside 0.60-0.80, at 2 vetoers below 0.90, at 3 vetoers below 1.0, gate_rederived blocked share above 0.0 in any cell, or any gate_rederived executed DENY plan.
+
+## 2026-11-17T02:02:16Z shared-context proposal:1b7efbf36a98a59eb5ce437b2232831a04e5af1336765e3d45f6b906b3f396f4
+
+Hypothesis: with 5 approvers, a quorum of 3, honest approvers erring (approving a DENY-class plan) independently at 0.1, and a per-plan shared-context event of probability rho in which all approvers approve, the executed DENY-class share of the quorum_trusted arm is approximately rho plus (1-rho) times the probability that at least 3 of 5 independent approvers err, so it lies between 0.49 and 0.53 at rho 0.5, is below 0.01 at rho 0, and is 1.0 at rho 1, while the gate_rederived arm executes 0 DENY-class plans at every rho and blocks 0.0 of legitimate ALLOW-class plans.
+
+Metric: /executed_deny_share_by_rho/0.5/quorum_trusted. Expected: between 0.49 and 0.53; rho 0 below 0.01; rho 1 exactly 1.0; gate_rederived 0 in every cell.
+
+Falsifier: quorum_trusted executed DENY share at rho 0.5 outside 0.49-0.53, at rho 0 at or above 0.01, at rho 1 below 1.0, any gate_rederived executed DENY plan, or any gate_rederived blocked legitimate plan.
