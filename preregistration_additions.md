@@ -157,3 +157,11 @@ Hypothesis: on seeded SIMULATED delegation trees (fan-out 4, depth 3, 85 agents,
 Metric: /authority/out_of_scope_grants_intersection. Expected: equals 0 in every round; request-as-granted mean out-of-scope grants per tree at least 20.
 
 Falsifier: any out-of-scope grant under the intersection arm in any round, a request-as-granted mean below 20 per tree, any benign false block under the intersection arm, or any audit log failing verify_full.
+
+## 2026-11-17T00:03:09Z log-tamper-collusion proposal:d6c6f40abefc6d74566cd679ea245245b30acfa81ed2bdda554dec7ca201b009
+
+Hypothesis: on seeded SIMULATED rounds with three sibling subtrees under per-subtree caps (as in results 335) that admit 150 units against a root limit of 100, a colluder that rehashes the log after deleting the entries evidencing the overdraw leaves 0 detected breaches under hash-chain-only verify_full plus replay (all concealed breaches undetected, rate 1.0), while verification with anchors captured during the original write flags every concealed breach (undetected rate 0.0), with a benign untampered log false-flagged 0 times under both verifiers.
+
+Metric: /tamper/undetected_breaches_writable_log. Expected: equals 1.0; anchored undetected rate equals 0.0.
+
+Falsifier: a hash-chain-only undetected rate below 1.0, an anchored undetected rate above 0.0, or any benign untampered log flagged under either verifier.

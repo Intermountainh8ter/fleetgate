@@ -1,0 +1,27 @@
+{
+  "config": {
+    "agents_per_subtree": 21,
+    "checkpoint_every": 16,
+    "root_limit_units": 100,
+    "rounds": 20,
+    "subtrees": 3
+  },
+  "provenance": {
+    "command": "python3 -m fleetgate log-tamper-collusion --seeds 7 --rounds 20 --out results/338-log-tamper-collusion.json",
+    "data_sources": [],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-17T00:03:12Z",
+    "wall_s": 0.138
+  },
+  "tamper": {
+    "benign_false_flag_anchored": 0,
+    "benign_false_flag_chain_only": 0,
+    "mean_entries_deleted": 5.0,
+    "undetected_breaches_anchored": 0.0,
+    "undetected_breaches_writable_log": 1.0,
+    "untampered_breach_detected_rate": 1.0
+  }
+}
