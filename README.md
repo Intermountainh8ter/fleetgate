@@ -389,3 +389,9 @@ cost. Source: `results/344-audit-suffix-verify.json`; simulated data only.
 ## Gate state cost (iteration 347, simulated)
 
 Pre-registered hypothesis refuted on one point: a log-derived gate that re-verifies the whole log before each decision performed 290932.0 SHA-256 operations per decision at 100,000 entries (results/347-gate-state-cost.json, `/ops_per_decision_by_arm/log_derived_full/100000`), outside the pre-registered 90,000 to 110,000 range, because verify_full also hashes Merkle blocks. Checkpoint-suffix verification stayed at 20.0 operations per decision at every scale, and the stateless and in-memory arms performed 0.0. After pre-checkpoint tampering the full-verify arm refused 1.0 of decisions and the in-memory and suffix arms 0.0. Verdict agreement across arms holds by construction (the rate cap never binds in this workload).
+
+## Collusion from an onset round (iteration 349, SIMULATED)
+
+`fleetgate.collusion_onset` runs the real `Policy` and `ApprovalQueue` with 5 approvers, a quorum of 3 and honest approvers erring at 0.1. The pre-registered hypothesis, that 2 colluders would raise the majority-quorum executed-deny share to 0.20-0.35, was **refuted**. With 2 colluders the post-onset share was 0.0007288629737609329, with 3 it was 0.008152173913043478, and with all 5 it was 1.0 (`results/349-collusion-onset.json`). The `gate_rederived` arm executed a share of 0.0 in every cell. `ApprovalQueue` rejects a request on any single reject vote, so one honest dissenter vetoes the colluders. Only unanimous collusion gets a DENY-class plan through the quorum arms.
+
+Reproduce: `PYTHONPATH=src python3 -m fleetgate.collusion_onset --seed 7 --rounds 2000 --out results/349-collusion-onset.json`

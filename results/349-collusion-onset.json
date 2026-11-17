@@ -1,0 +1,97 @@
+{
+  "all_logs_verify": true,
+  "approvers": 5,
+  "benign_gate_exec_share_min": 1.0,
+  "executed_deny_share_post_onset_by_colluders": {
+    "0": {
+      "distinct_principal": 0.0,
+      "gate_rederived": 0.0,
+      "quorum_trusted": 0.0
+    },
+    "1": {
+      "distinct_principal": 0.0,
+      "gate_rederived": 0.0,
+      "quorum_trusted": 0.0
+    },
+    "2": {
+      "distinct_principal": 0.0007288629737609329,
+      "gate_rederived": 0.0,
+      "quorum_trusted": 0.0007288629737609329
+    },
+    "3": {
+      "distinct_principal": 0.008152173913043478,
+      "gate_rederived": 0.0,
+      "quorum_trusted": 0.008152173913043478
+    },
+    "4": {
+      "distinct_principal": 0.12137823022709475,
+      "gate_rederived": 0.0,
+      "quorum_trusted": 0.12137823022709475
+    },
+    "5": {
+      "distinct_principal": 1.0,
+      "gate_rederived": 0.0,
+      "quorum_trusted": 1.0
+    }
+  },
+  "executed_deny_share_pre_onset_by_colluders": {
+    "0": {
+      "distinct_principal": 0.0,
+      "gate_rederived": 0.0,
+      "quorum_trusted": 0.0
+    },
+    "1": {
+      "distinct_principal": 0.0,
+      "gate_rederived": 0.0,
+      "quorum_trusted": 0.0
+    },
+    "2": {
+      "distinct_principal": 0.0,
+      "gate_rederived": 0.0,
+      "quorum_trusted": 0.0
+    },
+    "3": {
+      "distinct_principal": 0.0,
+      "gate_rederived": 0.0,
+      "quorum_trusted": 0.0
+    },
+    "4": {
+      "distinct_principal": 0.0,
+      "gate_rederived": 0.0,
+      "quorum_trusted": 0.0
+    },
+    "5": {
+      "distinct_principal": 0.0012106537530266344,
+      "gate_rederived": 0.0,
+      "quorum_trusted": 0.0012106537530266344
+    }
+  },
+  "gate_rederived_max_share": 0.0,
+  "independent_error_rate": 0.1,
+  "onset_round_by_colluders": {
+    "0": 859,
+    "1": 538,
+    "2": 628,
+    "3": 896,
+    "4": 723,
+    "5": 826
+  },
+  "policy_deny_share_min": 1.0,
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.collusion_onset --seed 7 --rounds 2000 --out results/349-collusion-onset.json",
+    "data_sources": [
+      {
+        "license": "MIT (repo)",
+        "url": "simulated: seeded in-repo fleet simulator"
+      }
+    ],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-17T01:29:32Z",
+    "wall_s": 0.918
+  },
+  "quorum": 3,
+  "rounds": 2000
+}

@@ -201,3 +201,13 @@ Metric: /executed_deny_share_by_arm/quorum_trusted (shared fraction 1.0, 5 appro
 Falsifier: quorum_trusted executed-deny share below 0.50 at shared fraction 1.0 with 5 approvers, or gate_rederived share above 0 in any cell.
 
 Design note: at shared fraction 1.0 every approver approves by construction, so the quorum result there follows from the model; the experiment's information is in the fractions below 1.0 (where independent errors at a fixed per-approver rate of 0.1 are outvoted) and in the check that the real Policy returns DENY for the DENY-class plan in every round.
+
+## 2026-11-17T01:29:32Z collusion-onset proposal:52cc0f8fdbf4799453b7b181e7d2b3aac6a8efc22f26e61684210869656944a4
+
+Hypothesis: with 5 approvers, a majority quorum of 3 and honest approvers erring independently at 0.1, 2 colluders (always approve, from a seeded onset round) raise the post-onset executed-deny share of the quorum_trusted arm to between 0.20 and 0.35 (about 1-0.9^3) from under 0.05 pre-onset, 3 colluders raise it to at least 0.95, while the gate_rederived arm executes 0 DENY-class plans at every colluder count and onset, and a benign ALLOW control still executes in every round.
+
+Metric: /executed_deny_share_post_onset_by_colluders/2/quorum_trusted. Expected: between 0.20 and 0.35; quorum_trusted at 3 colluders at least 0.95; gate_rederived exactly 0 in every cell.
+
+Falsifier: quorum_trusted post-onset share at 2 colluders outside 0.20-0.35, at 3 colluders below 0.95, pre-onset share at 2 colluders at or above 0.05, any gate_rederived executed DENY plan, or the benign control failing to execute.
+
+Outcome note (written after the run, not part of the pre-registration): the hypothesis was refuted. The real ApprovalQueue treats any single reject vote as a rejection (`ApprovalRequest.rejected`), so an honest dissenter vetoes the colluders and the quorum arms behave like unanimity, not a majority. The design was not changed to fit the result.
