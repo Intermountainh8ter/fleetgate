@@ -1,0 +1,28 @@
+{
+  "filtered_false_block": {
+    "by_reason": {
+      "DENY_BLAST_RADIUS": 62
+    },
+    "deny_rate": 0.062,
+    "n_benign": 1000,
+    "n_deny": 62,
+    "n_eligible_pairs": 511,
+    "n_precondition_failed": 0,
+    "n_total_pairs": 930
+  },
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.filtered_false_block_eval --seed 7 --n-benign 1000 --out results/393-filtered-false-block.json",
+    "data_sources": [
+      {
+        "license": "arXiv preprint; used only for the design question, no data taken",
+        "url": "https://arxiv.org/abs/2609.01931"
+      }
+    ],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-18T03:35:52Z",
+    "wall_s": 0.014
+  }
+}

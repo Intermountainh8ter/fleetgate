@@ -305,3 +305,15 @@ Falsifier: a top reason code covering less than 0.8 of benign DENY verdicts, or 
 Implementation note (written before the run): calls are drawn as in regex_baseline_eval (same fleet, same runbook filter), evaluated with Policy.evaluate and no record() calls; reason codes are counted over DENY verdicts only.
 
 Outcome note (written after the run, not part of the pre-registration): the primary metric held. /false_block/top_reason_share was 0.919 (DENY_PRECONDITION_FAILED, 477 of 519 DENY verdicts); the overall DENY rate was 0.519, inside 0.40-0.65. The other codes were DENY_BLAST_RADIUS (40) and DENY_ROLE_CAPACITY_FLOOR (2). The design was not changed to fit the result.
+
+## 2026-11-18T03:35:52Z filtered-false-block proposal:e0aae384c2fe939e44965d92d6b7cbb4a5d0564a5e524ab842404fad5b76265f
+
+Hypothesis: on 1000 seeded SIMULATED benign (runbook, host) calls (seed 7, 30-host fleet, runbooks outside the deny list) drawn only from pairs with no failed runbook precondition, the default-policy DENY rate is at most 0.10 (versus 0.519 for unfiltered calls in result 391), and DENY_PRECONDITION_FAILED accounts for 0 verdicts.
+
+Metric: /filtered_false_block/deny_rate. Expected: at most 0.10 (range 0.0 to 0.10).
+
+Falsifier: a filtered-call DENY rate above 0.10, any DENY_PRECONDITION_FAILED verdict among filtered calls, or no eligible pairs on the seeded fleet.
+
+Implementation note (written before the run): eligible pairs are those where Runbook.failed_preconditions(fleet, host) is empty on the fresh seeded fleet; calls are drawn uniformly from them with the same fleet as false_block_eval and evaluated with Policy.evaluate, no record() calls.
+
+Outcome note (written after the run, not part of the pre-registration): the primary metric held. /filtered_false_block/deny_rate was 0.062 (62 of 1000 calls), inside 0 to 0.10, all DENY_BLAST_RADIUS; /filtered_false_block/n_precondition_failed was 0. Eligible pairs: 511 of 930. The design was not changed to fit the result.
