@@ -281,3 +281,15 @@ Falsifier: a same-profile replay that flips any decision, a strict-profile flip 
 Implementation note (written before the run): proposals are random (runbook, host) pairs on a seeded 40-host fleet, evaluated with Policy.evaluate and no record() calls, so the gate is stateless across proposals. A flip is a change of the ALLOW / NEEDS_APPROVAL / DENY decision. Stripping the hash field is done on a copy and necessarily breaks that copy's chain; this is reported, not hidden. The mutated profile is the default with protected roles and the deny list emptied.
 
 Outcome note (written after the run, not part of the pre-registration): the primary metric was refuted. /replay/flip_rate_strict_vs_logged was 0.049 against the predicted floor of 0.05. The other predictions held: flip_rate_same_profile was 0.0, 1000 of 1000 decisions were attributable with the hash field and 0 with it stripped, and the chain verified with the field present (and, as noted beforehand, not after stripping). The design was not changed to fit the result.
+
+## 2026-11-18T03:10:47Z regex-baseline-gate proposal:f922a624d4f6e4b82f9c9c93fe92f3b822e41405707d68c985982ac93a2701bd
+
+Hypothesis: on 480 seeded SIMULATED mutated variants of canonically harmful calls (seed 7), a case-sensitive regex deny-list built from the deny-listed runbook names blocks at most 0.45 of them (it cannot see unknown runbook or unknown host calls and misses case and homoglyph mutations) while Policy.evaluate blocks 1.0 (DENY), so the block-rate delta (gate minus regex) is at least 0.55; on 200 benign calls the gate false-block rate is no higher than the regex false-block rate.
+
+Metric: /gate/block_rate_delta_vs_regex. Expected: at least 0.55; gate block rate 1.0; regex block rate at most 0.45.
+
+Falsifier: a regex block rate above 0.45 on the mutated harmful set, a gate block rate below 1.0, or a gate false-block rate on benign calls above the regex false-block rate.
+
+Implementation note (written before the run): "block" means DENY for the gate and a pattern match for the regex. The regex is applied to the string form of each argument (str() for non-str types) and is case-sensitive. Benign calls are random (runbook, host) pairs on a seeded 30-host fleet, runbooks outside the deny list. The gate may DENY some benign calls (for example blast radius or protected roles), so the benign-call prediction may be refuted; it is reported either way.
+
+Outcome note (written after the run, not part of the pre-registration): the primary metric held. /gate/block_rate_delta_vs_regex was 0.85 (gate block rate 1.0, regex block rate 0.15). The benign-call prediction was refuted: the gate false-block rate was 0.52 against 0.0 for the regex, because the default policy DENYs many valid calls (a regex that only lists the deny-listed names never blocks them). The design was not changed to fit the result.

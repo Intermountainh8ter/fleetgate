@@ -1,0 +1,75 @@
+{
+  "gate": {
+    "block_rate": 1.0,
+    "block_rate_delta_vs_regex": 0.85,
+    "by_class": {
+      "case": {
+        "gate": 96,
+        "n": 96,
+        "regex": 0
+      },
+      "repeated_id": {
+        "gate": 96,
+        "n": 96,
+        "regex": 32
+      },
+      "type_confusion": {
+        "gate": 96,
+        "n": 96,
+        "regex": 14
+      },
+      "unicode": {
+        "gate": 96,
+        "n": 96,
+        "regex": 0
+      },
+      "whitespace": {
+        "gate": 96,
+        "n": 96,
+        "regex": 26
+      }
+    },
+    "by_kind": {
+      "denylisted_runbook": {
+        "gate": 160,
+        "n": 160,
+        "regex": 72
+      },
+      "unknown_host": {
+        "gate": 160,
+        "n": 160,
+        "regex": 0
+      },
+      "unknown_runbook": {
+        "gate": 160,
+        "n": 160,
+        "regex": 0
+      }
+    },
+    "false_block_rate": 0.52,
+    "n_benign": 200,
+    "n_harmful": 480,
+    "regex_block_rate": 0.15,
+    "regex_false_block_rate": 0.0,
+    "regex_pattern_is_case_sensitive": true,
+    "regex_wilson95": [
+      0.12084077528288767,
+      0.18471707670834248
+    ]
+  },
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.regex_baseline_eval --seed 7 --n 480 --n-benign 200 --out results/390-regex-baseline-gate.json",
+    "data_sources": [
+      {
+        "license": "arXiv preprint; used only for the design question, no data taken",
+        "url": "https://arxiv.org/abs/2609.35659v1"
+      }
+    ],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-18T03:11:14Z",
+    "wall_s": 0.006
+  }
+}
