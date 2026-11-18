@@ -293,3 +293,15 @@ Falsifier: a regex block rate above 0.45 on the mutated harmful set, a gate bloc
 Implementation note (written before the run): "block" means DENY for the gate and a pattern match for the regex. The regex is applied to the string form of each argument (str() for non-str types) and is case-sensitive. Benign calls are random (runbook, host) pairs on a seeded 30-host fleet, runbooks outside the deny list. The gate may DENY some benign calls (for example blast radius or protected roles), so the benign-call prediction may be refuted; it is reported either way.
 
 Outcome note (written after the run, not part of the pre-registration): the primary metric held. /gate/block_rate_delta_vs_regex was 0.85 (gate block rate 1.0, regex block rate 0.15). The benign-call prediction was refuted: the gate false-block rate was 0.52 against 0.0 for the regex, because the default policy DENYs many valid calls (a regex that only lists the deny-listed names never blocks them). The design was not changed to fit the result.
+
+## 2026-11-18T03:18:09Z false-block-reasons proposal:99d08a7fadb233c36fb17a97142181bc96ae168969f53748b5653f1fe3b07e78
+
+Hypothesis: on 1000 seeded SIMULATED benign (runbook, host) calls (seed 7, 30-host fleet, runbooks outside the deny list) under the default policy, at least 0.8 of DENY verdicts carry a single reason code, and the overall DENY rate is between 0.40 and 0.65, reproducing the 0.52 rate seen on 200 calls.
+
+Metric: /false_block/top_reason_share. Expected: at least 0.8 (range 0.8 to 1.0).
+
+Falsifier: a top reason code covering less than 0.8 of benign DENY verdicts, or an overall benign DENY rate outside 0.40-0.65.
+
+Implementation note (written before the run): calls are drawn as in regex_baseline_eval (same fleet, same runbook filter), evaluated with Policy.evaluate and no record() calls; reason codes are counted over DENY verdicts only.
+
+Outcome note (written after the run, not part of the pre-registration): the primary metric held. /false_block/top_reason_share was 0.919 (DENY_PRECONDITION_FAILED, 477 of 519 DENY verdicts); the overall DENY rate was 0.519, inside 0.40-0.65. The other codes were DENY_BLAST_RADIUS (40) and DENY_ROLE_CAPACITY_FLOOR (2). The design was not changed to fit the result.
