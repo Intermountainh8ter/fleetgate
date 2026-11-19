@@ -317,3 +317,15 @@ Falsifier: a filtered-call DENY rate above 0.10, any DENY_PRECONDITION_FAILED ve
 Implementation note (written before the run): eligible pairs are those where Runbook.failed_preconditions(fleet, host) is empty on the fresh seeded fleet; calls are drawn uniformly from them with the same fleet as false_block_eval and evaluated with Policy.evaluate, no record() calls.
 
 Outcome note (written after the run, not part of the pre-registration): the primary metric held. /filtered_false_block/deny_rate was 0.062 (62 of 1000 calls), inside 0 to 0.10, all DENY_BLAST_RADIUS; /filtered_false_block/n_precondition_failed was 0. Eligible pairs: 511 of 930. The design was not changed to fit the result.
+
+## 2026-11-19T04:41:19Z bypass-reconcile proposal:0f6f94082f005ed7b76f1422c47a31da11141eb4bfbd3e3b5717828bbf259c07
+
+Hypothesis: on 1000 seeded SIMULATED rounds (seed 7, 20 reversible proposals per round, default PolicyConfig, a fraction 0.2 of executions run without calling Policy.evaluate and without any audit entry), verify_full on the audit log detects none of the rounds containing a bypassed execution (chain-only detected share 0.0) and the gate-side decision counter also detects none (share 0.0, because the gate never issued a decision for them), while reconciling the executor-side execution count against logged ALLOW verdicts detects every such round (share 1.0) with a false-flag rate of 0.0 on rounds with no bypass.
+
+Metric: /bypass/detected_share_chain_only. Expected: equals 0.0; gate-counter share 0.0; executor-reconciliation share 1.0; false-flag rate 0.0.
+
+Falsifier: a chain-only or gate-counter detected share above 0.0, an executor-reconciliation detected share below 1.0, any false flag on a round with no bypass, or any audit log that fails verify_full.
+
+Implementation note (written before the run): each round builds a fresh 30-host Fleet, a Policy and an AuditLog. Each proposal is a random reversible runbook on a random host; with probability 0.2 it is bypassed (executor count +1, no evaluate, no log entry), otherwise it goes through Policy.evaluate, a gate_verdict entry is logged, and an ALLOW verdict is executed (executor count +1, execution entry logged). Rounds are split by whether any proposal was bypassed; shares are computed per split.
+
+Outcome note (written after the run, not part of the pre-registration): the primary metric held. /bypass/detected_share_chain_only was 0.0 and /bypass/detected_share_gate_counter was 0.0; /bypass/detected_share_reconcile was 1.0 over 990 rounds with a bypass, and the false-flag rate on the 10 rounds without a bypass was 0.0 for all three arms. The design was not changed to fit the result.

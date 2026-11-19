@@ -1,0 +1,25 @@
+{
+  "bypass": {
+    "bypass_fraction": 0.2,
+    "detected_share_chain_only": 0.0,
+    "detected_share_gate_counter": 0.0,
+    "detected_share_reconcile": 1.0,
+    "false_flag_rate_chain_only": 0.0,
+    "false_flag_rate_gate_counter": 0.0,
+    "false_flag_rate_reconcile": 0.0,
+    "n_rounds": 1000,
+    "proposals_per_round": 20,
+    "rounds_with_bypass": 990,
+    "rounds_without_bypass": 10
+  },
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.bypass_reconcile_eval --seed 7 --n-rounds 1000 --out results/520-bypass-reconcile.json",
+    "data_sources": [],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-19T04:41:26Z",
+    "wall_s": 1.291
+  }
+}

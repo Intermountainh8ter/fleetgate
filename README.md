@@ -403,3 +403,7 @@ Reproduce: `PYTHONPATH=src python3 -m fleetgate.collusion_onset --seed 7 --round
 ### Approval fatigue (iteration 358, simulated)
 
 `results/358-approval-fatigue.json`: with the rejection probability of an unsafe DENY-class plan decaying as 0.9*exp(-d*n) over a 100-request shift, a single approver approved 0.09945 of unsafe plans at d = 0 and 0.81655 at d = 0.05; two independent fatigued approvers approved 0.71855 at d = 0.05. `gate_rederived` executed 0 unsafe plans in every cell. Simulated votes only.
+
+### Gate-bypass reconciliation (SIMULATED)
+
+`fleetgate.bypass_reconcile_eval` (result `results/520-bypass-reconcile.json`): with a bypass fraction of 0.2 of executions, `verify_full` and the gate-side decision counter both had a detected share of 0.0 over 990 rounds containing a bypass; reconciling the executor-side execution count against logged ALLOW verdicts had a detected share of 1.0, with a false-flag rate of 0.0 on the 10 rounds without a bypass. In the simulation the reconciliation is only as honest as the executor's own counter.
