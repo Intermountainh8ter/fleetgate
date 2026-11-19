@@ -329,3 +329,15 @@ Falsifier: a chain-only or gate-counter detected share above 0.0, an executor-re
 Implementation note (written before the run): each round builds a fresh 30-host Fleet, a Policy and an AuditLog. Each proposal is a random reversible runbook on a random host; with probability 0.2 it is bypassed (executor count +1, no evaluate, no log entry), otherwise it goes through Policy.evaluate, a gate_verdict entry is logged, and an ALLOW verdict is executed (executor count +1, execution entry logged). Rounds are split by whether any proposal was bypassed; shares are computed per split.
 
 Outcome note (written after the run, not part of the pre-registration): the primary metric held. /bypass/detected_share_chain_only was 0.0 and /bypass/detected_share_gate_counter was 0.0; /bypass/detected_share_reconcile was 1.0 over 990 rounds with a bypass, and the false-flag rate on the 10 rounds without a bypass was 0.0 for all three arms. The design was not changed to fit the result.
+
+## 2026-11-19T04:47:11Z collusion-base-rate proposal:a267b8c11f4b7a470484f6d1958e0b46956e5a5ef8a161a4845343dc2d1bec94
+
+Hypothesis: on seeded SIMULATED mixed traffic (seed 7, 2000 sequences per base rate, colluder base rates 0.01, 0.05, 0.20 and 0.50, composite of 8 reversible steps against a rack budget of 4 versus benign sequences of equal length spread over two racks), the default per-action gate clears every colluding composite at every base rate (clear rate 1.0), while the cumulative rule blocks every colluding composite and falsely blocks no benign sequence (false-block rate 0.0), so the cumulative rule's precision falls with the base rate only through the number of colluders and never through benign blocks.
+
+Metric: /collusion_base_rate/default_policy_clear_rate_at_0.01. Expected: equals 1.0 (range 1.0 to 1.0); cumulative-rule benign false-block rate equals 0.0 at every base rate.
+
+Falsifier: a default-gate clear rate below 1.0 at any base rate, any cumulative-rule false block on a benign sequence, or any colluding composite that clears the cumulative rule.
+
+Implementation note (written before the run): each sequence is a colluder with probability equal to the base rate (drawn from the seeded RNG), built as in split_action (8 distinct admissible runbooks on 8 hosts of one rack versus 4 hosts on each of two racks), and run through split_action.run_sequence for the default_policy and cumulative_rule arms. Clear means all 8 steps admitted.
+
+Outcome note (written after the run, not part of the pre-registration): the primary metric held. /collusion_base_rate/default_policy_clear_rate_at_0.01 was 1.0 (18 colluders of 2000 sequences); the default-gate clear rate was 1.0 at all four base rates, the cumulative-rule clear rate was 0.0 and its benign false-block rate was 0.0 at all four, and every audit log passed verify_full. The design was not changed to fit the result.

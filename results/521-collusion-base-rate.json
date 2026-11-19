@@ -1,0 +1,73 @@
+{
+  "collusion_base_rate": {
+    "by_base_rate": {
+      "0.01": {
+        "cumulative_rule_benign_false_block_rate": 0.0,
+        "cumulative_rule_clear_rate": 0.0,
+        "cumulative_rule_precision": 1.0,
+        "default_policy_benign_false_block_rate": 0.0,
+        "default_policy_clear_rate": 1.0,
+        "n_benign": 1982,
+        "n_colluders": 18
+      },
+      "0.05": {
+        "cumulative_rule_benign_false_block_rate": 0.0,
+        "cumulative_rule_clear_rate": 0.0,
+        "cumulative_rule_precision": 1.0,
+        "default_policy_benign_false_block_rate": 0.0,
+        "default_policy_clear_rate": 1.0,
+        "n_benign": 1893,
+        "n_colluders": 107
+      },
+      "0.2": {
+        "cumulative_rule_benign_false_block_rate": 0.0,
+        "cumulative_rule_clear_rate": 0.0,
+        "cumulative_rule_precision": 1.0,
+        "default_policy_benign_false_block_rate": 0.0,
+        "default_policy_clear_rate": 1.0,
+        "n_benign": 1591,
+        "n_colluders": 409
+      },
+      "0.5": {
+        "cumulative_rule_benign_false_block_rate": 0.0,
+        "cumulative_rule_clear_rate": 0.0,
+        "cumulative_rule_precision": 1.0,
+        "default_policy_benign_false_block_rate": 0.0,
+        "default_policy_clear_rate": 1.0,
+        "n_benign": 1026,
+        "n_colluders": 974
+      }
+    },
+    "cumulative_rule_false_block_rate_at_0.01": 0.0,
+    "cumulative_rule_false_block_rate_at_0.05": 0.0,
+    "cumulative_rule_false_block_rate_at_0.2": 0.0,
+    "cumulative_rule_false_block_rate_at_0.5": 0.0,
+    "default_policy_clear_rate_at_0.01": 1.0,
+    "default_policy_clear_rate_at_0.05": 1.0,
+    "default_policy_clear_rate_at_0.2": 1.0,
+    "default_policy_clear_rate_at_0.5": 1.0,
+    "verify_full_ok": true
+  },
+  "config": {
+    "base_rates": [
+      0.01,
+      0.05,
+      0.2,
+      0.5
+    ],
+    "depth": 8,
+    "n_sequences": 2000,
+    "rack_budget": 4,
+    "runbook_pool": 12
+  },
+  "provenance": {
+    "command": "python3 -m fleetgate.collusion_base_rate --seed 7 --n-sequences 2000 --out results/521-collusion-base-rate.json",
+    "data_sources": [],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-19T04:47:11Z",
+    "wall_s": 10.27
+  }
+}
