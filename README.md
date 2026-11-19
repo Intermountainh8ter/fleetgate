@@ -418,3 +418,7 @@ per crash are 0.0, 15.56 and 126.387 respectively. At 1 agent group commit degen
 decision, 0.0 entries lost). `verify_full` accepted all 140 crash-truncated logs it was run on (chain-only detection
 share 0.0), so truncation shows only against an externally held head count. Simulated; verification ran on a sample of 20
 truncated logs per policy and fleet size, and no real fsync was timed.
+
+### Audit signing cost (SIMULATED)
+
+`python3 -m fleetgate.audit_signing_cost --seed 7 --out results/527-audit-signing-cost.json` counts HMAC operations, not time. At 1000 agents with 20 decisions each, signing took 1.03125 operations per decision (20625 operations for 20000 decisions, the extra ones being checkpoint entries). Keyed `verify_full` made 20625 signature comparisons; keyless `verify_full` accepted the same log with 20625 unchecked signatures.

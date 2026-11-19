@@ -1,0 +1,57 @@
+{
+  "cells": {
+    "10": {
+      "append_hmac_ops": 206,
+      "decisions": 200,
+      "entries": 206,
+      "keyed_verify_hmac_recomputes": 206,
+      "keyed_verify_ok": true,
+      "keyed_verify_signature_compares": 206,
+      "keyless_unchecked_signatures": 206,
+      "keyless_verify_ok": true,
+      "signing_ops_per_decision": 1.03
+    },
+    "100": {
+      "append_hmac_ops": 2062,
+      "decisions": 2000,
+      "entries": 2062,
+      "keyed_verify_hmac_recomputes": 2062,
+      "keyed_verify_ok": true,
+      "keyed_verify_signature_compares": 2062,
+      "keyless_unchecked_signatures": 2062,
+      "keyless_verify_ok": true,
+      "signing_ops_per_decision": 1.031
+    },
+    "1000": {
+      "append_hmac_ops": 20625,
+      "decisions": 20000,
+      "entries": 20625,
+      "keyed_verify_hmac_recomputes": 20625,
+      "keyed_verify_ok": true,
+      "keyed_verify_signature_compares": 20625,
+      "keyless_unchecked_signatures": 20625,
+      "keyless_verify_ok": true,
+      "signing_ops_per_decision": 1.03125
+    }
+  },
+  "provenance": {
+    "command": "python3 -m fleetgate.audit_signing_cost --seed 7 --out results/527-audit-signing-cost.json",
+    "data_sources": [
+      {
+        "license": "MIT (own code)",
+        "url": "simulated: seeded in-process fleetgate decision stream"
+      }
+    ],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-19T05:16:23Z",
+    "wall_s": 0.823
+  },
+  "signing_ops_per_decision_by_fleet_size": {
+    "10": 1.03,
+    "100": 1.031,
+    "1000": 1.03125
+  }
+}

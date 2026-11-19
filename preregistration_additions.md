@@ -353,3 +353,15 @@ Falsifier: a group-commit flush rate at 512 agents outside 0.003 to 0.005, a per
 Implementation note (written before the run): flushes are counted, not timed. A crash point is a uniformly drawn number of appends k that reached the process; the durable prefix is the entries covered by the last flush at or before k. Because verify_full is O(n), it is run on a seeded sample of crash-truncated logs per policy and fleet size (the sample size is recorded as n_verified), not on all 2000.
 
 Outcome note (written after the run, not part of the pre-registration): the primary metric held. /flush_calls_per_decision/group_commit_largest_fleet was 0.0038871180906475938, inside 0.003 to 0.005; per-append flush was 1.0 with 0.0 entries lost; every-32 was 0.031242711653580037 at 512 agents. verify_full accepted all 140 sampled truncated logs (share 0.0). One falsifier clause was met in a single cell: group commit at 1 agent lost 0.0 entries on average (it equals per-append there), so "mean loss above 0.0 for the other two" held at 8, 64 and 512 agents but not at 1. The design was not changed to fit the result.
+
+## 2026-11-19T05:16:23Z audit-signing-cost proposal:a7e5edf59980f89cbc4f04b2429ce30faf7d8822bb0973ef599b5a9a70a19503
+
+Hypothesis: on seeded SIMULATED logs (seed 7, 20 decisions per agent, fleet sizes 10, 100, 1000, default AuditLog with an HMAC key and checkpoints every 32 entries), HMAC signing operations per appended decision are between 1.0 and 1.1 at every fleet size (one per entry plus one per checkpoint entry), independent of fleet size; keyed verify_full performs one signature comparison per entry; keyless verify_full on the same log accepts it with unchecked_signatures equal to the entry count, so signature coverage is visible only when the key is supplied.
+
+Metric: /signing_ops_per_decision_by_fleet_size/1000. Expected: between 1.0 and 1.1 (range 1.0 to 1.1).
+
+Falsifier: signing ops per decision outside 1.0-1.1 at any fleet size, keyed verification signature checks differing from the entry count, keyless verify_full unchecked_signatures differing from the entry count, or any log failing keyed verify_full.
+
+Implementation note (written before the run): operations are counted, not timed, by wrapping hmac.new and hmac.compare_digest in the audit module for the duration of each phase (append, keyed verify_full, keyless verify_full). Decisions are audit appends of kind gate_verdict; the entry count includes checkpoint entries. Wall time appears only in provenance.
+
+Outcome note (written after the run, not part of the pre-registration): the primary metric held. /signing_ops_per_decision_by_fleet_size/1000 was 1.03125 (20625 HMAC operations for 20000 decisions); it was 1.03 at 10 agents and 1.031 at 100. Keyed verify_full made 20625 signature comparisons for 20625 entries, and keyless verify_full accepted the log with unchecked_signatures of 20625. The design was not changed to fit the result.
