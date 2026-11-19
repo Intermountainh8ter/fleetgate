@@ -407,3 +407,14 @@ Reproduce: `PYTHONPATH=src python3 -m fleetgate.collusion_onset --seed 7 --round
 ### Gate-bypass reconciliation (SIMULATED)
 
 `fleetgate.bypass_reconcile_eval` (result `results/520-bypass-reconcile.json`): with a bypass fraction of 0.2 of executions, `verify_full` and the gate-side decision counter both had a detected share of 0.0 over 990 rounds containing a bypass; reconciling the executor-side execution count against logged ALLOW verdicts had a detected share of 1.0, with a false-flag rate of 0.0 on the 10 rounds without a bypass. In the simulation the reconciliation is only as honest as the executor's own counter.
+
+## Durable-flush policies and crash truncation (simulated)
+
+`PYTHONPATH=src python3 -m fleetgate.flush_policy_eval --seed 7 --ticks 400 --crashes 2000 --out results/524-flush-policy.json`
+replays a seeded decision stream (1, 8, 64 and 512 agents, 400 ticks) through three flush policies and counts flushes,
+not disk time. Source: `results/524-flush-policy.json`. At 512 agents flush calls per decision are 1.0 for per-append
+flush, 0.031242711653580037 for every-32 flush and 0.0038871180906475938 for per-tick group commit; mean entries lost
+per crash are 0.0, 15.56 and 126.387 respectively. At 1 agent group commit degenerates to per-append (1.0 flush per
+decision, 0.0 entries lost). `verify_full` accepted all 140 crash-truncated logs it was run on (chain-only detection
+share 0.0), so truncation shows only against an externally held head count. Simulated; verification ran on a sample of 20
+truncated logs per policy and fleet size, and no real fsync was timed.

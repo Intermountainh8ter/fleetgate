@@ -1,0 +1,178 @@
+{
+  "append_probability": 0.5,
+  "cells": {
+    "1": {
+      "every_32": {
+        "chain_only_detection_share": 0.0,
+        "crashes_with_loss": 1946,
+        "decisions": 181,
+        "flush_calls_per_decision": 0.027624309392265192,
+        "flushes": 5,
+        "max_entries_lost": 31,
+        "mean_entries_lost": 15.336,
+        "n_detected_by_verify_full": 0,
+        "n_verified": 20
+      },
+      "group_commit": {
+        "chain_only_detection_share": null,
+        "crashes_with_loss": 0,
+        "decisions": 181,
+        "flush_calls_per_decision": 1.0,
+        "flushes": 181,
+        "max_entries_lost": 0,
+        "mean_entries_lost": 0.0,
+        "n_detected_by_verify_full": 0,
+        "n_verified": 0
+      },
+      "per_append": {
+        "chain_only_detection_share": null,
+        "crashes_with_loss": 0,
+        "decisions": 181,
+        "flush_calls_per_decision": 1.0,
+        "flushes": 181,
+        "max_entries_lost": 0,
+        "mean_entries_lost": 0.0,
+        "n_detected_by_verify_full": 0,
+        "n_verified": 0
+      }
+    },
+    "512": {
+      "every_32": {
+        "chain_only_detection_share": 0.0,
+        "crashes_with_loss": 1943,
+        "decisions": 102904,
+        "flush_calls_per_decision": 0.031242711653580037,
+        "flushes": 3215,
+        "max_entries_lost": 31,
+        "mean_entries_lost": 15.558,
+        "n_detected_by_verify_full": 0,
+        "n_verified": 20
+      },
+      "group_commit": {
+        "chain_only_detection_share": 0.0,
+        "crashes_with_loss": 1990,
+        "decisions": 102904,
+        "flush_calls_per_decision": 0.0038871180906475938,
+        "flushes": 400,
+        "max_entries_lost": 283,
+        "mean_entries_lost": 126.387,
+        "n_detected_by_verify_full": 0,
+        "n_verified": 20
+      },
+      "per_append": {
+        "chain_only_detection_share": null,
+        "crashes_with_loss": 0,
+        "decisions": 102904,
+        "flush_calls_per_decision": 1.0,
+        "flushes": 102904,
+        "max_entries_lost": 0,
+        "mean_entries_lost": 0.0,
+        "n_detected_by_verify_full": 0,
+        "n_verified": 0
+      }
+    },
+    "64": {
+      "every_32": {
+        "chain_only_detection_share": 0.0,
+        "crashes_with_loss": 1950,
+        "decisions": 12888,
+        "flush_calls_per_decision": 0.031191806331471134,
+        "flushes": 402,
+        "max_entries_lost": 31,
+        "mean_entries_lost": 15.5135,
+        "n_detected_by_verify_full": 0,
+        "n_verified": 20
+      },
+      "group_commit": {
+        "chain_only_detection_share": 0.0,
+        "crashes_with_loss": 1940,
+        "decisions": 12888,
+        "flush_calls_per_decision": 0.031036623215394164,
+        "flushes": 400,
+        "max_entries_lost": 40,
+        "mean_entries_lost": 15.82,
+        "n_detected_by_verify_full": 0,
+        "n_verified": 20
+      },
+      "per_append": {
+        "chain_only_detection_share": null,
+        "crashes_with_loss": 0,
+        "decisions": 12888,
+        "flush_calls_per_decision": 1.0,
+        "flushes": 12888,
+        "max_entries_lost": 0,
+        "mean_entries_lost": 0.0,
+        "n_detected_by_verify_full": 0,
+        "n_verified": 0
+      }
+    },
+    "8": {
+      "every_32": {
+        "chain_only_detection_share": 0.0,
+        "crashes_with_loss": 1943,
+        "decisions": 1579,
+        "flush_calls_per_decision": 0.03103229892336922,
+        "flushes": 49,
+        "max_entries_lost": 31,
+        "mean_entries_lost": 15.648,
+        "n_detected_by_verify_full": 0,
+        "n_verified": 20
+      },
+      "group_commit": {
+        "chain_only_detection_share": 0.0,
+        "crashes_with_loss": 1475,
+        "decisions": 1579,
+        "flush_calls_per_decision": 0.253324889170361,
+        "flushes": 400,
+        "max_entries_lost": 7,
+        "mean_entries_lost": 1.7465,
+        "n_detected_by_verify_full": 0,
+        "n_verified": 20
+      },
+      "per_append": {
+        "chain_only_detection_share": null,
+        "crashes_with_loss": 0,
+        "decisions": 1579,
+        "flush_calls_per_decision": 1.0,
+        "flushes": 1579,
+        "max_entries_lost": 0,
+        "mean_entries_lost": 0.0,
+        "n_detected_by_verify_full": 0,
+        "n_verified": 0
+      }
+    }
+  },
+  "crashes": 2000,
+  "fleets": [
+    1,
+    8,
+    64,
+    512
+  ],
+  "flush_calls_per_decision": {
+    "every_32_largest_fleet": 0.031242711653580037,
+    "group_commit_largest_fleet": 0.0038871180906475938,
+    "per_append_largest_fleet": 1.0
+  },
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.flush_policy_eval --seed 7 --ticks 400 --crashes 2000 --out results/524-flush-policy.json",
+    "data_sources": [
+      {
+        "license": "MIT (repo-internal synthetic data)",
+        "url": "simulated: fleetgate seeded multi-agent decision stream"
+      }
+    ],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-19T05:05:58Z",
+    "wall_s": 17.535
+  },
+  "ticks": 400,
+  "truncation": {
+    "chain_only_detection_share": 0.0,
+    "n_detected_by_verify_full": 0,
+    "n_verified": 140
+  }
+}
