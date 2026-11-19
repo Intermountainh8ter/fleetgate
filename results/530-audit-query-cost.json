@@ -1,0 +1,80 @@
+{
+  "all_record_sets_identical": true,
+  "all_verifications_ok": true,
+  "decisions_per_agent": 20,
+  "fleet_size_ratio_largest_to_smallest": 100.0,
+  "full_scan_records_ratio_largest_to_smallest": 100.12135922330097,
+  "index_to_full_sha256_ratio_largest": 428.57142857142856,
+  "per_fleet_size": {
+    "10": {
+      "entries": 206,
+      "full_ops": 584,
+      "full_verify_ok": true,
+      "identical_record_sets": true,
+      "index_ops_per_query": 135.2,
+      "index_scanned_per_query": 20.0,
+      "proofs_ok": true,
+      "queries": 10
+    },
+    "100": {
+      "entries": 2062,
+      "full_ops": 5968,
+      "full_verify_ok": true,
+      "identical_record_sets": true,
+      "index_ops_per_query": 139.04,
+      "index_scanned_per_query": 20.0,
+      "proofs_ok": true,
+      "queries": 50
+    },
+    "1000": {
+      "entries": 20625,
+      "full_ops": 60000,
+      "full_verify_ok": true,
+      "identical_record_sets": true,
+      "index_ops_per_query": 140.0,
+      "index_scanned_per_query": 20.0,
+      "proofs_ok": true,
+      "queries": 50
+    }
+  },
+  "provenance": {
+    "command": "PYTHONPATH=src python3 -m fleetgate.audit_query_cost --seed 7 --out results/530-audit-query-cost.json",
+    "data_sources": [
+      {
+        "license": "MIT (repository code)",
+        "url": "simulated: seeded in-process audit logs, no external data"
+      }
+    ],
+    "hardware": "x86_64 cpu, python 3.11.2",
+    "seeds": [
+      7
+    ],
+    "started_at": "2026-11-19T05:35:57Z",
+    "wall_s": 0.732
+  },
+  "queries_per_fleet_size": 50,
+  "records_scanned_per_query": {
+    "full_scan": {
+      "10": 206,
+      "100": 2062,
+      "1000": 20625
+    },
+    "index": {
+      "10": 20.0,
+      "100": 20.0,
+      "1000": 20.0
+    }
+  },
+  "sha256_ops_per_query": {
+    "full_scan": {
+      "10": 584,
+      "100": 5968,
+      "1000": 60000
+    },
+    "index": {
+      "10": 135.2,
+      "100": 139.04,
+      "1000": 140.0
+    }
+  }
+}

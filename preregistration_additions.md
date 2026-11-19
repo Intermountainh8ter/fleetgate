@@ -365,3 +365,15 @@ Falsifier: signing ops per decision outside 1.0-1.1 at any fleet size, keyed ver
 Implementation note (written before the run): operations are counted, not timed, by wrapping hmac.new and hmac.compare_digest in the audit module for the duration of each phase (append, keyed verify_full, keyless verify_full). Decisions are audit appends of kind gate_verdict; the entry count includes checkpoint entries. Wall time appears only in provenance.
 
 Outcome note (written after the run, not part of the pre-registration): the primary metric held. /signing_ops_per_decision_by_fleet_size/1000 was 1.03125 (20625 HMAC operations for 20000 decisions); it was 1.03 at 10 agents and 1.031 at 100. Keyed verify_full made 20625 signature comparisons for 20625 entries, and keyless verify_full accepted the log with unchecked_signatures of 20625. The design was not changed to fit the result.
+
+## 2026-11-19T05:34:52Z audit-query-cost proposal:8c4a32ed8d4afc59bdbf3991e386d77def76f24483edb90f9874b84c5e6bd6c1
+
+Hypothesis: retry of 528. On seeded SIMULATED audit logs (seed 7, 20 decisions per agent, fleet sizes 10, 100 and 1000, default AuditLog checkpoint cadence), answering one per-agent query by a verified full-chain scan scans at least 20000 records at 1000 agents and its records-scanned count grows linearly with fleet size, while a per-agent index scans exactly 20 records per query at every fleet size and needs at least 50 times fewer SHA-256 operations per query than the full scan at 1000 agents; both methods return the identical record set for every queried agent.
+
+Metric: /records_scanned_per_query/full_scan/1000. Expected: at least 20000 (range 20000 to 30000); index records scanned equals 20 at every fleet size.
+
+Falsifier: full-scan records scanned below 20000 at 1000 agents, index records scanned other than 20 at any fleet size, index-to-full SHA-256 ratio below 50 at 1000 agents, or any queried agent returning different record sets from the two methods.
+
+Implementation note (written before the run): counts only, no wall-clock. Full scan is verify_full over the whole log plus a filter on agent; its SHA-256 count is measured with the counting hashlib wrapper from audit_suffix. The index arm looks up the agent's entry positions and verifies each record with the Merkle-proof reconstruction from audit_fleet_cost (prover trees warmed outside the count). Each agent submits exactly 20 decisions in seeded shuffled order; a seeded sample of queried agents is used per fleet size.
+
+Outcome note (written after the run, not part of the pre-registration): the primary metric held. /records_scanned_per_query/full_scan/1000 was 20625; the index arm scanned 20.0 records per query at 10, 100 and 1000 agents. Full scan used 60000 SHA-256 operations per query at 1000 agents against 140.0 for the index arm (ratio 428.57142857142856). Both methods returned identical record sets for every queried agent and all verifications passed. The design was not changed to fit the result.

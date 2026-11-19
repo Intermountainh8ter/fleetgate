@@ -422,3 +422,7 @@ truncated logs per policy and fleet size, and no real fsync was timed.
 ### Audit signing cost (SIMULATED)
 
 `python3 -m fleetgate.audit_signing_cost --seed 7 --out results/527-audit-signing-cost.json` counts HMAC operations, not time. At 1000 agents with 20 decisions each, signing took 1.03125 operations per decision (20625 operations for 20000 decisions, the extra ones being checkpoint entries). Keyed `verify_full` made 20625 signature comparisons; keyless `verify_full` accepted the same log with 20625 unchecked signatures.
+
+### Per-agent audit query cost (simulated, iteration 530)
+
+Counts only, from `results/530-audit-query-cost.json` (seed 7, 20 decisions per agent, 50 queried agents per fleet size). At 1000 agents a verified full-chain scan reads 20625 records and uses 60000 SHA-256 operations per query; a per-agent index plus Merkle-proof verification reads 20.0 records and uses 140.0 operations, and both return identical record sets. Full-scan records grow 100.12135922330097 times from 10 to 1000 agents. Simulated logs; no wall-clock claim. Reproduce: `PYTHONPATH=src python3 -m fleetgate.audit_query_cost --seed 7 --out results/530-audit-query-cost.json`.
